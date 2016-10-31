@@ -9,7 +9,7 @@ else ifeq ($(STM),LOCKFREE)
 else
   BINS = $(BINDIR)/$(STM)-linkedlist
 endif
-CFLAGS += -std=gnu89
+CFLAGS += -std=gnu89 -L ../../../../../ThreadScan -lthreadscan
 
 .PHONY:	all clean
 

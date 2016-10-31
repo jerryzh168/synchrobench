@@ -11,7 +11,7 @@ else
 endif
 
 LLREP = $(ROOT)/src/linkedlists/lockfree-list
-CFLAGS += -std=gnu89
+CFLAGS += -std=gnu89 -L ../../../../../ThreadScan -lthreadscan
 
 .PHONY:	all clean
 

@@ -24,7 +24,7 @@
  */
 
 #include "harris.h"
-
+#include <threadscan.h>
 /*
  * The five following functions handle the low-order mark bit that indicates
  * whether a node is logically deleted (1) or not (0).
@@ -159,6 +159,7 @@ int harris_delete(intset_t *set, val_t val) {
 	} while(1);
 	if (!ATOMIC_CAS_MB(&left_node->next, right_node, right_node_next))
 		right_node = harris_search(set, right_node->val, &left_node);
+	threadscan_collect(right_node);
 	return 1;
 }
 
