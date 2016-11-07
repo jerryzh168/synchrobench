@@ -80,8 +80,8 @@ int set_size(intset_t *set);
 node_t* LFRCPass(node_t *v);
 void LFRCDestroy(node_t *v);
 long add_to_rc(node_t *v, int val);
-void LFRCStore(std::atomic<node_t *> A, node_t *v);
-void LFRCStoreAlloc(std::atomic<node_t *> A, node_t *v);
-void LFRCCopy(std::atomic<node_t *>v, node_t *w);
+//void LFRCStore(std::atomic<node_t *> A, node_t *v);
+void LFRCStoreAlloc(std::atomic<node_t *> &A, node_t *v);
+void LFRCCopy(std::atomic<node_t *> &v, node_t *w);
 //bool LFRCDCAS(node_t **A0, node_t **A1, node_t *old0, node_t *old1, node_t *new0, node_t *new1);
 

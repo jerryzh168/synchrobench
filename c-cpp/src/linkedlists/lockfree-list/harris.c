@@ -70,7 +70,7 @@ node_t *harris_search(intset_t *set, val_t val, node_t **left_node) {
 search_again:
 	do {
 		node_t *t = set->head;
-		node_t *t_next = set->head->next;
+		node_t *t_next = set->head.load()->next;
 		
 		/* Find left_node and right_node */
 		do {

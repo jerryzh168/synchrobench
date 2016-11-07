@@ -39,9 +39,10 @@ intset_t *set_new()
     perror("malloc");
     exit(1);
   }
-  LFRCStoreAlloc(max, new_node(VAL_MAX, NULL, 0));
+  //  LFRCStoreAlloc(max, std::atomic<node_t *>(new_node(VAL_MAX, NULL, 0)));  
+  LFRCStoreAlloc(max, new_node(VAL_MAX, NULL, 0)); // node_t *
   LFRCStoreAlloc(min, new_node(VAL_MIN, max.load(), 0));
-  LFRCCopy(set->head, min);
+  LFRCCopy(set->head, min.load());
 
   return set;
 }
@@ -66,7 +67,7 @@ int set_size(intset_t *set)
 
   /* We have at least 2 elements */
   //node = set->head->next;
-  LFRCCopy(node, set->head->next);
+  LFRCCopy(node, set->head.load()->next);
   while (node.load()->next != NULL) {
     size++;
     //node = node->next;
@@ -112,7 +113,7 @@ long add_to_rc(node_t *v, int val) {
   long oldrc;
   while (true) {
     oldrc = v->rc;
-    if (v->rc.atomic_compare_exchange_strong(oldrc, oldrc+val))
+    if (v->rc.compare_exchange_strong(oldrc, oldrc+val))
       return oldrc;
   }
 }
@@ -129,18 +130,18 @@ long add_to_rc(node_t *v, int val) {
 /*   } */
 /* } */
 
-void LFRCStoreAlloc(std::atomic<node_t *> A, node_t *v) {
+void LFRCStoreAlloc(std::atomic<node_t *> &A, node_t *v) {
   node_t *oldval;
   while (true) {
     oldval = A.load();
-    if (A.atomic_compare_exchange_strong(oldval, v)) {
+    if (A.compare_exchange_strong(oldval, v)) {
       LFRCDestroy(oldval);
       return;
     }
   }
 }
 
-void LFRCCopy(std::atomic<node_t *>v, node_t *w) {
+void LFRCCopy(std::atomic<node_t *> &v, node_t *w) {
   node_t *oldv = v.load();
   if (w != NULL) add_to_rc(w,1);
   v.store(w);
