@@ -9,7 +9,8 @@ else ifeq ($(STM),LOCKFREE)
 else
   BINS = $(BINDIR)/$(STM)-linkedlist
 endif
-CFLAGS += -std=gnu89
+CXXFLAGS = $(CFLAGS)
+#CFLAGS += -std=gnu89
 CXXFLAGS += -std=c++11
 
 .PHONY:	all clean
