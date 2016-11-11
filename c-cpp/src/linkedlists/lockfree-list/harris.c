@@ -63,41 +63,56 @@ inline long get_marked_ref(long w) {
  * Encountered nodes that are marked as logically deleted are physically removed
  * from the list, yet not garbage collected.
  */
-node_t *harris_search(intset_t *set, val_t val, node_t **left_node) {
-	node_t *left_node_next, *right_node;
-	left_node_next = set->head;
+node_t *harris_search(intset_t *set, val_t val, std::atomic<node_t *>&left_node) {
+  std::atomic<node_t *> left_node_next, right_node;
+  //left_node_next = set->head;
+  LFRCCopy(left_node_next, set->head.load());
 	
 search_again:
 	do {
-		node_t *t = set->head;
-		node_t *t_next = set->head.load()->next;
+	  //node_t *t = set->head;
+	  std::atomic<node_t *>t;
+	  LFRCCopy(t, set->head.load());
+	  //node_t *t_next = set->head->next;
+	  std::atomic<node_t *>t_next;
+	  LFRCCopy(t_next, set->head.load()->next.load());
 		
 		/* Find left_node and right_node */
 		do {
-			if (!is_marked_ref((long) t_next)) {
-				(*left_node) = t;
-				left_node_next = t_next;
+		  // if (!is_marked_ref((long) t_next)) {
+		  if (!is_marked_ref((long) t_next.load())) {
+			  //(*left_node) = t;
+			  LFRCStore(left_node, t.load());
+			  //left_node_next = t_next;
+			  LFRCStore(left_node_next, t_next.load());
 			}
-			t = (node_t *) get_unmarked_ref((long) t_next);
-			if (!t->next) break;
-			t_next = t->next;
-		} while (is_marked_ref((long) t_next) || (t->val < val));
-		right_node = t;
+			//t = (node_t *) get_unmarked_ref((long) t_next);
+		  LFRCStore(t, (node_t *)get_unmarked_ref((long)t_next.load()));
+			//if (!t->next) break;
+		  if (!t.load()->next.load()) break;
+			//t_next = t->next;
+		  LFRCCopy(t_next, t.load()->next.load());
+			//} while (is_marked_ref((long) t_next) || (t->val < val));
+		} while (is_marked_ref((long)t_next.load() || (t.load()->val < val)));
+		//right_node = t;
+		LFRCCopy(right_node, t.load());
 		
 		/* Check that nodes are adjacent */
-		if (left_node_next == right_node) {
-			if (right_node->next && is_marked_ref((long) right_node->next))
-				goto search_again;
-			else return right_node;
+		//if (left_node_next == right_node) {
+		if (left_node_next.load() == right_node.load()) {
+		  // if (right_node->next && is_marked_ref((long) right_node->next))
+		  if (right_node.load()->next.load() && is_marked_ref((long) right_node.load()->next.load()))
+		    goto search_again;
+		  else return right_node.load();
 		}
 		
 		/* Remove one or more marked nodes */
-		if (ATOMIC_CAS_MB(&(*left_node)->next, 
-						  left_node_next, 
-						  right_node)) {
-			if (right_node->next && is_marked_ref((long) right_node->next))
-				goto search_again;
-			else return right_node;
+		//if (ATOMIC_CAS_MB(&(*left_node)->next, left_node_next, right_node)) {
+		if (LFRCCAS(left_node.load()->next, left_node_next.load(), right_node.load())) {
+		  //if (right_node->next && is_marked_ref((long) right_node->next))
+		  if (right_node.load()->next.load() && is_marked_ref((long) right_node.load()->next.load()))		  
+		    goto search_again;
+		  else return right_node;
 		} 
 		
 	} while (1);
@@ -107,11 +122,16 @@ search_again:
  * harris_find returns whether there is a node in the list owning value val.
  */
 int harris_find(intset_t *set, val_t val) {
-	node_t *right_node, *left_node;
-	left_node = set->head;
+  //node_t *right_node, *left_node;
+  std::atomic<node_t *> left_node;
+  node_t *right_node;
+  //left_node = set->head;
+  LFRCCopy(left_node, set->head.load());
 	
-	right_node = harris_search(set, val, &left_node);
-	if ((!right_node->next) || right_node->val != val)
+  //	right_node = harris_search(set, val, &left_node);
+  right_node = harris_search(set, val, left_node);
+  //	if ((!right_node->next) || right_node->val != val)
+  if ((!right_node->next) || right_node->val != val)
 		return 0;
 	else 
 		return 1;
@@ -122,19 +142,24 @@ int harris_find(intset_t *set, val_t val) {
  * (if the value was absent) or does nothing (if the value is already present).
  */
 int harris_insert(intset_t *set, val_t val) {
-	node_t *newnode, *right_node, *left_node;
-	left_node = set->head;
+  //node_t *newnode, *right_node, *left_node;
+  std::atomic<node_t *>newnode, left_node;
+  node_t *right_node;
+  //left_node = set->head;
+  LFRCCopy(left_node, set->head.load());
 	
-	do {
-		right_node = harris_search(set, val, &left_node);
-		if (right_node->val == val)
-			return 0;
-		newnode = new_node(val, right_node, 0);
-		/* mem-bar between node creation and insertion */
-		AO_nop_full(); 
-		if (ATOMIC_CAS_MB(&left_node->next, right_node, newnode))
-			return 1;
-	} while(1);
+  do {
+    //right_node = harris_search(set, val, &left_node);
+    right_node = harris_search(set, val, left_node);
+    if (right_node->val == val)
+      return 0;
+    LFRCStoreAlloc(newnode, new_node(val, right_node, 0));
+    /* mem-bar between node creation and insertion */
+    AO_nop_full(); 
+    //if (ATOMIC_CAS_MB(&left_node->next, right_node, newnode))
+    if (LFRCCAS(left_node.load()->next, right_node, newnode.load()))
+      return 1;
+  } while(1);
 }
 
 /*
@@ -143,23 +168,30 @@ int harris_insert(intset_t *set, val_t val) {
  * The deletion is logical and consists of setting the node mark bit to 1.
  */
 int harris_delete(intset_t *set, val_t val) {
-	node_t *right_node, *right_node_next, *left_node;
-	left_node = set->head;
-	
-	do {
-		right_node = harris_search(set, val, &left_node);
-		if (right_node->val != val)
-			return 0;
-		right_node_next = right_node->next;
-		if (!is_marked_ref((long) right_node_next))
-			if (ATOMIC_CAS_MB(&right_node->next, 
-							  right_node_next, 
-							  get_marked_ref((long) right_node_next)))
+  //node_t *right_node, *right_node_next, *left_node;
+  std::atomic<node_t *> right_node_next, left_node;
+  node_t *right_node;
+  //left_node = set->head;
+  LFRCCopy(left_node, set->head.load());
+  do {
+    //right_node = harris_search(set, val, &left_node);
+    right_node = harris_search(set, val, left_node);
+    //if (right_node->val != val)
+    if (right_node->val != val)
+      return 0;
+    //right_node_next = right_node->next;
+    LFRCCopy(right_node_next, right_node->next);
+    //if (!is_marked_ref((long) right_node_next))
+    if (!is_marked_ref((long) right_node_next.load()))
+      //if (ATOMIC_CAS_MB(&right_node->next, right_node_next, get_marked_ref((long) right_node_next)))
+      if (LFRCCAS(right_node->next, right_node_next.load(), (node_t *)get_marked_ref((long) right_node_next.load())))
 				break;
 	} while(1);
-	if (!ATOMIC_CAS_MB(&left_node->next, right_node, right_node_next))
-		right_node = harris_search(set, right_node->val, &left_node);
-	return 1;
+  //if (!ATOMIC_CAS_MB(&left_node->next, right_node, right_node_next))
+  if (!LFRCCAS(left_node.load()->next, right_node, right_node_next.load()))
+    //right_node = harris_search(set, right_node->val, &left_node);
+    right_node = harris_search(set, right_node->val, left_node);
+  return 1;
 }
 
 

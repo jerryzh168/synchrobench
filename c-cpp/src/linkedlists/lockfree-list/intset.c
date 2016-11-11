@@ -26,8 +26,8 @@ int set_contains(intset_t *set, val_t val, int transactional)
 	prev = set->head;
 	next = prev->next;
 	while (next->val < val) {
-		prev = next;
-		next = prev->next;
+	  prev = next;
+	  next = prev->next;
 	}
 	result = (next->val == val);
 

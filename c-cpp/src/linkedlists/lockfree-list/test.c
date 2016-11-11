@@ -132,7 +132,6 @@ void *test(void *data) {
 	
 	/* Is the first op an update? */
 	unext = (rand_range_re(&d->seed, 100) - 1 < d->update);
-	
 #ifdef ICC 
 	while (stop == 0) {
 #else
@@ -144,10 +143,12 @@ void *test(void *data) {
 			if (last < 0) { // add
 		
 				val = rand_range_re(&d->seed, d->range);
+				printf("Before set_add\n");
 				if (set_add(d->set, val, TRANSACTIONAL)) {
 					d->nb_added++;
 					last = val;
-				} 				
+				}
+				printf("After set add\n");
 				d->nb_add++;
 				
 			} else { // remove
@@ -437,6 +438,7 @@ int main(int argc, char **argv) {
 		data[i].set = set;
 		data[i].barrier = &barrier;
 		data[i].failures_because_contention = 0;
+		printf("Before pthread_create\n");
 		if (pthread_create(&threads[i], &attr, test, (void *)(&data[i])) != 0) {
 			fprintf(stderr, "Error creating thread\n");
 			exit(1);

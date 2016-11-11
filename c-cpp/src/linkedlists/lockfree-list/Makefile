@@ -11,7 +11,7 @@ else
 endif
 CXXFLAGS = $(CFLAGS)
 #CFLAGS += -std=gnu89
-CXXFLAGS += -std=c++11
+CXXFLAGS += -std=c++11 -mcx16 -g -O3
 
 .PHONY:	all clean
 

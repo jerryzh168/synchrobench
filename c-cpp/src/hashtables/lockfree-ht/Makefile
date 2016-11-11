@@ -13,7 +13,7 @@ endif
 LLREP = $(ROOT)/src/linkedlists/lockfree-list
 #CFLAGS += -std=gnu89
 CXXFLAGS = $(CFLAGS)
-CXXFLAGS += -std=c++11
+CXXFLAGS += -std=c++11 -mcx16 -g
 
 .PHONY:	all clean
 
