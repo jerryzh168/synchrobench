@@ -191,7 +191,7 @@ void *test(void *data) {
 					}
 				}
 			}	else val = rand_range_re(&d->seed, d->range);
-			
+			printf("Before set_contains\n");
 			if (set_contains(d->set, val, TRANSACTIONAL)) 
 				d->nb_found++;
 			d->nb_contains++;

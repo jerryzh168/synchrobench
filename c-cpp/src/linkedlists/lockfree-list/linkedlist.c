@@ -41,7 +41,7 @@ intset_t *set_new()
   }
   //  LFRCStoreAlloc(max, std::atomic<node_t *>(new_node(VAL_MAX, NULL, 0)));  
   LFRCStoreAlloc(max, new_node(VAL_MAX, NULL, 0)); // node_t *
-  LFRCStoreAlloc(min, new_node(VAL_MIN, max.load(), 0));
+  LFRCStoreAlloc(min, new_node(VAL_MIN, LFRCPass(max.load()), 0));
   LFRCCopy(set->head, min.load());
 
   return set;
@@ -103,9 +103,10 @@ node_t* LFRCPass(node_t *v) {
 }
 
 void LFRCDestroy(node_t *v) {
-  printf("%p\n", v);
   if(v != NULL && add_to_rc(v, -1) == 1) {
-    LFRCDestroy(v->next.load());
+    node_t *next = v->next.load();
+    printf("From LFRCDestroy %p\n", next);    
+    LFRCDestroy(next);
     free(v);
   }
 }
@@ -125,6 +126,7 @@ void LFRCStore(std::atomic<node_t *>&A, node_t *v) {
   while (true) {
     oldval = A.load();
     if (A.compare_exchange_strong(oldval, v)) {
+      printf("From LFRCStore %p\n", oldval);
       LFRCDestroy(oldval);
       return;
     }
@@ -136,6 +138,7 @@ void LFRCStoreAlloc(std::atomic<node_t *> &A, node_t *v) {
   while (true) {
     oldval = A.load();
     if (A.compare_exchange_strong(oldval, v)) {
+      printf("From LFRCStoreAlloc %p\n", oldval);      
       LFRCDestroy(oldval);
       return;
     }
@@ -146,14 +149,17 @@ void LFRCCopy(std::atomic<node_t *> &v, node_t *w) {
   node_t *oldv = v.load();
   if (w != NULL) add_to_rc(w,1);
   v.store(w);
+  printf("From LFRCCopy %p\n", oldv);  
   LFRCDestroy(oldv);
 }
 bool LFRCCAS(std::atomic<node_t *> &A0, node_t *old, node_t *newv) {
   if (newv != NULL) add_to_rc(newv, 1);
   if(A0.compare_exchange_strong(old, newv)) {
+    printf("From LFRCCAS %p\n", old);    
     LFRCDestroy(old);
     return true;
   } else {
+    printf("From LFRCCAS %p\n", old);    
     LFRCDestroy(newv);
     return false;
   }
