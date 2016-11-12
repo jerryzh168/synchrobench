@@ -49,7 +49,7 @@ intset_t *set_new()
 
 void set_delete(intset_t *set)
 {
-  std::atomic<node_t *> node, next;
+  std::atomic<node_t *> node({nullptr}), next({nullptr});
 
   LFRCCopy(node, set->head);
   while (node.load() != NULL) {
@@ -63,7 +63,7 @@ void set_delete(intset_t *set)
 int set_size(intset_t *set)
 {
   int size = 0;
-  std::atomic<node_t *>node;
+  std::atomic<node_t *>node({nullptr});
 
   /* We have at least 2 elements */
   //node = set->head->next;
@@ -105,7 +105,9 @@ node_t* LFRCPass(node_t *v) {
 void LFRCDestroy(node_t *v) {
   if(v != NULL && add_to_rc(v, -1) == 1) {
     node_t *next = v->next.load();
-    printf("From LFRCDestroy %p\n", next);    
+    #ifdef DEBUG
+    printf("From LFRCDestroy %p\n", next);
+    #endif
     LFRCDestroy(next);
     free(v);
   }
@@ -126,7 +128,9 @@ void LFRCStore(std::atomic<node_t *>&A, node_t *v) {
   while (true) {
     oldval = A.load();
     if (A.compare_exchange_strong(oldval, v)) {
+      #ifdef DEBUG
       printf("From LFRCStore %p\n", oldval);
+      #endif
       LFRCDestroy(oldval);
       return;
     }
@@ -138,7 +142,9 @@ void LFRCStoreAlloc(std::atomic<node_t *> &A, node_t *v) {
   while (true) {
     oldval = A.load();
     if (A.compare_exchange_strong(oldval, v)) {
-      printf("From LFRCStoreAlloc %p\n", oldval);      
+      #ifdef DEBUG
+      printf("From LFRCStoreAlloc %p\n", oldval);
+      #endif
       LFRCDestroy(oldval);
       return;
     }
@@ -149,17 +155,17 @@ void LFRCCopy(std::atomic<node_t *> &v, node_t *w) {
   node_t *oldv = v.load();
   if (w != NULL) add_to_rc(w,1);
   v.store(w);
-  printf("From LFRCCopy %p\n", oldv);  
+#ifdef DEBUG  
+  printf("From LFRCCopy %p\n", oldv);
+  #endif
   LFRCDestroy(oldv);
 }
 bool LFRCCAS(std::atomic<node_t *> &A0, node_t *old, node_t *newv) {
   if (newv != NULL) add_to_rc(newv, 1);
   if(A0.compare_exchange_strong(old, newv)) {
-    printf("From LFRCCAS %p\n", old);    
     LFRCDestroy(old);
     return true;
   } else {
-    printf("From LFRCCAS %p\n", old);    
     LFRCDestroy(newv);
     return false;
   }

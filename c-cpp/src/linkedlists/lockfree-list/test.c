@@ -143,12 +143,10 @@ void *test(void *data) {
 			if (last < 0) { // add
 		
 				val = rand_range_re(&d->seed, d->range);
-				printf("Before set_add\n");
 				if (set_add(d->set, val, TRANSACTIONAL)) {
 					d->nb_added++;
 					last = val;
 				}
-				printf("After set add\n");
 				d->nb_add++;
 				
 			} else { // remove
@@ -191,7 +189,9 @@ void *test(void *data) {
 					}
 				}
 			}	else val = rand_range_re(&d->seed, d->range);
+			#ifdef DEBUG
 			printf("Before set_contains\n");
+			#endif
 			if (set_contains(d->set, val, TRANSACTIONAL)) 
 				d->nb_found++;
 			d->nb_contains++;
@@ -404,8 +404,12 @@ int main(int argc, char **argv) {
 			i++;
 		}
 	}
+	#ifdef DEBUG
+	printf("Before set size\n");
+	#endif
 	size = set_size(set);
 	printf("Set size     : %d\n", size);
+
 	
 	/* Access set from all threads */
 	barrier_init(&barrier, nb_threads + 1);
@@ -438,7 +442,6 @@ int main(int argc, char **argv) {
 		data[i].set = set;
 		data[i].barrier = &barrier;
 		data[i].failures_because_contention = 0;
-		printf("Before pthread_create\n");
 		if (pthread_create(&threads[i], &attr, test, (void *)(&data[i])) != 0) {
 			fprintf(stderr, "Error creating thread\n");
 			exit(1);

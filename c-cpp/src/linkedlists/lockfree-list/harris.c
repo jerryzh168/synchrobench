@@ -64,17 +64,17 @@ inline long get_marked_ref(long w) {
  * from the list, yet not garbage collected.
  */
 node_t *harris_search(intset_t *set, val_t val, std::atomic<node_t *>&left_node) {
-  std::atomic<node_t *> left_node_next, right_node;
+  std::atomic<node_t *> left_node_next({nullptr}), right_node({nullptr});
   //left_node_next = set->head;
   LFRCCopy(left_node_next, set->head.load());
 	
 search_again:
 	do {
 	  //node_t *t = set->head;
-	  std::atomic<node_t *>t;
+	  std::atomic<node_t *>t({nullptr});
 	  LFRCCopy(t, set->head.load());
 	  //node_t *t_next = set->head->next;
-	  std::atomic<node_t *>t_next;
+	  std::atomic<node_t *>t_next({nullptr});
 	  LFRCCopy(t_next, set->head.load()->next.load());
 		
 		/* Find left_node and right_node */
@@ -123,18 +123,26 @@ search_again:
  */
 int harris_find(intset_t *set, val_t val) {
   //node_t *right_node, *left_node;
+  #ifdef DEBUG
   printf("--------------------Entering harris_find------------------\n");
+  #endif
   std::atomic<node_t *> left_node({nullptr});
   node_t *right_node;
   //left_node = set->head;
+#ifdef DEBUG  
   printf("Before LFRCCopy, left_node(%d), second(%d)\n", left_node.load(), set->head.load());
+  #endif
   LFRCCopy(left_node, set->head.load());
 	
   //	right_node = harris_search(set, val, &left_node);
-  printf("Before harris_search\n");  
+#ifdef DEBUG
+  printf("Before harris_search\n");
+#endif
   right_node = harris_search(set, val, left_node);
   //	if ((!right_node->next) || right_node->val != val)
-  printf("------------------Exiting harris_find---------------\n");  
+#ifdef DEBUG  
+  printf("------------------Exiting harris_find---------------\n");
+#endif
   if ((!right_node->next) || right_node->val != val)
 		return 0;
 	else 
@@ -147,7 +155,7 @@ int harris_find(intset_t *set, val_t val) {
  */
 int harris_insert(intset_t *set, val_t val) {
   //node_t *newnode, *right_node, *left_node;
-  std::atomic<node_t *>newnode, left_node;
+  std::atomic<node_t *>newnode({nullptr}), left_node({nullptr});
   node_t *right_node;
   //left_node = set->head;
   LFRCCopy(left_node, set->head.load());
@@ -173,7 +181,7 @@ int harris_insert(intset_t *set, val_t val) {
  */
 int harris_delete(intset_t *set, val_t val) {
   //node_t *right_node, *right_node_next, *left_node;
-  std::atomic<node_t *> right_node_next, left_node;
+  std::atomic<node_t *> right_node_next({nullptr}), left_node({nullptr});
   node_t *right_node;
   //left_node = set->head;
   LFRCCopy(left_node, set->head.load());
