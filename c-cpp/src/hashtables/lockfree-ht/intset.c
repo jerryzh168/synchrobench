@@ -151,7 +151,7 @@ int ht_move_naive(ht_intset_t *set, int val1, int val2, int transactional) {
 	}
 
 #elif defined LOCKFREE /* No CAS-based implementation is provided */
-
+	
 	printf("ht_snapshot: No other implementation of atomic snapshot is available\n");
 	exit(1);
 
