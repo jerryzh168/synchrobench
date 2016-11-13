@@ -22,6 +22,7 @@
 #include <atomic>
 
 #include "tm.h"
+#include "list.h"
 
 #ifdef DEBUG
 #define IO_FLUSH                        fflush(NULL)
@@ -42,6 +43,7 @@
 #define STR(s)                          #s
 
 #define ATOMIC_CAS_MB(a, e, v)          (AO_compare_and_swap_full((volatile AO_t *)(a), (AO_t)(e), (AO_t)(v)))
+#define ATOMIC_TAS(a) 			(AO_test_and_set((volatile AO_t *)(a)))
 
 static volatile AO_t stop;
 
@@ -51,38 +53,19 @@ typedef intptr_t val_t;
 #define VAL_MIN                         INT_MIN
 #define VAL_MAX                         INT_MAX
 
-/* struct node_t; */
+typedef struct node {
+	val_t val;
+	list_t r_entry;
+	struct node *next;
+} node_t;
 
-/* struct ref_t { */
-/*   node_t *next; */
-/*   long rc; */
-/* }; */
-
-struct node_t {
-  //std::atomic<ref_t> ref;
-  val_t val;
-  std::atomic<node_t *>next;
-  std::atomic<long> rc;
-};
-
-
-struct intset_t {
-  std::atomic<node_t *> head;
-};
+typedef struct intset {
+	node_t *head;
+	char padding[CACHE_LINE_SIZE - sizeof(node_t*)];
+} intset_t;
 
 node_t *new_node(val_t val, node_t *next, int transactional);
 intset_t *set_new();
 void set_delete(intset_t *set);
 int set_size(intset_t *set);
-
-// LFRC
-//void LFRCLoad(node_t **dest, node_t **A);
-node_t* LFRCPass(node_t *v);
-void LFRCDestroy(node_t *v);
-long add_to_rc(node_t *v, int val);
-void LFRCStore(std::atomic<node_t *> &A, node_t *v);
-void LFRCStoreAlloc(std::atomic<node_t *> &A, node_t *v);
-void LFRCCopy(std::atomic<node_t *> &v, node_t *w);
-bool LFRCCAS(std::atomic<node_t *> &A0, node_t *old, node_t *newv);
-//bool LFRCDCAS(node_t **A0, node_t **A1, node_t *old0, node_t *old1, node_t *new0, node_t *new1);
 
