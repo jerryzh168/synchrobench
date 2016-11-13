@@ -21,6 +21,7 @@
 #include <atomic_ops.h>
 
 #include "tm.h"
+#include "list.h"
 
 #ifdef DEBUG
 #define IO_FLUSH                        fflush(NULL)
@@ -41,6 +42,7 @@
 #define STR(s)                          #s
 
 #define ATOMIC_CAS_MB(a, e, v)          (AO_compare_and_swap_full((volatile AO_t *)(a), (AO_t)(e), (AO_t)(v)))
+#define ATOMIC_TAS(a) 			(AO_test_and_set((volatile AO_t *)(a)))
 
 static volatile AO_t stop;
 
@@ -52,11 +54,13 @@ typedef intptr_t val_t;
 
 typedef struct node {
 	val_t val;
+	list_t r_entry;
 	struct node *next;
 } node_t;
 
 typedef struct intset {
 	node_t *head;
+	char padding[CACHE_LINE_SIZE - sizeof(struct node_t*)];
 } intset_t;
 
 node_t *new_node(val_t val, node_t *next, int transactional);
