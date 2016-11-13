@@ -19,7 +19,6 @@
 #include <stdint.h>
 
 #include <atomic_ops.h>
-#include <atomic>
 
 #include "tm.h"
 #include "list.h"
@@ -53,6 +52,7 @@ typedef intptr_t val_t;
 #define VAL_MIN                         INT_MIN
 #define VAL_MAX                         INT_MAX
 
+#define CACHE_LINE_SIZE 		64
 typedef struct node {
 	val_t val;
 	list_t r_entry;
@@ -68,4 +68,3 @@ node_t *new_node(val_t val, node_t *next, int transactional);
 intset_t *set_new();
 void set_delete(intset_t *set);
 int set_size(intset_t *set);
-
