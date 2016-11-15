@@ -49,7 +49,7 @@ int ht_size(ht_intset_t *set) {
 	int i;
 	
 	for (i=0; i < maxhtlength; i++) {
-	  node = set->buckets[i]->head.load()->next;
+		node = set->buckets[i]->head->next;
 		while (node->next) {
 			size++;
 			node = node->next;

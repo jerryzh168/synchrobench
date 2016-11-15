@@ -6,14 +6,15 @@
 
 typedef struct hp{
 	node_t *ptr;
-	char padding[CACHE_LINE_SIZE - sizeof(NodeType_t)];	
+	char padding[CACHE_LINE_SIZE - sizeof(node_t)];	
 }HP_t;
 
+#define K 2
 
-HP_t *HP;
+extern HP_t *HP;
 
 class HPRecType_t{
-	HPRecType_t *Next;
+	public:
 	int Active;
 	list_t rlist;
 	int rcount;
@@ -23,28 +24,29 @@ class HPRecType_t{
 	node_t *cur;
 	node_t *next;
 	int tid;
-	HPRecType_t(int maxThreadcount, void (*lamda)(node_t*), int idx){
+	void init(int maxThreadcount, void (*lamda)(node_t*), int idx){
 		Active = true;
 		rcount = 0;
-		for( int i = 0; i < K ; i++)
-			HP[i] = NULL;
-		Next = NULL;
 		list_init(&rlist);
 		plist = new node_t*[maxThreadcount*K];
 		free_node = lamda;
-		prev = cur = next = NULL;
+		prev = NULL;
+		cur = next = NULL;
 		tid = idx;
 	}
-
+		
+	
 };
-
-HPRecType_t *HeadHPRec = NULL;
-int H = 0;
-int maxThreadCount;
-void allocate_hprec(HPRecType_t **myhprec);
-void retire_hprec(HPRecType_t *myhprec);
-void retire_node(node_t *node, HPRecType_t *myhprec);
-void scan(HPRecType_t *head, HPRecType_t *myhprec);
-void help_scan(HPRectType_t *myhprec);
+void hp_init_global(int thread_cnt);
+extern __thread HPRecType_t thread_local_hpr;
+//HPRecType_t *HeadHPRec = NULL;
+extern int maxThreadCount;
+#define H maxThreadCount*K 
+#define R(H) ((H)*2 + 100)
+//void allocate_hprec(HPRecType_t **myhprec);
+//void retire_hprec(HPRecType_t *myhprec);
+void retire_node(node_t *node);
+void scan(HPRecType_t *myhprec);
+//void help_scan(HPRecType_t *myhprec);
 #endif
 

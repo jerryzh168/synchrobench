@@ -10,7 +10,7 @@
  */
 
 /* Public APIs */
-#include <list.h>
+#include "list.h"
 #include <stddef.h> /* NULL */
 
 /**
@@ -42,6 +42,8 @@ void list_init(list_ptr head) {
 list_ptr list_remv(list_ptr entry) {
   entry->prev->next = entry->next;
   entry->next->prev = entry->prev;
+  entry->next = entry;
+  entry->prev = entry;
   return entry;
 }
 

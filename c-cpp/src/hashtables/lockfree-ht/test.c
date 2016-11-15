@@ -22,7 +22,7 @@
  */
 
 #include "intset.h"
-
+#include "../../linkedlists/lockfree-list/hprectype.h"
 /* Hashtable length (# of buckets) */
 unsigned int maxhtlength;
 
@@ -100,6 +100,7 @@ inline long rand_range_re(unsigned int *seed, long r) {
 
 typedef struct thread_data {
   val_t first;
+	int idx;
 	long range;
 	int update;
 	int move;
@@ -135,14 +136,16 @@ typedef struct thread_data {
 	unsigned long failures_because_contention;
 } thread_data_t;
 
-
+void free_node(node_t *n){
+	free((void *)n);
+}
 void *test(void *data) {
 	int val2, numtx, r, last = -1;
 	val_t val = 0;
 	int unext, mnext, cnext;
 	
 	thread_data_t *d = (thread_data_t *)data;
-	
+	thread_local_hpr.init(DEFAULT_NB_THREADS, free_node, d->idx);
 	/* Create transaction */
 	TM_THREAD_ENTER();
 	/* Wait on barrier */
@@ -581,6 +584,7 @@ int main(int argc, char **argv)
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	for (i = 0; i < nb_threads; i++) {
 		printf("Creating thread %d\n", i);
+		data[i].idx = i;
 		data[i].first = last;
 		data[i].range = range;
 		data[i].update = update;

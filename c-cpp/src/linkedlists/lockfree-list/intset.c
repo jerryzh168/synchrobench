@@ -26,8 +26,8 @@ int set_contains(intset_t *set, val_t val, int transactional)
 	prev = set->head;
 	next = prev->next;
 	while (next->val < val) {
-	  prev = next;
-	  next = prev->next;
+		prev = next;
+		next = prev->next;
 	}
 	result = (next->val == val);
 
@@ -69,10 +69,7 @@ int set_contains(intset_t *set, val_t val, int transactional)
 	}
 
 
-#elif defined LOCKFREE
-	#ifdef DEBUG
-	printf("Before harris_find\n");
-	#endif
+#elif defined LOCKFREE			
 	result = harris_find(set, val);
 #endif	
 	
@@ -82,31 +79,18 @@ int set_contains(intset_t *set, val_t val, int transactional)
 inline int set_seq_add(intset_t *set, val_t val)
 {
 	int result;
-	//node_t *prev, *next;
-	std::atomic<node_t *>prev({nullptr}), next({nullptr});
-	//prev = set->head;
-	#ifdef DEBUG
-	printf("---------------Entering set_seq_add--------------\n");
-	#endif
-	LFRCCopy(prev, set->head.load());
-	//next = prev->next;
-	LFRCCopy(next, prev.load()->next.load());
-	//while (next->val < val) {
-	while (next.load()->val < val) {
-	  //prev = next;
-	  LFRCCopy(prev, next.load());
-	  //next = prev->next;
-	  LFRCCopy(next, prev.load()->next.load());
+	node_t *prev, *next;
+	
+	prev = set->head;
+	next = prev->next;
+	while (next->val < val) {
+		prev = next;
+		next = prev->next;
 	}
-	//result = (next->val != val);
-	result = (next.load()->val != val);	
+	result = (next->val != val);
 	if (result) {
-	  //prev->next = new_node(val, next, 0);
-	  LFRCCopy(prev.load()->next, new_node(val, LFRCPass(next.load()), 0)); 
+		prev->next = new_node(val, next, 0);
 	}
-	#ifdef DEBUG
-	printf("---------------Exiting set_seq_add--------------\n");
-	#endif
 	return result;
 }	
 		
@@ -117,24 +101,21 @@ int set_add(intset_t *set, val_t val, int transactional)
 	
 #ifdef DEBUG
 	printf("++> set_add(%d)\n", (int)val);
-	printf("transactiona(%d)\n", transactional);
 	IO_FLUSH;
 #endif
 
 	if (!transactional) {
-	  #ifdef DEBUG
-	  printf("Calling set_seq_add\n");
-	  #endif
-	  result = set_seq_add(set, val);
-          #ifdef DEBUG
-		printf("Returned from set_seq_add\n");
-          #endif
+		
+		result = set_seq_add(set, val);
+		
 	} else { 
 	
 #ifdef SEQUENTIAL /* Unprotected */
+		
 		result = set_seq_add(set, val);
 		
 #elif defined STM
+	
 		node_t *prev, *next;
 		val_t v;	
 	
@@ -177,16 +158,11 @@ int set_add(intset_t *set, val_t val, int transactional)
 		}
 
 #elif defined LOCKFREE
-		#ifdef DEBUG
-		printf("Calling harris_insert\n");
-		#endif
 		result = harris_insert(set, val);
 #endif
 		
 	}
-#ifdef DEBUG	
-	printf("Returned from set add\n");
-#endif
+	
 	return result;
 }
 
