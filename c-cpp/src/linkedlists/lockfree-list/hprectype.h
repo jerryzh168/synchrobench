@@ -1,6 +1,6 @@
 #ifndef _HPRECTYPE_H_
 #define _HPRECTYPE_H_
-
+#include <iostream>
 #include "list.h"
 #include "harris.h"
 

@@ -534,7 +534,7 @@ int main(int argc, char **argv)
 				 (int)sizeof(long),
 				 (int)sizeof(void *),
 				 (int)sizeof(uintptr_t));
-	
+	hp_init_global(nb_threads);
 	timeout.tv_sec = duration / 1000;
 	timeout.tv_nsec = (duration % 1000) * 1000000;
 	
