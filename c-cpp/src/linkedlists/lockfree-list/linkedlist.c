@@ -10,15 +10,19 @@
 
 #include <atomic>
 #include "linkedlist.h"
+#include <stdlib.h>
+
+#define CACHELINE_SIZE 64
 
 node_t *new_node(val_t val, node_t *next, int transactional)
 {
   node_t *node;
 
   if (transactional) {
-    node = (node_t *)MALLOC(sizeof(node_t));
+    //node = (node_t *)MALLOC(sizeof(node_t));
+    node = (node_t *)aligned_alloc(CACHELINE_SIZE, sizeof(node_t));    
   } else {
-    node = (node_t *)malloc(sizeof(node_t));
+    node = (node_t *)aligned_alloc(CACHELINE_SIZE, sizeof(node_t));
   }
   if (node == NULL) {
 	perror("malloc");
