@@ -65,9 +65,9 @@
  *
  *
  */
-#define OFFSETOF(type, member)  ((unsigned int) (&((type *)0)->member))
+#define OFFSETOF(type, member)  ((char *) (&((type *)0)->member))
 #define LIST_ENTRY(entry_ptr, type, member) \
-  ((entry_ptr) ? ((type *) ((char *) (entry_ptr) - OFFSETOF(type, member))): 0)
+  (((type *) ((char *) (entry_ptr) - OFFSETOF(type, member))))
 #define NEXT(list_ptr) ((list_ptr)->next)
 #define PREV(list_ptr) ((list_ptr)->prev)
 typedef struct _list *list_ptr;
