@@ -18,6 +18,7 @@ void hp_init_global(int thread_cnt){
 void retire_node(node_t *node){
 	list_add_head(&thread_local_hpr.rlist, &node->r_entry);
 	thread_local_hpr.rcount++;
+	//std::cout<<"rcount is "<<thread_local_hpr.rcount<<std::endl;
 	if(thread_local_hpr.rcount >= R(H)){
 		scan(&thread_local_hpr);
 		//help_scan(myprec);	
@@ -51,7 +52,8 @@ void scan(HPRecType_t *myhprec){
 		if(std::binary_search(plist, plist + cnt, node)){
 			list_add_head(&myhprec->rlist, &node->r_entry);
 			myhprec->rcount++;
-		}else{
+		}else{	
+		//	std::cout<<myhprec->tid<<":free node "<<node<<std::endl;
 			myhprec->free_node(node);
 		}
 		entry = list_remv_head(&tmplist);

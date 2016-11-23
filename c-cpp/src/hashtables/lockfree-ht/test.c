@@ -101,6 +101,7 @@ inline long rand_range_re(unsigned int *seed, long r) {
 typedef struct thread_data {
   val_t first;
 	int idx;
+	int nb_threads;
 	long range;
 	int update;
 	int move;
@@ -145,7 +146,7 @@ void *test(void *data) {
 	int unext, mnext, cnext;
 	
 	thread_data_t *d = (thread_data_t *)data;
-	thread_local_hpr.init(DEFAULT_NB_THREADS, free_node, d->idx);
+	thread_local_hpr.init(d->nb_threads, free_node, d->idx);
 	/* Create transaction */
 	TM_THREAD_ENTER();
 	/* Wait on barrier */
@@ -587,6 +588,7 @@ int main(int argc, char **argv)
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	for (i = 0; i < nb_threads; i++) {
 		printf("Creating thread %d\n", i);
+		data[i].nb_threads = nb_threads;
 		data[i].idx = i;
 		data[i].first = last;
 		data[i].range = range;

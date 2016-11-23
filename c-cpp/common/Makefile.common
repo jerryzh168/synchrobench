@@ -211,7 +211,7 @@ endif
 CFLAGS += -D_REENTRANT
 #CFLAGS += -Wall
 CFLAGS += -fno-strict-aliasing
-CFLAGS += -I$(LIBAO_INC) -I$(ROOT)/include
+CFLAGS += -I$(LIBAO_INC) -I$(ROOT)/include 
 
 #LDFLAGS += -L$(LIBAO)/lib -latomic_ops 
 LDFLAGS += -lpthread

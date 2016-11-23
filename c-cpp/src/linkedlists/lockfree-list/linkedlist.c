@@ -7,9 +7,9 @@
  *  Copyright 2009 __MyCompanyName__. All rights reserved.
  *
  */
-
+#include <iostream>
 #include "linkedlist.h"
-
+#include "list.h"
 node_t *new_node(val_t val, node_t *next, int transactional)
 {
   node_t *node;
@@ -23,10 +23,10 @@ node_t *new_node(val_t val, node_t *next, int transactional)
 	perror("malloc");
 	exit(1);
   }
-
+  //std::cout <<"alloc node "<<node<<std::endl;
   node->val = val;
   node->next = next;
-
+  list_init(&node->r_entry);
   return node;
 }
 
