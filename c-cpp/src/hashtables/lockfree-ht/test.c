@@ -227,7 +227,7 @@ void *test(void *data) {
 						}
 					}
 	      }	else val = rand_range_re(&d->seed, d->range);
-				
+			
 	      if (ht_contains(d->set, val, TRANSACTIONAL)) 
 					d->nb_found++;
 	      d->nb_contains++;
@@ -366,9 +366,9 @@ int main(int argc, char **argv)
 		// These options don't set a flag
 		{"help",                      no_argument,       NULL, 'h'},
 		{"duration",                  required_argument, NULL, 'd'},
-		{"initial-size",              required_argument, NULL, 'i'},
+		{"size",      		      required_argument, NULL, 'i'},
 		{"thread-num",                required_argument, NULL, 't'},
-		{"range",                     required_argument, NULL, 'r'},
+//		{"range",                     required_argument, NULL, 'r'},
 		{"seed",                      required_argument, NULL, 'S'},
 		{"update-rate",               required_argument, NULL, 'u'},
 		{"move-rate",                 required_argument, NULL, 'a'},
@@ -395,7 +395,9 @@ int main(int argc, char **argv)
 	int duration = DEFAULT_DURATION;
 	int initial = DEFAULT_INITIAL;
 	int nb_threads = DEFAULT_NB_THREADS;
-	long range = DEFAULT_RANGE;
+//	long range = DEFAULT_RANGE;
+	long range = initial*2;
+
 	int seed = DEFAULT_SEED;
 	int update = DEFAULT_UPDATE;
 	int load_factor = DEFAULT_LOAD;
@@ -436,12 +438,12 @@ int main(int argc, char **argv)
 								 "        update txs must effectively write (0=trial, 1=effective, default=" XSTR(DEFAULT_EFFECTIVE) ")\n"
 								 "  -d, --duration <int>\n"
 								 "        Test duration in milliseconds (0=infinite, default=" XSTR(DEFAULT_DURATION) ")\n"
-								 "  -i, --initial-size <int>\n"
+								 "  -i, --size <int>\n"
 								 "        Number of elements to insert before test (default=" XSTR(DEFAULT_INITIAL) ")\n"
 								 "  -t, --thread-num <int>\n"
 								 "        Number of threads (default=" XSTR(DEFAULT_NB_THREADS) ")\n"
-								 "  -r, --range <int>\n"
-								 "        Range of integer values inserted in set (default=" XSTR(DEFAULT_RANGE) ")\n"
+//								 "  -r, --range <int>\n"
+//								 "        Range of integer values inserted in set (default=" XSTR(DEFAULT_RANGE) ")\n"
 								 "  -S, --seed <int>\n"
 								 "        RNG seed (0=time-based, default=" XSTR(DEFAULT_SEED) ")\n"
 								 "  -u, --update-rate <int>\n"
@@ -473,13 +475,14 @@ int main(int argc, char **argv)
 					break;
 				case 'i':
 					initial = atoi(optarg);
+					range = initial*2;
 					break;
 				case 't':
 					nb_threads = atoi(optarg);
 					break;
-				case 'r':
-					range = atol(optarg);
-					break;
+//				case 'r':
+//					range = atol(optarg);
+//					break;
 				case 'S':
 					seed = atoi(optarg);
 					break;
