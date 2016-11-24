@@ -29,7 +29,7 @@ class HPRecType_t{
 		rcount = 0;
 		list_init(&rlist);
 
-		plist = (node_t**)malloc((maxThreadcount*K + 1)*sizeof(node_t*));
+		plist = (node_t**)malloc((maxThreadcount*K)*sizeof(node_t*));
 		free_node = lamda;
 		prev = NULL;
 		cur = next = NULL;

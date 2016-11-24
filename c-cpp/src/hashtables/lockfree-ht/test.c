@@ -22,6 +22,7 @@
  */
 
 #include "intset.h"
+#include <unistd.h>
 #include "../../linkedlists/lockfree-list/hprectype.h"
 /* Hashtable length (# of buckets) */
 unsigned int maxhtlength;
@@ -40,6 +41,8 @@ typedef struct barrier {
 	int crossing;
 } barrier_t;
 
+#define DEFAULT_PROFILE_RATE 10    //in ms
+int nb_threads = 0;
 
 void barrier_init(barrier_t *b, int n)
 {
@@ -245,9 +248,10 @@ void *test(void *data) {
 	  /* Is the next op an update, a move, a contains? */
 	  if (d->effective) { // a failed remove/add is a read-only tx
 	    numtx = d->nb_contains + d->nb_add + d->nb_remove + d->nb_move + d->nb_snapshot;
-	    unext = ((100.0 * (d->nb_added + d->nb_removed + d->nb_moved)) < (d->update * numtx));
-	    mnext = ((100.0 * d->nb_moved) < (d->move * numtx));
-	    cnext = !((100.0 * d->nb_snapshoted) < (d->snapshot * numtx)); 
+	    unext = ((100 * (d->nb_added + d->nb_removed + d->nb_moved)) < (d->update * numtx));
+	    //std::cout <<   (d->nb_added + d->nb_removed + d->nb_moved)<<":"<<d->update*numtx<<std::endl;
+	    mnext = ((100 * d->nb_moved) < (d->move * numtx));
+	    cnext = !((100 * d->nb_snapshoted) < (d->snapshot * numtx)); 
 	  } else { // remove/add (even failed) is considered as an update
 	    r = rand_range_re(&d->seed, 100) - 1;
 	    unext = (r < d->update);
@@ -361,6 +365,16 @@ void print_ht(ht_intset_t *set) {
 	}
 }
 
+int greater_and_sub(int *sum_time, int delta){
+	if(*sum_time >= delta){	
+		*sum_time -= delta;
+		return 1;
+	}else{
+		return -1;
+	}
+}
+
+
 int main(int argc, char **argv)
 {
 	struct option long_options[] = {
@@ -375,6 +389,7 @@ int main(int argc, char **argv)
 		{"move-rate",                 required_argument, NULL, 'a'},
 		{"snapshot-rate",             required_argument, NULL, 's'},
 		{"elasticity",                required_argument, NULL, 'x'},
+		{"profile", 		      required_argument, NULL, 'p'},
 		{NULL, 0, NULL, 0}
 	};
 	
@@ -393,9 +408,10 @@ int main(int argc, char **argv)
 	barrier_t barrier;
 	struct timeval start, end;
 	struct timespec timeout;
+	struct timespec accounting_timeout;
 	int duration = DEFAULT_DURATION;
 	int initial = DEFAULT_INITIAL;
-	int nb_threads = DEFAULT_NB_THREADS;
+	nb_threads = DEFAULT_NB_THREADS;
 //	long range = DEFAULT_RANGE;
 	long range = initial*2;
 
@@ -407,6 +423,7 @@ int main(int argc, char **argv)
 	int unit_tx = DEFAULT_ELASTICITY;
 	int alternate = DEFAULT_ALTERNATE;
 	int effective = DEFAULT_EFFECTIVE;
+	unsigned int profile_rate = DEFAULT_PROFILE_RATE;
 	sigset_t block_set;
 	
 	while(1) {
@@ -463,6 +480,8 @@ int main(int argc, char **argv)
 								 "        3 = read/add elastic-tx,\n"
 								 "        4 = read/add/rem elastic-tx,\n"
 								 "        5 = elastic-tx w/ optimized move.\n"
+								 "  -p, --profile rate(default=10ms)\n"
+								 "	 Profiling rate in milliseconds"
 								 );
 					exit(0);
 				case 'A':
@@ -502,6 +521,8 @@ int main(int argc, char **argv)
 				case 'x':
 					unit_tx = atoi(optarg);
 					break;
+				case 'p':
+					profile_rate = atoi(optarg);
 				case '?':
 					printf("Use -h or --help for help\n");
 					exit(0);
@@ -533,6 +554,7 @@ int main(int argc, char **argv)
 	printf("Elasticity   : %d\n", unit_tx);
 	printf("Alternate    : %d\n", alternate);	
 	printf("Effective    : %d\n", effective);
+	printf("profile	     : %d ms\n", profile_rate);
 	printf("Type sizes   : int=%d/long=%d/ptr=%d/word=%d\n",
 				 (int)sizeof(int),
 				 (int)sizeof(long),
@@ -541,6 +563,8 @@ int main(int argc, char **argv)
 	hp_init_global(nb_threads);
 	timeout.tv_sec = duration / 1000;
 	timeout.tv_nsec = (duration % 1000) * 1000000;
+	accounting_timeout.tv_sec = profile_rate/1000;
+	accounting_timeout.tv_nsec = (profile_rate % 1000) *1000000;
 	
 	if ((data = (thread_data_t *)malloc(nb_threads * sizeof(thread_data_t))) == NULL) {
 		perror("malloc");
@@ -631,11 +655,29 @@ int main(int argc, char **argv)
 	
 	// Start threads 
 	barrier_cross(&barrier);
-	
+	/* install alarm signal */
 	printf("STARTING...\n");
 	gettimeofday(&start, NULL);
 	if (duration > 0) {
+		int last_sum = 0;
+		while(greater_and_sub(&duration, profile_rate) > 0){	
+			nanosleep(&accounting_timeout, NULL);
+			int reads = 0;
+			int updates = 0;
+			int snapshots = 0;
+			for(int i = 0 ; i < nb_threads;i++){
+				reads += data[i].nb_contains;
+				snapshots += data[i].nb_snapshot;
+				updates += (data[i].nb_add + data[i].nb_remove + data[i].nb_move);
+			}
+		//	std::cout << reads+updates+snapshots - last_sum <<std::endl;
+			//std::cout << duration<<":"<<profile_rate<<std::endl;
+			last_sum = reads + updates + snapshots;
+		}
+		timeout.tv_sec = duration/1000;
+		timeout.tv_nsec = (duration % 1000) * 1000000;
 		nanosleep(&timeout, NULL);
+		//usleep(duration);
 	} else {
 		sigemptyset(&block_set);
 		sigsuspend(&block_set);
