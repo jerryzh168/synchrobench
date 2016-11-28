@@ -23,6 +23,7 @@
 
 #include "intset.h"
 #include <unistd.h>
+#include <hwloc.h>
 #include "../../linkedlists/lockfree-list/hprectype.h"
 /* Hashtable length (# of buckets) */
 unsigned int maxhtlength;
@@ -105,6 +106,8 @@ typedef struct thread_data {
   val_t first;
 	int idx;
 	int nb_threads;
+	hwloc_obj_t topo_root;
+	int topo_pu_num;
 	long range;
 	int update;
 	int move;
@@ -140,9 +143,36 @@ typedef struct thread_data {
 	unsigned long failures_because_contention;
 } thread_data_t;
 
+static int locate_pu_affinity_helper(hwloc_obj_t root, int *child_found, int idx){
+	if(root->type == HWLOC_OBJ_PU){
+		int found = (*child_found)++;
+		if(found == idx){
+			return root->os_index;
+		}else{
+			return -1;
+		}
+
+	}else{
+		int ret = -1;
+		for(auto i = 0; i < root->arity; i++){
+			ret = locate_pu_affinity_helper(root->children[i], child_found, idx);
+			if(ret != -1)
+				return ret;
+		}
+
+		return -1;
+	}
+}
+static int locate_pu_affinity(hwloc_obj_t root, int num_pu, int idx){
+	idx = idx % num_pu;
+	int child_found = 0;
+	return locate_pu_affinity_helper(root, &child_found, idx);	
+}
+
 void free_node(node_t *n){
 	free((void *)n);
 }
+
 void *test(void *data) {
 	int val2, numtx, r, last = -1;
 	val_t val = 0;
@@ -150,6 +180,14 @@ void *test(void *data) {
 	
 	thread_data_t *d = (thread_data_t *)data;
 	thread_local_hpr.init(d->nb_threads, free_node, d->idx);
+	int physical_idx = locate_pu_affinity(d->topo_root, d->topo_pu_num, d->idx);
+	/* set affinity according to topology */
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	CPU_SET(physical_idx, &cpuset);
+	int ret = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+	if(ret != 0)
+		throw "set affinity fail\n";
 	/* Create transaction */
 	TM_THREAD_ENTER();
 	/* Wait on barrier */
@@ -271,7 +309,7 @@ void *test(void *data) {
 	return NULL;
 }
 
-
+#if 0
 void *test2(void *data)
 {
 	int val, newval, last, flag = 1;
@@ -343,7 +381,7 @@ void *test2(void *data)
 	TM_THREAD_EXIT();
 	return NULL;
 }
-
+#endif
 void print_set(intset_t *set) {
 	node_t *curr, *tmp;
 	
@@ -374,6 +412,18 @@ int greater_and_sub(int *sum_time, int delta){
 	}
 }
 
+static int sum_pu_num_under(hwloc_obj_t root){
+	if(root->type == HWLOC_OBJ_PU)
+		return 1;
+	else{
+		int sum = 0;
+		for(int i = 0; i < root->arity; i++){
+			sum += sum_pu_num_under(root->children[i]);
+		}
+		return sum;
+	}
+
+}
 
 int main(int argc, char **argv)
 {
@@ -390,6 +440,8 @@ int main(int argc, char **argv)
 		{"snapshot-rate",             required_argument, NULL, 's'},
 		{"elasticity",                required_argument, NULL, 'x'},
 		{"profile", 		      required_argument, NULL, 'p'},
+		{"topology-level",	      required_argument, NULL, 'L'},
+		{"topology-number", 	      required_argument, NULL, 'n'},
 		{NULL, 0, NULL, 0}
 	};
 	
@@ -414,6 +466,8 @@ int main(int argc, char **argv)
 	nb_threads = DEFAULT_NB_THREADS;
 //	long range = DEFAULT_RANGE;
 	long range = initial*2;
+	int topo_level = 0;
+	int topo_num = 0;
 
 	int seed = DEFAULT_SEED;
 	int update = DEFAULT_UPDATE;
@@ -428,7 +482,7 @@ int main(int argc, char **argv)
 	
 	while(1) {
 		i = 0;
-		c = getopt_long(argc, argv, "hAf:d:i:t:r:S:u:a:s:l:x:", long_options, &i);
+		c = getopt_long(argc, argv, "hAf:d:i:t:r:S:u:a:s:l:x:p:L:n:", long_options, &i);
 		
 		if(c == -1)
 			break;
@@ -481,7 +535,11 @@ int main(int argc, char **argv)
 								 "        4 = read/add/rem elastic-tx,\n"
 								 "        5 = elastic-tx w/ optimized move.\n"
 								 "  -p, --profile rate(default=10ms)\n"
-								 "	 Profiling rate in milliseconds"
+								 "        Profiling rate in milliseconds\n"
+								 "  -L, --topology\n"									
+								 "        Topology level to start placing threads for locality test\n"
+								 "  -n, --object number on the topology level\n"
+								 "        Object number on the topology level to place threads, default = 0\n"
 								 );
 					exit(0);
 				case 'A':
@@ -523,6 +581,13 @@ int main(int argc, char **argv)
 					break;
 				case 'p':
 					profile_rate = atoi(optarg);
+					break;
+				case 'L':
+					topo_level = atoi(optarg);
+					break;
+				case 'n':
+					topo_num = atoi(optarg);
+					break;
 				case '?':
 					printf("Use -h or --help for help\n");
 					exit(0);
@@ -530,7 +595,15 @@ int main(int argc, char **argv)
 					exit(1);
 		}
 	}
-	
+	hwloc_topology_t topology;
+	hwloc_topology_init(&topology);
+	hwloc_topology_load(topology);	
+	if(topo_num >= hwloc_get_nbobjs_by_depth(topology, topo_level))
+		throw std::invalid_argument("invalid topology num relative to level");
+	hwloc_obj_t topo_start_parent = hwloc_get_obj_by_depth(topology, topo_level, topo_num);
+	assert(topo_start_parent != NULL);
+	int topo_pu_num = sum_pu_num_under(topo_start_parent);
+	assert(topo_pu_num >= 1);
 	assert(duration >= 0);
 	assert(initial >= 0);
 	assert(nb_threads > 0);
@@ -554,7 +627,7 @@ int main(int argc, char **argv)
 	printf("Elasticity   : %d\n", unit_tx);
 	printf("Alternate    : %d\n", alternate);	
 	printf("Effective    : %d\n", effective);
-	printf("profile	     : %d ms\n", profile_rate);
+	printf("Profile	     : %d ms\n", profile_rate);
 	printf("Type sizes   : int=%d/long=%d/ptr=%d/word=%d\n",
 				 (int)sizeof(int),
 				 (int)sizeof(long),
@@ -614,6 +687,8 @@ int main(int argc, char **argv)
 		printf("Creating thread %d\n", i);
 		data[i].nb_threads = nb_threads;
 		data[i].idx = i;
+		data[i].topo_root = topo_start_parent;
+		data[i].topo_pu_num = topo_pu_num;
 		data[i].first = last;
 		data[i].range = range;
 		data[i].update = update;
