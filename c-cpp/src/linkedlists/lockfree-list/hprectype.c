@@ -53,7 +53,6 @@ void scan(HPRecType_t *myhprec){
 			list_add_head(&myhprec->rlist, &node->r_entry);
 			myhprec->rcount++;
 		}else{	
-		//	std::cout<<myhprec->tid<<":free node "<<node<<std::endl;
 			myhprec->free_node(node);
 		}
 		entry = list_remv_head(&tmplist);

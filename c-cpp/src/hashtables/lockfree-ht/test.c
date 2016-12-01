@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <hwloc.h>
 #include "../../linkedlists/lockfree-list/hprectype.h"
+#include "../../linkedlists/lockfree-list/linkedlist.h"
 /* Hashtable length (# of buckets) */
 unsigned int maxhtlength;
 
@@ -163,14 +164,29 @@ static int locate_pu_affinity_helper(hwloc_obj_t root, int *child_found, int idx
 		return -1;
 	}
 }
+
+
+
 static int locate_pu_affinity(hwloc_obj_t root, int num_pu, int idx){
 	idx = idx % num_pu;
 	int child_found = 0;
 	return locate_pu_affinity_helper(root, &child_found, idx);	
 }
 
+struct malloc_list{
+	int nb_malloc;
+	char padding[CACHE_LINE_SIZE - sizeof(int)];
+} *malloc_list;
+
 void free_node(node_t *n){
 	free((void *)n);
+	malloc_list[thread_local_hpr.tid].nb_malloc--;
+}
+
+void *malloc_node(unsigned int size){
+	void *ret = malloc(size);
+	malloc_list[thread_local_hpr.tid].nb_malloc++;
+	return ret;
 }
 
 void *test(void *data) {
@@ -179,7 +195,7 @@ void *test(void *data) {
 	int unext, mnext, cnext;
 	
 	thread_data_t *d = (thread_data_t *)data;
-	thread_local_hpr.init(d->nb_threads, free_node, d->idx);
+	thread_local_hpr.init(d->nb_threads, free_node, malloc_node, d->idx);
 	int physical_idx = locate_pu_affinity(d->topo_root, d->topo_pu_num, d->idx);
 	/* set affinity according to topology */
 	cpu_set_t cpuset;
@@ -647,7 +663,13 @@ int main(int argc, char **argv)
 		perror("malloc");
 		exit(1);
 	}
-	
+	if ((malloc_list = (struct malloc_list *)aligned_alloc(CACHE_LINE_SIZE, nb_threads*sizeof(struct malloc_list))) == NULL)
+	{	
+		perror("aligned alloc");
+		exit(1);
+	}
+	memset(malloc_list, 0, nb_threads*sizeof(struct malloc_list));
+
 	if (seed == 0)
 		srand((int)time(0));
 	else
@@ -740,12 +762,15 @@ int main(int argc, char **argv)
 			int reads = 0;
 			int updates = 0;
 			int snapshots = 0;
+			int memory_use = 0;
 			for(int i = 0 ; i < nb_threads;i++){
 				reads += data[i].nb_contains;
 				snapshots += data[i].nb_snapshot;
 				updates += (data[i].nb_add + data[i].nb_remove + data[i].nb_move);
+				memory_use += malloc_list[i].nb_malloc;
 			}
 		//	std::cout << reads+updates+snapshots - last_sum <<std::endl;
+			//std::cout <<memory_use<<std::endl;
 			//std::cout << duration<<":"<<profile_rate<<std::endl;
 			last_sum = reads + updates + snapshots;
 		}
