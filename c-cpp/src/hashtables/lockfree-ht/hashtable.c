@@ -34,7 +34,7 @@ void ht_delete(ht_intset_t *set) {
     node = set->buckets[i]->head;
     while (node != NULL) {
       next = node->next;
-      free(node);
+      //free(node); // TODO
       node = next;
     }
     free(set->buckets[i]);

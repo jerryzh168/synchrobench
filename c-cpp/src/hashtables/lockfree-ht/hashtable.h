@@ -21,7 +21,7 @@
  * GNU General Public License for more details.
  */
 
-#include "../../linkedlists/lockfree-list/intset.h"
+#include "../../linkedlists/linkedlist-harris-qsense/intset.h"
 
 #define DEFAULT_MOVE                    0
 #define DEFAULT_SNAPSHOT                0

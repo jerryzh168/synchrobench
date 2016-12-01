@@ -15,6 +15,7 @@ LLREP = $(ROOT)/src/linkedlists/lockfree-list
 
 CXXFLAGS = $(CFLAGS)
 CXXFLAGS += -std=c++11 -mcx16
+# -DPLATFORM_MCORE
 
 .PHONY:	all clean
 
