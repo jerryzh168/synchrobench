@@ -14,8 +14,9 @@ LLREP = $(ROOT)/src/linkedlists/lockfree-list
 # CFLAGS += -std=gnu89
 CXXFLAGS = $(CFLAGS)
 CXXFLAGS += -std=c++11 -mcx16 -O3
-CXXFLAGS += $(pkg-config --cflags hwloc)
-LDLIBS += $(pkg-config --libs hwloc)
+# CXXFLAGS += $(pkg-config --cflags hwloc)
+# LDLIBS += $(pkg-config --libs hwloc)
+# Need to add export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib to your .bashrc
 
 .PHONY:	all clean
 
@@ -37,10 +38,10 @@ intset.o: $(LLREP)/linkedlist.h harris.o hashtable.o
 	$(CXX) $(CXXFLAGS) -c -o $(BUILDIR)/intset.o intset.c
 
 test.o: linkedlist.o harris.o intset.o hashtable.o intset.o
-	$(CXX) $(CXXFLAGS) -c -o $(BUILDIR)/test.o test.c
+	$(CXX) $(CXXFLAGS) -c -o $(BUILDIR)/test.o test.c -I/usr/local/include -L/usr/local/lib -lhwloc
 
 main: linkedlist.o harris.o intset.o hashtable.o intset.o test.o 
-	$(CXX) $(CXXFLAGS) $(BUILDIR)/linkedlist.o $(BUILDIR)/harris.o $(BUILDIR)/ll-intset.o $(BUILDIR)/hashtable.o $(BUILDIR)/intset.o $(BUILDIR)/test.o -o $(BINS) $(LDFLAGS) $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(BUILDIR)/linkedlist.o $(BUILDIR)/harris.o $(BUILDIR)/ll-intset.o $(BUILDIR)/hashtable.o $(BUILDIR)/intset.o $(BUILDIR)/test.o -o $(BINS) $(LDFLAGS) -I/usr/local/include -L/usr/local/lib -lhwloc
 
 clean:
 	-rm -f $(BINS)
