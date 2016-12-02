@@ -1,6 +1,6 @@
 #/bin/sh
 
-threads=(1 2 4 8 16 20 32)
+threads=(1 2 4 8)
 
 touch result
 for i in "${threads[@]}"
