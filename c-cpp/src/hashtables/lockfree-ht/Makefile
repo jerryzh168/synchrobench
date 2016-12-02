@@ -11,9 +11,10 @@ else
 endif
 
 LLREP = $(ROOT)/src/linkedlists/lockfree-list
-#CFLAGS += -std=gnu89
+# CFLAGS += -std=gnu89
 CXXFLAGS = $(CFLAGS)
-CXXFLAGS += -std=c++11 -mcx16 -g
+CXXFLAGS += -std=c++11 -mcx16 -O3
+# Need to add export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib to your .bashrc
 
 .PHONY:	all clean
 
