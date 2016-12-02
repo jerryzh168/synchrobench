@@ -204,7 +204,7 @@ void *test(void *data) {
 	/* set affinity according to topology */
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
-	CPU_SET(physical_idx, &cpuset);
+	CPU_SET(physical_idx * 2, &cpuset);
 	int ret = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
 	if(ret != 0)
 		throw "set affinity fail\n";
@@ -753,6 +753,7 @@ int main(int argc, char **argv)
 		}
 	}
 	pthread_attr_destroy(&attr);
+
 	
 	// Start threads 
 	barrier_cross(&barrier);
