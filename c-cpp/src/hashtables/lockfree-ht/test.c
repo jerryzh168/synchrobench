@@ -175,6 +175,7 @@ static int locate_pu_affinity(hwloc_obj_t root, int num_pu, int idx){
 		if(root->type == HWLOC_OBJ_PU)
 			return root->os_index;
 		int i = idx % root->arity;
+		idx = idx / root->arity;
 		root = root->children[i];
 	}
 }
@@ -207,6 +208,7 @@ void *test(void *data) {
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
 	CPU_SET(physical_idx, &cpuset);
+	//std::cout <<"thread "<<d->idx<<" on core "<<physical_idx<<std::endl;
 	int ret = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
 	if(ret != 0)
 		throw "set affinity fail\n";
