@@ -84,9 +84,7 @@ ht_intset_t *ht_new() {
 	exit(1);
 	}  
 	for (i=0; i < maxhtlength; i++) {
-	  printf("set new %d\n", i);
 		set->buckets[i] = set_new();
 	}
-	printf("----------2\n");	
 	return set;
 }

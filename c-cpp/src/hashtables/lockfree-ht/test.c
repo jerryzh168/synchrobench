@@ -681,9 +681,7 @@ int main(int argc, char **argv)
 		srand(seed);
 	
 	maxhtlength = (unsigned int) initial / load_factor;
-	printf("Before ht_new\n");
 	set = ht_new();
-	printf("After ht_new\n");	
 	stop = 0;
 	
 	// Init STM 
