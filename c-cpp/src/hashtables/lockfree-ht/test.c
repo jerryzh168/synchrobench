@@ -172,9 +172,15 @@ static int locate_pu_affinity_helper(hwloc_obj_t root, int *child_found, int idx
 
 
 static int locate_pu_affinity(hwloc_obj_t root, int num_pu, int idx){
-	idx = idx % num_pu;
-	int child_found = 0;
-	return locate_pu_affinity_helper(root, &child_found, idx);	
+	/* idx = idx % num_pu; */
+	/* int child_found = 0; */
+	/* return locate_pu_affinity_helper(root, &child_found, idx);	 */
+	while(1){
+	  if(root->type == HWLOC_OBJ_PU)
+	    return root->os_index;
+	  int i = idx % root->arity;
+	  root = root->children[i];
+	}
 }
 
 struct malloc_list{
@@ -204,7 +210,7 @@ void *test(void *data) {
 	/* set affinity according to topology */
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
-	CPU_SET(physical_idx * 2, &cpuset);
+	CPU_SET(physical_idx, &cpuset);
 	int ret = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
 	if(ret != 0)
 		throw "set affinity fail\n";
