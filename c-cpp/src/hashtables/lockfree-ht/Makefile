@@ -11,32 +11,36 @@ else
 endif
 
 LLREP = $(ROOT)/src/linkedlists/lockfree-list
-CFLAGS += -std=gnu89
+# CFLAGS += -std=gnu89
+CXXFLAGS = $(CFLAGS)
+CXXFLAGS += -std=c++11 -mcx16 -O3
+CXXFLAGS += $(pkg-config --cflags hwloc)
+LDLIBS += $(pkg-config --libs hwloc)
 
 .PHONY:	all clean
 
 all:	main
 
 linkedlist.o:
-	$(CC) $(CFLAGS) -c -o $(BUILDIR)/linkedlist.o $(LLREP)/linkedlist.c
+	$(CXX) $(CXXFLAGS) -c -o $(BUILDIR)/linkedlist.o $(LLREP)/linkedlist.c
 
 harris.o: $(LLREP)/linkedlist.h linkedlist.o
-	$(CC) $(CFLAGS) -c -o $(BUILDIR)/harris.o $(LLREP)/harris.c
+	$(CXX) $(CXXFLAGS) -c -o $(BUILDIR)/harris.o $(LLREP)/harris.c
 
 ll-intset.o: $(LLREP)/linkedlist.h linkedlist.o harris.o
-	$(CC) $(CFLAGS) -c -o $(BUILDIR)/ll-intset.o $(LLREP)/intset.c
+	$(CXX) $(CXXFLAGS) -c -o $(BUILDIR)/ll-intset.o $(LLREP)/intset.c
 
 hashtable.o: $(LLREP)/linkedlist.h linkedlist.o harris.o ll-intset.o
-	$(CC) $(CFLAGS) -c -o $(BUILDIR)/hashtable.o hashtable.c
+	$(CXX) $(CXXFLAGS) -c -o $(BUILDIR)/hashtable.o hashtable.c
 
 intset.o: $(LLREP)/linkedlist.h harris.o hashtable.o 
-	$(CC) $(CFLAGS) -c -o $(BUILDIR)/intset.o intset.c
+	$(CXX) $(CXXFLAGS) -c -o $(BUILDIR)/intset.o intset.c
 
 test.o: linkedlist.o harris.o intset.o hashtable.o intset.o
-	$(CC) $(CFLAGS) -c -o $(BUILDIR)/test.o test.c
+	$(CXX) $(CXXFLAGS) -c -o $(BUILDIR)/test.o test.c
 
 main: linkedlist.o harris.o intset.o hashtable.o intset.o test.o 
-	$(CC) $(CFLAGS) $(BUILDIR)/linkedlist.o $(BUILDIR)/harris.o $(BUILDIR)/ll-intset.o $(BUILDIR)/hashtable.o $(BUILDIR)/intset.o $(BUILDIR)/test.o -o $(BINS) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(BUILDIR)/linkedlist.o $(BUILDIR)/harris.o $(BUILDIR)/ll-intset.o $(BUILDIR)/hashtable.o $(BUILDIR)/intset.o $(BUILDIR)/test.o -o $(BINS) $(LDFLAGS) $(LDLIBS)
 
 clean:
 	-rm -f $(BINS)
