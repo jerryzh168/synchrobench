@@ -29,25 +29,24 @@ node_t *new_node(val_t val, node_t *next, int transactional)
 	exit(1);
   }
   node->val = val;
-  LFRCCopy(node->next, next);
   node->rc = 1;
+  node->next.store(NULL);
+  LFRCCopy(node->next, next);
   return node;
 }
 
 intset_t *set_new()
 {
   intset_t *set;
-  std::atomic<node_t *> min{nullptr}, max{nullptr};
-	
+  std::atomic<node_t *> min{NULL}, max{NULL};
   if ((set = (intset_t *)malloc(sizeof(intset_t))) == NULL) {
     perror("malloc");
     exit(1);
   }
-  //  LFRCStoreAlloc(max, std::atomic<node_t *>(new_node(VAL_MAX, NULL, 0)));  
   LFRCStoreAlloc(max, new_node(VAL_MAX, NULL, 0)); // node_t *
   LFRCStoreAlloc(min, new_node(VAL_MIN, LFRCPass(max.load()), 0));
+  set->head.store(NULL);
   LFRCCopy(set->head, min.load());
-
   return set;
 }
 

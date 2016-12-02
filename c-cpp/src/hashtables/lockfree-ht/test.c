@@ -197,10 +197,11 @@ void *test(void *data) {
 	int val2, numtx, r, last = -1;
 	val_t val = 0;
 	int unext, mnext, cnext;
-	
+	printf("In test 0\n");
 	thread_data_t *d = (thread_data_t *)data;
 	//thread_local_hpr.init(d->nb_threads, free_node, malloc_node, d->idx);
 	int physical_idx = locate_pu_affinity(d->topo_root, d->topo_pu_num, d->idx);
+	printf("In test 1\n");	
 	/* set affinity according to topology */
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
@@ -658,7 +659,7 @@ int main(int argc, char **argv)
 	timeout.tv_nsec = (duration % 1000) * 1000000;
 	accounting_timeout.tv_sec = profile_rate/1000;
 	accounting_timeout.tv_nsec = (profile_rate % 1000) *1000000;
-	
+	printf("Before malloc\n");
 	if ((data = (thread_data_t *)malloc(nb_threads * sizeof(thread_data_t))) == NULL) {
 		perror("malloc");
 		exit(1);
@@ -680,8 +681,9 @@ int main(int argc, char **argv)
 		srand(seed);
 	
 	maxhtlength = (unsigned int) initial / load_factor;
+	printf("Before ht_new\n");
 	set = ht_new();
-	
+	printf("After ht_new\n");	
 	stop = 0;
 	
 	// Init STM 

@@ -31,7 +31,7 @@ void ht_delete(ht_intset_t *set) {
   int i;
   
   for (i=0; i < maxhtlength; i++) {
-    node = set->buckets[i]->head;
+    node = set->buckets[i]->head.load();
     while (node != NULL) {
       next = node->next;
       free(node);
@@ -78,14 +78,15 @@ ht_intset_t *ht_new() {
 	if ((set = (ht_intset_t *)malloc(sizeof(ht_intset_t))) == NULL) {
 		perror("malloc");
 		exit(1);
-	}  
+	}
         if ((set->buckets = (intset_t **)malloc((maxhtlength + 1)* sizeof(intset_t *))) == NULL) {
 	perror("malloc");
 	exit(1);
 	}  
-
 	for (i=0; i < maxhtlength; i++) {
+	  printf("set new %d\n", i);
 		set->buckets[i] = set_new();
 	}
+	printf("----------2\n");	
 	return set;
 }

@@ -23,6 +23,8 @@
 
 #include "tm.h"
 
+//#define DEBUG
+
 #ifdef DEBUG
 #define IO_FLUSH                        fflush(NULL)
 /* Note: stdio is thread-safe */
@@ -59,15 +61,14 @@ typedef intptr_t val_t;
 /* }; */
 
 struct node_t {
-  //std::atomic<ref_t> ref;
   val_t val;
-  std::atomic<node_t *>next;
-  std::atomic<long> rc;
+  std::atomic<node_t *>next{nullptr};
+  std::atomic<long> rc{1};
 };
 
 
 struct intset_t {
-  std::atomic<node_t *> head;
+  std::atomic<node_t *> head{nullptr};
 };
 
 node_t *new_node(val_t val, node_t *next, int transactional);
