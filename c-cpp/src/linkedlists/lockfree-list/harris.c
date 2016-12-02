@@ -67,7 +67,7 @@ static int find(intset_t *set, val_t val){
 try_again:
 	int offset = 0;
 	int base = K*thread_local_hpr.tid;
-	thread_local_hpr.prev = &set->head;
+	thread_local_hpr.prev = &set->head->next->next;
 	thread_local_hpr.cur = *(thread_local_hpr.prev);
 	while(thread_local_hpr.cur != NULL){
 		HP[base + offset].ptr = thread_local_hpr.cur;					

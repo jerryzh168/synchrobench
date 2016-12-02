@@ -168,9 +168,15 @@ static int locate_pu_affinity_helper(hwloc_obj_t root, int *child_found, int idx
 
 
 static int locate_pu_affinity(hwloc_obj_t root, int num_pu, int idx){
-	idx = idx % num_pu;
-	int child_found = 0;
-	return locate_pu_affinity_helper(root, &child_found, idx);	
+	// idx = idx % num_pu;
+	// int child_found = 0;
+	// return locate_pu_affinity_helper(root, &child_found, idx);	
+	while(1){
+		if(root->type == HWLOC_OBJ_PU)
+			return root->os_index;
+		int i = idx % root->arity;
+		root = root->children[i];
+	}
 }
 
 struct malloc_list{
@@ -614,8 +620,11 @@ int main(int argc, char **argv)
 	hwloc_topology_t topology;
 	hwloc_topology_init(&topology);
 	hwloc_topology_load(topology);	
-	if(topo_num >= hwloc_get_nbobjs_by_depth(topology, topo_level))
-		throw std::invalid_argument("invalid topology num relative to level");
+	if(topo_num >= hwloc_get_nbobjs_by_depth(topology, topo_level)){
+		//throw std::invalid_argument("invalid topology num relative to level");
+		printf("topo object index wrong\n");
+		exit(1);
+	}
 	hwloc_obj_t topo_start_parent = hwloc_get_obj_by_depth(topology, topo_level, topo_num);
 	assert(topo_start_parent != NULL);
 	int topo_pu_num = sum_pu_num_under(topo_start_parent);

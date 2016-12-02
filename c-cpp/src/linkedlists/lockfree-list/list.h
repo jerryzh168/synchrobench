@@ -65,7 +65,7 @@
  *
  *
  */
-#define OFFSETOF(type, member)  ((unsigned int) (&((type *)0)->member))
+#define OFFSETOF(type, member)  ((char *) (&((type *)0)->member))
 #define LIST_ENTRY(entry_ptr, type, member) \
   (((type *) ((char *) (entry_ptr) - OFFSETOF(type, member))))
 #define NEXT(list_ptr) ((list_ptr)->next)
