@@ -2,8 +2,15 @@
 
 threads=(1 2 4 8 16 20 32)
 
-rm -f result
+DURATION=10000
+mkdir -p results
 for i in "${threads[@]}"
 do
-    bin/lockfree-hashtable -L 1 -n 0 -d 10000 -t $i >> result
+    echo "threads $i"
+    bin/lockfree-hashtable -L 1 -n 0 -d $DURATION -t $i > results/"numa_$i"
+done
+
+for i in "${threads[@]}"
+do
+    python scripts/get_stats.py -f results/"numa_$i"
 done
