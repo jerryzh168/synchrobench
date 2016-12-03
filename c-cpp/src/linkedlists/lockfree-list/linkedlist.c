@@ -7,26 +7,27 @@
  *  Copyright 2009 __MyCompanyName__. All rights reserved.
  *
  */
-
+#include <iostream>
 #include "linkedlist.h"
+#include "list.h"
+#include "hprectype.h"
 
 node_t *new_node(val_t val, node_t *next, int transactional)
 {
   node_t *node;
-
-  if (transactional) {
-	node = (node_t *)MALLOC(sizeof(node_t));
-  } else {
+  if(thread_local_hpr.alloc_node == NULL){
 	node = (node_t *)malloc(sizeof(node_t));
+  }else{
+  	node = (node_t *)thread_local_hpr.alloc_node(sizeof(node_t));
   }
   if (node == NULL) {
 	perror("malloc");
 	exit(1);
   }
-
+  //std::cout <<"alloc node "<<node<<std::endl;
   node->val = val;
   node->next = next;
-
+  list_init(&node->r_entry);
   return node;
 }
 

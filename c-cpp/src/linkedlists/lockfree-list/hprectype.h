@@ -20,16 +20,23 @@ class HPRecType_t{
 	int rcount;
 	node_t **plist;
 	void (*free_node)(node_t*);
+	//int nb_free;
+	int nb_malloc;
+	void *(*alloc_node)(unsigned );
 	node_t **prev;
 	node_t *cur;
 	node_t *next;
 	int tid;
-	void init(int maxThreadcount, void (*lamda)(node_t*), int idx){
+	void init(int maxThreadcount, void (*lamda)(node_t*), void *(*alloc)(unsigned),int idx){
 		Active = true;
 		rcount = 0;
+		nb_malloc = 0;
+		//nb_free = 0;
 		list_init(&rlist);
-		plist = new node_t*[maxThreadcount*K];
+
+		plist = (node_t**)malloc((maxThreadcount*K)*sizeof(node_t*));
 		free_node = lamda;
+		alloc_node = alloc;
 		prev = NULL;
 		cur = next = NULL;
 		tid = idx;

@@ -4,7 +4,7 @@ include $(ROOT)/common/Makefile.common
 
 BINS = $(BINDIR)/lockfree-linkedlist
 CXXFLAGS = $(CFLAGS)
-CXXFLAGS += -std=c++11 -g -O3
+CXXFLAGS += -std=c++11 -g -O3 
 
 .PHONY:	all clean
 

@@ -210,11 +210,13 @@ endif
 
 CFLAGS += -D_REENTRANT
 #CFLAGS += -Wall
-CFLAGS += -fno-strict-aliasing
-CFLAGS += -I$(LIBAO_INC) -I$(ROOT)/include
+CFLAGS += -fno-strict-aliasing 
+CFLAGS += -I/usr/local/include
+CFLAGS += -I$(LIBAO_INC) -I$(ROOT)/include 
 
 #LDFLAGS += -L$(LIBAO)/lib -latomic_ops 
-LDFLAGS += -lpthread
+LDFLAGS += -lpthread 
+LDFLAGS += -L/usr/local/lib -lhwloc
 
 ifdef STM
   ifneq ($(STM), SEQUENTIAL)
