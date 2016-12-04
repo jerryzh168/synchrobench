@@ -728,10 +728,10 @@ int main(int argc, char **argv)
 	pthread_attr_destroy(&attr);
 
 	
-	sigset_t sig_set;
-	sigemptyset(&sig_set);
-	sigaddset(&sig_set, TIMER_SIGNAL);
-	pthread_sigmask(SIG_BLOCK, &sig_set, NULL);
+	//sigset_t sig_set;
+	//sigemptyset(&sig_set);
+	//sigaddset(&sig_set, TIMER_SIGNAL);
+	//pthread_sigmask(SIG_BLOCK, &sig_set, NULL);
 	//Start threads 
 	barrier_cross(&barrier);
 	/* install alarm signal */

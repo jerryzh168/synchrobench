@@ -1,5 +1,5 @@
 #ifndef _SMR_H_
-
+#define _SMR_H_
 #include "intset.h"
 #include <hwloc.h>
 
