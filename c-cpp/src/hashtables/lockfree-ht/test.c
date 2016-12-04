@@ -25,8 +25,8 @@
 #include "smr.h"
 #include <unistd.h>
 #include <hwloc.h>
-#include "../../linkedlists/lockfree-list/hprectype.h"
-#include "../../linkedlists/lockfree-list/linkedlist.h"
+//#include "../../linkedlists/lockfree-list/hprectype.h"
+//#include "../../linkedlists/lockfree-list/linkedlist.h"
 #include <stdexcept>      // std::invalid_argument
 
 
