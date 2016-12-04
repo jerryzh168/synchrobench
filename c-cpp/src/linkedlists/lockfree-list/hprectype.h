@@ -3,10 +3,17 @@
 #include <iostream>
 #include "list.h"
 #include "harris.h"
+#include <pthread.h>
+
+
+
+#define TIMER_SIGNAL SIGALRM
+
 
 typedef struct hp{
 	node_t *ptr;
-	char padding[CACHE_LINE_SIZE - sizeof(node_t)];	
+	unsigned long epoch;
+	char padding[CACHE_LINE_SIZE - sizeof(node_t) - sizeof(unsigned long)];	
 }HP_t;
 
 #define K 2
@@ -20,27 +27,12 @@ class HPRecType_t{
 	int rcount;
 	node_t **plist;
 	void (*free_node)(node_t*);
-	//int nb_free;
-	int nb_malloc;
 	void *(*alloc_node)(unsigned );
 	node_t **prev;
 	node_t *cur;
 	node_t *next;
 	int tid;
-	void init(int maxThreadcount, void (*lamda)(node_t*), void *(*alloc)(unsigned),int idx){
-		Active = true;
-		rcount = 0;
-		nb_malloc = 0;
-		//nb_free = 0;
-		list_init(&rlist);
-
-		plist = (node_t**)malloc((maxThreadcount*K)*sizeof(node_t*));
-		free_node = lamda;
-		alloc_node = alloc;
-		prev = NULL;
-		cur = next = NULL;
-		tid = idx;
-	}
+	void init(int maxThreadcount, pthread_t *threads, void (*lamda)(node_t*), void *(*alloc)(unsigned),int idx);
 		
 	
 };

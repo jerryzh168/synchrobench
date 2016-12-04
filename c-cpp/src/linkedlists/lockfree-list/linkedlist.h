@@ -58,6 +58,7 @@ typedef intptr_t val_t;
 typedef struct node {
 	val_t val;
 	list_t r_entry;
+	unsigned long remove_epoch;
 	struct node *next;
 } node_t;
 
