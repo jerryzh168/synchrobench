@@ -215,7 +215,7 @@ CFLAGS += -I/usr/local/include
 CFLAGS += -I$(LIBAO_INC) -I$(ROOT)/include 
 
 #LDFLAGS += -L$(LIBAO)/lib -latomic_ops 
-LDFLAGS += -lpthread 
+LDFLAGS += -lpthread -lrt
 LDFLAGS += -L/usr/local/lib -lhwloc
 
 ifdef STM

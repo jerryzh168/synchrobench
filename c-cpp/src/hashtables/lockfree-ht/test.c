@@ -107,6 +107,7 @@ typedef struct thread_data {
   val_t first;
 	int idx;
 	int nb_threads;
+	pthread_t *threads;
 	hwloc_obj_t topo_root;
 	int topo_pu_num;
 	long range;
@@ -187,6 +188,7 @@ struct malloc_list{
 
 void free_node(node_t *n){
 	free((void *)n);
+	//std::cout << "free"<<std::endl;
 	malloc_list[thread_local_hpr.tid].nb_malloc--;
 }
 
@@ -202,7 +204,7 @@ void *test(void *data) {
 	int unext, mnext, cnext;
 	
 	thread_data_t *d = (thread_data_t *)data;
-	thread_local_hpr.init(d->nb_threads, free_node, malloc_node, d->idx);
+	thread_local_hpr.init(d->nb_threads, d->threads, free_node, malloc_node, d->idx);
 	int physical_idx = locate_pu_affinity(d->topo_root, d->topo_pu_num, d->idx);
 	/* set affinity according to topology */
 	cpu_set_t cpuset;
@@ -716,8 +718,10 @@ int main(int argc, char **argv)
 	barrier_init(&barrier, nb_threads + 1);
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
 	for (i = 0; i < nb_threads; i++) {
 		printf("Creating thread %d\n", i);
+		data[i].threads = threads;
 		data[i].nb_threads = nb_threads;
 		data[i].idx = i;
 		data[i].topo_root = topo_start_parent;
@@ -761,8 +765,13 @@ int main(int argc, char **argv)
 	}
 	pthread_attr_destroy(&attr);
 	
-	// Start threads 
+	sigset_t sig_set;
+	sigemptyset(&sig_set);
+	sigaddset(&sig_set, TIMER_SIGNAL);
+	pthread_sigmask(SIG_BLOCK, &sig_set, NULL);
+	//Start threads 
 	barrier_cross(&barrier);
+
 	/* install alarm signal */
 	printf("STARTING...\n");
 	gettimeofday(&start, NULL);
@@ -780,7 +789,7 @@ int main(int argc, char **argv)
 				updates += (data[i].nb_add + data[i].nb_remove + data[i].nb_move);
 				memory_use += malloc_list[i].nb_malloc;
 			}
-		//	std::cout << reads+updates+snapshots - last_sum <<std::endl;
+			//std::cout << "sum"<<reads+updates+snapshots - last_sum <<std::endl;
 			//std::cout <<memory_use<<std::endl;
 			//std::cout << duration<<":"<<profile_rate<<std::endl;
 			last_sum = reads + updates + snapshots;

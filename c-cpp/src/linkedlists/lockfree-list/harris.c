@@ -16,14 +16,12 @@ int harris_insert(intset_t *set, val_t val) {
 	while(1){
 		if(find(set, val)){
 		  if(newnode != NULL)
-		  /* TODO free the node */
 		  	thread_local_hpr.free_node(newnode);
 		  reset_hp();
 		  return 0;
 		}
 		if(newnode == NULL){
 			newnode = new_node(val, thread_local_hpr.cur, 0);
-			AO_nop_full();
 		}
 		else
 			newnode->next = thread_local_hpr.cur;
@@ -71,7 +69,7 @@ try_again:
 	thread_local_hpr.cur = *(thread_local_hpr.prev);
 	while(thread_local_hpr.cur != NULL){
 		HP[base + offset].ptr = thread_local_hpr.cur;					
-		AO_nop_full();
+		//AO_nop_full();
 		if(*thread_local_hpr.prev != thread_local_hpr.cur)
 			goto try_again;
 		thread_local_hpr.next = (thread_local_hpr.cur)->next;
