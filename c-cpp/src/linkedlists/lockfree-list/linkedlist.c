@@ -120,7 +120,7 @@ long add_to_rc(node_t *v, int val) {
   long oldrc;
   while (true) {
     oldrc = v->rc;
-    if (v->rc.compare_exchange_strong(oldrc, oldrc+val))
+    if (v->rc.compare_exchange_weak(oldrc, oldrc+val))
       return oldrc;
   }
 }
@@ -130,7 +130,7 @@ void LFRCStore(std::atomic<node_t *>&A, node_t *v) {
   if (v != NULL) add_to_rc(v, 1);
   while (true) {
     oldval = A.load();
-    if (A.compare_exchange_strong(oldval, v)) {
+    if (A.compare_exchange_weak(oldval, v)) {
       #ifdef DEBUG
       printf("From LFRCStore %p\n", oldval);
       #endif
@@ -144,7 +144,7 @@ void LFRCStoreAlloc(std::atomic<node_t *> &A, node_t *v) {
   node_t *oldval;
   while (true) {
     oldval = A.load();
-    if (A.compare_exchange_strong(oldval, v)) {
+    if (A.compare_exchange_weak(oldval, v)) {
       #ifdef DEBUG
       printf("From LFRCStoreAlloc %p\n", oldval);
       #endif
@@ -165,7 +165,7 @@ void LFRCCopy(std::atomic<node_t *> &v, node_t *w) {
 }
 bool LFRCCAS(std::atomic<node_t *> &A0, node_t *old, node_t *newv) {
   if (newv != NULL) add_to_rc(newv, 1);
-  if(A0.compare_exchange_strong(old, newv)) {
+  if(A0.compare_exchange_weak(old, newv)) {
     LFRCDestroy(old);
     return true;
   } else {
