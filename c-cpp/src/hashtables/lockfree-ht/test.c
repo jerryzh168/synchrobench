@@ -22,8 +22,11 @@
  */
 
 #include "intset.h"
+#include "smr.h"
 #include <unistd.h>
 #include <hwloc.h>
+#include "../../linkedlists/lockfree-list/hprectype.h"
+#include "../../linkedlists/lockfree-list/linkedlist.h"
 #include <stdexcept>      // std::invalid_argument
 
 
@@ -40,12 +43,6 @@ __thread unsigned int *rng_seed;
 pthread_key_t rng_seed_key;
 #endif /* ! TLS */
 
-typedef struct barrier {
-	pthread_cond_t complete;
-	pthread_mutex_t mutex;
-	int count;
-	int crossing;
-} barrier_t;
 
 #define DEFAULT_PROFILE_RATE 10    //in ms
 int nb_threads = 0;
@@ -107,46 +104,6 @@ inline long rand_range_re(unsigned int *seed, long r) {
 	return v;
 }
 
-typedef struct thread_data {
-  val_t first;
-	int idx;
-	int nb_threads;
-	hwloc_obj_t topo_root;
-	int topo_pu_num;
-	long range;
-	int update;
-	int move;
-	int snapshot;
-	int unit_tx;
-	int alternate;
-	int effective;
-	unsigned long nb_add;
-	unsigned long nb_added;
-	unsigned long nb_remove;
-	unsigned long nb_removed;
-	unsigned long nb_contains;
-	/* added for HashTables */
-	unsigned long load_factor;
-	unsigned long nb_move;
-	unsigned long nb_moved;
-	unsigned long nb_snapshot;
-	unsigned long nb_snapshoted;
-	/* end: added for HashTables */
-	unsigned long nb_found;
-	unsigned long nb_aborts;
-	unsigned long nb_aborts_locked_read;
-	unsigned long nb_aborts_locked_write;
-	unsigned long nb_aborts_validate_read;
-	unsigned long nb_aborts_validate_write;
-	unsigned long nb_aborts_validate_commit;
-	unsigned long nb_aborts_invalid_memory;
-	unsigned long nb_aborts_double_write;
-	unsigned long max_retries;
-	unsigned int seed;
-	ht_intset_t *set;
-	barrier_t *barrier;
-	unsigned long failures_because_contention;
-} thread_data_t;
 
 static int locate_pu_affinity_helper(hwloc_obj_t root, int *child_found, int idx){
 	if(root->type == HWLOC_OBJ_PU){
@@ -172,14 +129,15 @@ static int locate_pu_affinity_helper(hwloc_obj_t root, int *child_found, int idx
 
 
 static int locate_pu_affinity(hwloc_obj_t root, int num_pu, int idx){
-	/* idx = idx % num_pu; */
-	/* int child_found = 0; */
-	/* return locate_pu_affinity_helper(root, &child_found, idx);	 */
+	// idx = idx % num_pu;
+	// int child_found = 0;
+	// return locate_pu_affinity_helper(root, &child_found, idx);	
 	while(1){
-	  if(root->type == HWLOC_OBJ_PU)
-	    return root->os_index;
-	  int i = idx % root->arity;
-	  root = root->children[i];
+		if(root->type == HWLOC_OBJ_PU)
+			return root->os_index;
+		int i = idx % root->arity;
+		idx = idx / root->arity;
+		root = root->children[i];
 	}
 }
 
@@ -190,12 +148,13 @@ struct malloc_list{
 
 void free_node(node_t *n){
 	free((void *)n);
-	//malloc_list[thread_local_hpr.tid].nb_malloc--;
+	//std::cout << "free"<<std::endl;
+	malloc_list[get_thread_idx()].nb_malloc--;
 }
 
 void *malloc_node(unsigned int size){
 	void *ret = malloc(size);
-	//malloc_list[thread_local_hpr.tid].nb_malloc++;
+	malloc_list[get_thread_idx()].nb_malloc++;
 	return ret;
 }
 
@@ -205,7 +164,8 @@ void *test(void *data) {
 	int unext, mnext, cnext;
 	printf("In test 0\n");
 	thread_data_t *d = (thread_data_t *)data;
-	//thread_local_hpr.init(d->nb_threads, free_node, malloc_node, d->idx);
+	thread_local_init(d);
+	// thread_local_hpr.init(d->nb_threads, d->threads, free_node, malloc_node, d->idx);
 	int physical_idx = locate_pu_affinity(d->topo_root, d->topo_pu_num, d->idx);
 	printf("In test 1\n");	
 	/* set affinity according to topology */
@@ -625,8 +585,11 @@ int main(int argc, char **argv)
 	hwloc_topology_t topology;
 	hwloc_topology_init(&topology);
 	hwloc_topology_load(topology);	
-	if(topo_num >= hwloc_get_nbobjs_by_depth(topology, topo_level))
-		throw std::invalid_argument("invalid topology num relative to level");
+	if(topo_num >= hwloc_get_nbobjs_by_depth(topology, topo_level)){
+		//throw std::invalid_argument("invalid topology num relative to level");
+		printf("topo object index wrong\n");
+		exit(1);
+	}
 	hwloc_obj_t topo_start_parent = hwloc_get_obj_by_depth(topology, topo_level, topo_num);
 	assert(topo_start_parent != NULL);
 	int topo_pu_num = sum_pu_num_under(topo_start_parent);
@@ -660,7 +623,7 @@ int main(int argc, char **argv)
 				 (int)sizeof(long),
 				 (int)sizeof(void *),
 				 (int)sizeof(uintptr_t));
-	//hp_init_global(nb_threads);
+	smr_global_init(nb_threads);
 	timeout.tv_sec = duration / 1000;
 	timeout.tv_nsec = (duration % 1000) * 1000000;
 	accounting_timeout.tv_sec = profile_rate/1000;
@@ -715,9 +678,13 @@ int main(int argc, char **argv)
 	barrier_init(&barrier, nb_threads + 1);
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
 	for (i = 0; i < nb_threads; i++) {
 		printf("Creating thread %d\n", i);
+		data[i].threads = threads;
 		data[i].nb_threads = nb_threads;
+		data[i].malloc_node = malloc_node;
+		data[i].free_node = free_node;
 		data[i].idx = i;
 		data[i].topo_root = topo_start_parent;
 		data[i].topo_pu_num = topo_pu_num;
@@ -761,7 +728,11 @@ int main(int argc, char **argv)
 	pthread_attr_destroy(&attr);
 
 	
-	// Start threads 
+	sigset_t sig_set;
+	sigemptyset(&sig_set);
+	sigaddset(&sig_set, TIMER_SIGNAL);
+	pthread_sigmask(SIG_BLOCK, &sig_set, NULL);
+	//Start threads 
 	barrier_cross(&barrier);
 	/* install alarm signal */
 	printf("STARTING...\n");
@@ -780,7 +751,7 @@ int main(int argc, char **argv)
 				updates += (data[i].nb_add + data[i].nb_remove + data[i].nb_move);
 				memory_use += malloc_list[i].nb_malloc;
 			}
-		//	std::cout << reads+updates+snapshots - last_sum <<std::endl;
+			//std::cout << "sum"<<reads+updates+snapshots - last_sum <<std::endl;
 			//std::cout <<memory_use<<std::endl;
 			//std::cout << duration<<":"<<profile_rate<<std::endl;
 			last_sum = reads + updates + snapshots;
