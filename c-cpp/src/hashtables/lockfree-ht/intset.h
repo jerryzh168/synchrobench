@@ -21,7 +21,7 @@
  * GNU General Public License for more details.
  */
 
-
+#ifndef _INTSET_H_
 #include "hashtable.h"
 
 int ht_contains(ht_intset_t *set, int val, int transactional);
@@ -43,3 +43,5 @@ int ht_move(ht_intset_t *set, int val1, int val2, int transactional);
  * compose with elastic transactions.
  */
 int ht_snapshot(ht_intset_t *set, int transactional);
+
+#endif
