@@ -57,8 +57,10 @@ typedef struct thread_data {
 	unsigned long failures_because_contention;
 } thread_data_t;
 
-
+/* should get the idx of thread passed in from d->idx, not pthread_self()!!*/
 int get_thread_idx();
+/* you can have a chance to do thread local init */
 void thread_local_init(thread_data_t *d);
+/* you can have a chance to do global init before any smr threads are spawned */
 void smr_global_init(int thread_cnt);
 #endif
