@@ -22,13 +22,15 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-
+#ifndef _HARRIS_H_
+#define _HARRIS_H_
 
 #include "linkedlist.h"
 
 /* ################################################################### *
  * HARRIS' LINKED LIST
  * ################################################################### */
+extern __thread int thread_id;
 
 inline int is_marked_ref(long i);
 inline long unset_mark(long i);
@@ -40,3 +42,5 @@ node_t *harris_search(intset_t *set, val_t val, std::atomic<node_t *>&left_node)
 int harris_find(intset_t *set, val_t val);
 int harris_insert(intset_t *set, val_t val);
 int harris_delete(intset_t *set, val_t val);
+
+#endif

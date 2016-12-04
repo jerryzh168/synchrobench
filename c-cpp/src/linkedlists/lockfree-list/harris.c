@@ -24,6 +24,9 @@
  */
 
 #include "harris.h"
+#include "../../hashtables/lockfree-ht/smr.h"
+__thread int thread_id;
+
 
 /*
  * The five following functions handle the low-order mark bit that indicates
@@ -206,5 +209,19 @@ int harris_delete(intset_t *set, val_t val) {
   return 1;
 }
 
+/* Tests */
 
+/* should get the idx of thread passed in from d->idx, not pthread_self()!!*/
+int get_thread_idx() {
+  return thread_id;
+}
+/* you can have a chance to do thread local init */
+void thread_local_init(thread_data_t *d) {
+  thread_id = d->idx;
+  return;
+}
+/* you can have a chance to do global init before any smr threads are spawned */
+void smr_global_init(int thread_cnt) {
+  return;
+}
 
