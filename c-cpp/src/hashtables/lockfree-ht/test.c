@@ -27,8 +27,14 @@
 #include <hwloc.h>
 #include "../../linkedlists/lockfree-list/hprectype.h"
 #include "../../linkedlists/lockfree-list/linkedlist.h"
+#include <stdexcept>      // std::invalid_argument
+
+
 /* Hashtable length (# of buckets) */
 unsigned int maxhtlength;
+
+/* TOOD .. here? */
+#define CACHE_LINE_SIZE 64
 
 /* Hashtable seed */
 #ifdef TLS
@@ -165,7 +171,6 @@ void *test(void *data) {
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
 	CPU_SET(physical_idx, &cpuset);
-	//std::cout <<"thread "<<d->idx<<" on core "<<physical_idx<<std::endl;
 	int ret = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
 	if(ret != 0)
 		throw "set affinity fail\n";
@@ -721,6 +726,7 @@ int main(int argc, char **argv)
 		}
 	}
 	pthread_attr_destroy(&attr);
+
 	
 	sigset_t sig_set;
 	sigemptyset(&sig_set);
@@ -728,7 +734,6 @@ int main(int argc, char **argv)
 	pthread_sigmask(SIG_BLOCK, &sig_set, NULL);
 	//Start threads 
 	barrier_cross(&barrier);
-
 	/* install alarm signal */
 	printf("STARTING...\n");
 	gettimeofday(&start, NULL);

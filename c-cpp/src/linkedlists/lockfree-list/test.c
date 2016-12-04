@@ -132,7 +132,6 @@ void *test(void *data) {
 	
 	/* Is the first op an update? */
 	unext = (rand_range_re(&d->seed, 100) - 1 < d->update);
-	
 #ifdef ICC 
 	while (stop == 0) {
 #else
@@ -147,7 +146,7 @@ void *test(void *data) {
 				if (set_add(d->set, val, TRANSACTIONAL)) {
 					d->nb_added++;
 					last = val;
-				} 				
+				}
 				d->nb_add++;
 				
 			} else { // remove
@@ -190,7 +189,9 @@ void *test(void *data) {
 					}
 				}
 			}	else val = rand_range_re(&d->seed, d->range);
-			
+			#ifdef DEBUG
+			printf("Before set_contains\n");
+			#endif
 			if (set_contains(d->set, val, TRANSACTIONAL)) 
 				d->nb_found++;
 			d->nb_contains++;
@@ -403,8 +404,12 @@ int main(int argc, char **argv) {
 			i++;
 		}
 	}
+	#ifdef DEBUG
+	printf("Before set size\n");
+	#endif
 	size = set_size(set);
 	printf("Set size     : %d\n", size);
+
 	
 	/* Access set from all threads */
 	barrier_init(&barrier, nb_threads + 1);
