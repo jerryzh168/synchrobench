@@ -16,13 +16,14 @@ def to_persec(stats, key):
     if key in stats:
         per_sec = get_persec(stats[key])
         stats[key + ' per second'] = per_sec
-    
+
 def main(args):
     filename = args.filename
     with open(filename, 'r') as handle:
         lines = handle.readlines()
     stats = dict()
     # get params
+    # TODO add more reporting options
     for i in xrange(len(lines)):
         result = lines[i].split(':')
         if len(result) == 2:
@@ -30,7 +31,7 @@ def main(args):
             stats[key.strip()] = value.strip()
     stats['Nb threads'] = int(stats['Nb threads'])
     to_persec(stats, '#txs')
-    print stats
+    print args.filename, stats['#txs per second']
     return stats
 
 
