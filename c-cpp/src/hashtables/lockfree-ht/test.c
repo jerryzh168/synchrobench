@@ -162,7 +162,7 @@ struct malloc_list{
 
 void free_node(node_t *n){
 	free((void *)n);
-	//std::cout << "free"<<std::endl;
+	std::cout << "free"<<std::endl;
 	malloc_list[get_thread_idx()].nb_free++;
 }
 
@@ -625,7 +625,6 @@ int main(int argc, char **argv)
 	timeout.tv_nsec = (duration % 1000) * 1000000;
 	accounting_timeout.tv_sec = profile_rate/1000;
 	accounting_timeout.tv_nsec = (profile_rate % 1000) *1000000;
-	printf("Before malloc\n");
 	if ((data = (thread_data_t *)malloc(nb_threads * sizeof(thread_data_t))) == NULL) {
 		perror("malloc");
 		exit(1);

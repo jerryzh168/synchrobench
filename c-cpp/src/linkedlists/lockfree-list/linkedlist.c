@@ -14,15 +14,15 @@
 #include "../../hashtables/lockfree-ht/smr.h"
 __thread thread_local_info_t bench;
 
+#define CACHE_LINE_SIZE 64
 
 node_t *new_node(val_t val, node_t *next, int transactional)
 {
   node_t *node;
-
-  if (transactional) {
+  if (bench.malloc_node != NULL) {
     node = (node_t *)bench.malloc_node(sizeof(node_t));
   } else {
-    node = (node_t *)bench.malloc_node(sizeof(node_t));
+    node = (node_t *)aligned_alloc(CACHE_LINE_SIZE, sizeof(node_t));
   }
   if (node == NULL) {
 	perror("malloc");
@@ -112,7 +112,11 @@ void LFRCDestroy(node_t *v) {
     printf("From LFRCDestroy %p\n", next);
     #endif
     LFRCDestroy(next);
-    bench.free_node(v);
+    if (bench.free_node != NULL) {
+      bench.free_node(v);
+    } else {
+      free(v);
+    }
   }
 }
 

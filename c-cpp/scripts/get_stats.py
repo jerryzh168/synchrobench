@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 def parse_args():
     parser = argparse.ArgumentParser(description='Process result...')
     parser.add_argument('-f', '--filename', action='store', help='input file name', type=str)
-    parser.add_argument('-e', '--enable_metrics', action='store_true', help='enable profile', type=bool, default=False)
+    parser.add_argument('-e', '--enable_metrics', action='store_true', help='enable profile', default=False)
     parser.add_argument('-m', '--metrics', nargs='+', help = 'list of metrics', required=False, type=list, default=[])
     return parser.parse_args()
 

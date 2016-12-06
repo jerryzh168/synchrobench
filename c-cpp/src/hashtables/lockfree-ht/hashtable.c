@@ -74,7 +74,6 @@ int floor_log_2(unsigned int n) {
 ht_intset_t *ht_new() {
 	ht_intset_t *set;
 	int i;
-	
 	if ((set = (ht_intset_t *)malloc(sizeof(ht_intset_t))) == NULL) {
 		perror("malloc");
 		exit(1);
