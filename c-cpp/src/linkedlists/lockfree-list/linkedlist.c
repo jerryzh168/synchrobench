@@ -9,6 +9,8 @@
  */
 
 #include "linkedlist.h"
+#include "../../hashtables/lockfree-ht/smr.h"
+__thread int thread_id;
 
 node_t *new_node(val_t val, node_t *next, int transactional)
 {
@@ -72,4 +74,20 @@ int set_size(intset_t *set)
   }
 
   return size;
+}
+
+/* Tests */
+
+/* should get the idx of thread passed in from d->idx, not pthread_self()!!*/
+int get_thread_idx() {
+  return thread_id;
+}
+/* you can have a chance to do thread local init */
+void thread_local_init(thread_data_t *d) {
+  thread_id = d->idx;
+  return;
+}
+/* you can have a chance to do global init before any smr threads are spawned */
+void smr_global_init(int thread_cnt) {
+  return;
 }

@@ -25,8 +25,7 @@
 #include "smr.h"
 #include <unistd.h>
 #include <hwloc.h>
-//#include "../../linkedlists/lockfree-list/hprectype.h"
-//#include "../../linkedlists/lockfree-list/linkedlist.h"
+#include <iostream>
 #include <stdexcept>      // std::invalid_argument
 
 
@@ -142,14 +141,15 @@ static int locate_pu_affinity(hwloc_obj_t root, int num_pu, int idx){
 }
 
 struct malloc_list{
-	int nb_malloc;
-	char padding[CACHE_LINE_SIZE - sizeof(int)];
+  int nb_malloc;
+  int nb_free;
+  char padding[CACHE_LINE_SIZE - sizeof(int)];
 } *malloc_list;
 
 void free_node(node_t *n){
 	free((void *)n);
 	//std::cout << "free"<<std::endl;
-	malloc_list[get_thread_idx()].nb_malloc--;
+	malloc_list[get_thread_idx()].nb_free++;
 }
 
 void *malloc_node(unsigned int size){
@@ -744,15 +744,17 @@ int main(int argc, char **argv)
 			int reads = 0;
 			int updates = 0;
 			int snapshots = 0;
-			int memory_use = 0;
+			int mallocs = 0;
+			int frees = 0;
 			for(int i = 0 ; i < nb_threads;i++){
 				reads += data[i].nb_contains;
 				snapshots += data[i].nb_snapshot;
 				updates += (data[i].nb_add + data[i].nb_remove + data[i].nb_move);
-				memory_use += malloc_list[i].nb_malloc;
+				mallocs += malloc_list[i].nb_malloc;
+				frees += malloc_list[i].nb_free;
 			}
-			//std::cout << "sum"<<reads+updates+snapshots - last_sum <<std::endl;
-			//std::cout <<memory_use<<std::endl;
+			std::cout << "#profile: (txs, "<<reads+updates+snapshots<< ") (mallocs, " << mallocs << ") (frees, " << frees << ")" << std::endl;
+			// Add custome stats here, following the same format.
 			//std::cout << duration<<":"<<profile_rate<<std::endl;
 			last_sum = reads + updates + snapshots;
 		}

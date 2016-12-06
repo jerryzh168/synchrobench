@@ -55,8 +55,11 @@
 # Updates
 updates=(0 20 80)
 
+# size
+size=100000
+
 # Load factor
-lfs=(1 4 8)
+lfs=(1 100 10000)
 
 # numa
 topos=(0 1)
@@ -74,8 +77,8 @@ interval=10
 seed=1
 
 # Alternate
-alternate=1
-# mkdir -p results
+alternate=0
+
 # for i in "${threads[@]}"
 # do
 #     echo "threads $i"
