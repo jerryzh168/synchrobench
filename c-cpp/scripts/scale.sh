@@ -13,7 +13,7 @@ do
 	do
 	    echo "Thread: $thread LF: $lf Update: $update"
 	    name=results/scale'_'$thread'_'$lf'_'$update
-	    bin/lockfree-hashtable -A $alternate -d $duration -t $thread -S $seed -u $update -l $lf -p $interval > $name
+	    bin/lockfree-hashtable -s $size -A $alternate -d $duration -t $thread -S $seed -u $update -l $lf -p $interval > $name
 	    python scripts/get_stats.py -f $name
 	    python scripts/get_stats.py -f $name >> $report_name
 	done

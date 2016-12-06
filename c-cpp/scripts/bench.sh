@@ -53,7 +53,7 @@
 #### 4. load factor 1, 4, 8(low contention, medium contention, high contention)
 
 # Updates
-updates=(0 20 80)
+updates=(0 20 50)
 
 # size
 size=100000
