@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Process result...')
-    parser.add_argument('-f', '--filename', action='store', type=str)
-    parser.add_argument('-m', '--metrics', nargs='+', required=False, type=list, default=[])
+    parser.add_argument('-f', '--filename', action='store', help='input file name', type=str)
+    parser.add_argument('-e', '--enable_metrics', action='store_true', help='enable profile', type=bool, default=False)
+    parser.add_argument('-m', '--metrics', nargs='+', help = 'list of metrics', required=False, type=list, default=[])
     return parser.parse_args()
 
 def get_persec(s):
@@ -55,16 +56,17 @@ def main(args):
                 stats[key.strip()] = value.strip()
     stats['Nb threads'] = int(stats['Nb threads'])
     to_persec(stats, '#txs')
-    metrics = ['txs', 'mallocs', 'frees'] + args.metrics
-    get_profile(stats, metrics)
+    if args.enable_metrics:
+        metrics = ['txs', 'mallocs', 'frees'] + args.metrics
+        get_profile(stats, metrics)
+        del stats['#profile']
+        lines = []
+        for metric in metrics:
+            line, = plt.plot(stats['#profile-'+metric], label=metric)
+            lines.append(line)
+        plt.legend(metrics, loc=1)
+        plt.savefig(args.filename + '.png')
     print args.filename, stats['#txs per second']
-    del stats['#profile']
-    lines = []
-    for metric in metrics:
-        line, = plt.plot(stats['#profile-'+metric], label=metric)
-        lines.append(line)
-    plt.legend(metrics, loc=1)
-    plt.savefig(args.filename + '.png')
     return stats
 
 
