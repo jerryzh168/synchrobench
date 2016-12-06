@@ -74,7 +74,6 @@ void *timer_handler(void *arg){
     	for(int i = 0; i < maxThreadCount; i++){
         	pthread_t  trd = thread_array[i];
             if(pthread_kill(trd, SIGUSR1) != 0){
-               	printf("pthread_kill fail\n");
                	return NULL;
             }
     	}

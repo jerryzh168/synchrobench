@@ -22,15 +22,19 @@ int harris_insert(intset_t *set, val_t val) {
 		}
 		if(newnode == NULL){
 			newnode = new_node(val, thread_local_hpr.cur, 0);
+			if(newnode == NULL){
+				std::cout<<"new_node fail"<<std::endl;
+				exit(1);
+			}
 		}
 		else
 			newnode->next = thread_local_hpr.cur;
 		//node->next = thread_local.cur;
 		//AO_nop_full(); 	
 		if(ATOMIC_CAS_MB(thread_local_hpr.prev, thread_local_hpr.cur, newnode)) {
-		reset_hp();
-		return 1;
-	}
+			reset_hp();
+			return 1;
+		}
 	}
 }
 
@@ -67,9 +71,11 @@ try_again:
 	int base = K*thread_local_hpr.tid;
 	thread_local_hpr.prev = &set->head->next->next;
 	thread_local_hpr.cur = *(thread_local_hpr.prev);
+	int i = 0;
 	while(thread_local_hpr.cur != NULL){
 		HP[base + offset].ptr = thread_local_hpr.cur;					
 		//AO_nop_full();
+		// if(i++ % 10000 == 10000)
 		if(*thread_local_hpr.prev != thread_local_hpr.cur)
 			goto try_again;
 		thread_local_hpr.next = (thread_local_hpr.cur)->next;

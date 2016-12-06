@@ -36,25 +36,25 @@ typedef struct thread_data {
 	unsigned long nb_contains;
 	/* added for HashTables */
 	unsigned long load_factor;
-	unsigned long nb_move;
-	unsigned long nb_moved;
-	unsigned long nb_snapshot;
-	unsigned long nb_snapshoted;
+	// unsigned long nb_move;
+	// unsigned long nb_moved;
+	// unsigned long nb_snapshot;
+	// unsigned long nb_snapshoted;
 	/* end: added for HashTables */
 	unsigned long nb_found;
-	unsigned long nb_aborts;
-	unsigned long nb_aborts_locked_read;
-	unsigned long nb_aborts_locked_write;
-	unsigned long nb_aborts_validate_read;
-	unsigned long nb_aborts_validate_write;
-	unsigned long nb_aborts_validate_commit;
-	unsigned long nb_aborts_invalid_memory;
-	unsigned long nb_aborts_double_write;
-	unsigned long max_retries;
-	unsigned int seed;
+	// unsigned long nb_aborts;
+	// unsigned long nb_aborts_locked_read;
+	// unsigned long nb_aborts_locked_write;
+	// unsigned long nb_aborts_validate_read;
+	// unsigned long nb_aborts_validate_write;
+	// unsigned long nb_aborts_validate_commit;
+	// unsigned long nb_aborts_invalid_memory;
+	// unsigned long nb_aborts_double_write;
+	// unsigned long max_retries;
+	unsigned short seed[3];
 	ht_intset_t *set;
 	barrier_t *barrier;
-	unsigned long failures_because_contention;
+	// unsigned long failures_because_contention;
 } thread_data_t;
 
 
