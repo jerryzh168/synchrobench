@@ -66,6 +66,12 @@ struct intset_t {
   std::atomic<node_t *> head{nullptr};
 };
 
+struct thread_local_info_t {
+  int thread_id;
+  void *(*malloc_node)(unsigned int);
+  void (*free_node)(node_t *);
+};
+
 node_t *new_node(val_t val, node_t *next, int transactional);
 intset_t *set_new();
 void set_delete(intset_t *set);
@@ -82,5 +88,4 @@ void LFRCCopy(std::atomic<node_t *> &v, node_t *w);
 bool LFRCCAS(std::atomic<node_t *> &A0, node_t *old, node_t *newv);
 
 //bool LFRCDCAS(node_t **A0, node_t **A1, node_t *old0, node_t *old1, node_t *new0, node_t *new1);
-
 #endif

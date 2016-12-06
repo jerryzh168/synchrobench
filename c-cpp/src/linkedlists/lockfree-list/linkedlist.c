@@ -11,18 +11,18 @@
 #include <atomic>
 #include "linkedlist.h"
 #include <stdlib.h>
+#include "../../hashtables/lockfree-ht/smr.h"
+__thread thread_local_info_t bench;
 
-#define CACHELINE_SIZE 64
 
 node_t *new_node(val_t val, node_t *next, int transactional)
 {
   node_t *node;
 
   if (transactional) {
-    //node = (node_t *)MALLOC(sizeof(node_t));
-    node = (node_t *)aligned_alloc(CACHELINE_SIZE, sizeof(node_t));    
+    node = (node_t *)bench.malloc_node(sizeof(node_t));
   } else {
-    node = (node_t *)aligned_alloc(CACHELINE_SIZE, sizeof(node_t));
+    node = (node_t *)bench.malloc_node(sizeof(node_t));
   }
   if (node == NULL) {
 	perror("malloc");
@@ -57,7 +57,7 @@ void set_delete(intset_t *set)
   LFRCCopy(node, set->head);
   while (node.load() != NULL) {
     LFRCCopy(next, node.load()->next.load());
-    //free(node);
+    free(node);
     LFRCCopy(node, next.load());
   }
   free(set);
@@ -112,7 +112,7 @@ void LFRCDestroy(node_t *v) {
     printf("From LFRCDestroy %p\n", next);
     #endif
     LFRCDestroy(next);
-    free(v);
+    bench.free_node(v);
   }
 }
 
@@ -187,3 +187,22 @@ bool LFRCCAS(std::atomic<node_t *> &A0, node_t *old, node_t *newv) {
 /*     return false; */
 /*   } */
 /* } */
+
+/* Tests */
+
+/* should get the idx of thread passed in from d->idx, not pthread_self()!!*/
+int get_thread_idx() {
+  return bench.thread_id;
+}
+/* you can have a chance to do thread local init */
+void thread_local_init(thread_data_t *d) {
+  bench.thread_id = d->idx;
+  bench.malloc_node = d->malloc_node;
+  bench.free_node = d->free_node;
+  return;
+}
+/* you can have a chance to do global init before any smr threads are spawned */
+void smr_global_init(int thread_cnt) {
+  return;
+}
+
