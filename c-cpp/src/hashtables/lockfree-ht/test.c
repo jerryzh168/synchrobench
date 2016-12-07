@@ -787,7 +787,7 @@ int main(int argc, char **argv)
 		printf("    #removed  : %lu\n", data[i].nb_removed);
 		printf("  #contains   : %lu\n", data[i].nb_contains);
 		printf("    #found    : %lu\n", data[i].nb_found);
-		printf("Memory Pressure: %ld\n", malloc_list[i].nb_malloc);
+		printf("Memory Pressure: %ld\n", malloc_list[i].nb_malloc - malloc_list[i].nb_free);
 		// printf("  #move       : %lu\n", data[i].nb_move);
 		// printf("  #moved      : %lu\n", data[i].nb_moved);
 		// printf("  #snapshot   : %lu\n", data[i].nb_snapshot);
