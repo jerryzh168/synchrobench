@@ -25,7 +25,7 @@
 
 #include "tm.h"
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #define IO_FLUSH                        fflush(NULL)
@@ -57,13 +57,13 @@ typedef intptr_t val_t;
 
 typedef struct node {
   val_t val;
-  std::atomic<struct node *>next{nullptr};
-  std::atomic<long> rc{1};
+  struct node *next;
+  long rc;
 } node_t;
 
 
 struct intset_t {
-  std::atomic<node_t *> head{nullptr};
+  node_t * head;
 };
 
 struct thread_local_info_t {
@@ -79,13 +79,13 @@ int set_size(intset_t *set);
 
 // LFRC
 //void LFRCLoad(node_t **dest, node_t **A);
-node_t* LFRCPass(node_t *v);
+//node_t* LFRCPass(node_t *v);
 void LFRCDestroy(node_t *v);
 long add_to_rc(node_t *v, int val);
-void LFRCStore(std::atomic<node_t *> &A, node_t *v);
-void LFRCStoreAlloc(std::atomic<node_t *> &A, node_t *v);
-void LFRCCopy(std::atomic<node_t *> &v, node_t *w);
-bool LFRCCAS(std::atomic<node_t *> &A0, node_t *old, node_t *newv);
+void LFRCStore(node_t **A, node_t *v);
+void LFRCStoreAlloc(node_t **A, node_t *v);
+void LFRCCopy(node_t **v, node_t *w);
+bool LFRCCAS(node_t **A0, node_t *old, node_t *newv);
 
 //bool LFRCDCAS(node_t **A0, node_t **A1, node_t *old0, node_t *old1, node_t *new0, node_t *new1);
 #endif

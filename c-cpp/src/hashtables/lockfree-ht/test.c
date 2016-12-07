@@ -172,6 +172,40 @@ void *malloc_node(unsigned int size){
 	return ret;
 }
 
+
+void print_set_rc(intset_t *s) {
+  node_t *n = s->head;
+  printf("----------rc start---------\n");
+  while (n != NULL) {
+    printf("%d: %d,", n->val, n->rc);
+    n = n->next;
+  }
+  printf("\n----------rc end---------\n");
+}
+
+void print_ht_rc(void *data) {
+  thread_data_t *d = (thread_data_t *)data;
+  ht_intset_t *set = d->set;
+  int i;
+  for (i=0; i < maxhtlength; i++) {
+    print_set_rc(set->buckets[i]);
+  }
+}
+
+void *test0(void *data) {
+  thread_data_t *d = (thread_data_t *)data;
+  thread_local_init(d);
+  print_ht_rc(data);
+  int val = 100;
+  if (ht_add(d->set, val, TRANSACTIONAL)) {
+    printf("Added %d\n", val);
+  }
+  print_ht_rc(data);
+  if (ht_remove(d->set, val, 0)) {
+    printf("Removed %d\n", val);
+  }
+  print_ht_rc(data);
+}
 void *test(void *data) {
 	int val2, numtx, r;
 	long int last = -10;
@@ -714,7 +748,7 @@ int main(int argc, char **argv)
 		data[i].set = set;
 		data[i].barrier = &barrier;
 		// data[i].failures_because_contention = 0;
-		if (pthread_create(&threads[i], &attr, test, (void *)(&data[i])) != 0) {
+		if (pthread_create(&threads[i], &attr, test0, (void *)(&data[i])) != 0) {
 			fprintf(stderr, "Error creating thread\n");
 			exit(1);
 		}
