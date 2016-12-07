@@ -162,7 +162,7 @@ struct malloc_list{
 
 void free_node(node_t *n){
 	free((void *)n);
-	std::cout << "free"<<std::endl;
+	//std::cout << "free"<<std::endl;
 	malloc_list[get_thread_idx()].nb_free++;
 }
 
@@ -748,7 +748,7 @@ int main(int argc, char **argv)
 		data[i].set = set;
 		data[i].barrier = &barrier;
 		// data[i].failures_because_contention = 0;
-		if (pthread_create(&threads[i], &attr, test0, (void *)(&data[i])) != 0) {
+		if (pthread_create(&threads[i], &attr, test, (void *)(&data[i])) != 0) {
 			fprintf(stderr, "Error creating thread\n");
 			exit(1);
 		}

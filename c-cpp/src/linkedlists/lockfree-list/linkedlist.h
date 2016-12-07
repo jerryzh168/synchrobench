@@ -25,7 +25,7 @@
 
 #include "tm.h"
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #define IO_FLUSH                        fflush(NULL)

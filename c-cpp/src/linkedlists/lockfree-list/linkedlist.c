@@ -30,26 +30,26 @@ node_t *new_node(val_t val, node_t *next, int transactional)
   }
   node->val = val;
   node->rc = 1;
-  node->next = next;
+  node->next = NULL;
+  if (next != NULL) {
+    LFRCCopy(&node->next, next);
+  }
+
   return node;
 }
 
 intset_t *set_new()
 {
   intset_t *set;
-  node_t *min, *max;
+  node_t *min = NULL, *max = NULL;
   if ((set = (intset_t *)malloc(sizeof(intset_t))) == NULL) {
     perror("malloc");
     exit(1);
   }
   max = new_node(VAL_MAX, NULL, 0); // node_t *
-  //printf("max rc0: %d\n", max->rc);
   min = new_node(VAL_MIN, max, 0);
-  //printf("min rc0: %d\n", min->rc);
   set->head = NULL;
   LFRCStoreAlloc(&set->head, min);
-  //printf("max rc1: %d\n", max->rc);
-  //printf("min rc1: %d\n", min->rc);
   return set;
 }
 
@@ -105,25 +105,27 @@ int set_size(intset_t *set)
 /*   LFRCDestroy(olddest); */
 /* } */
 
-/* node_t* LFRCPass(node_t *v) { */
-/*   if (v!=NULL) add_to_rc(v,1); */
-/*   return v; */
-/* } */
+node_t* LFRCPass(node_t *v) {
+  if (v!=NULL) add_to_rc(v,1);
+  return v;
+}
 
 void LFRCDestroy(node_t *v) {
+  #ifdef DEBUG
   if (v != NULL) {
     printf("rc of %p: %d\n", v, v->rc);
   }
+  #endif
   if(v != NULL && add_to_rc(v, -1) == 1) {
     node_t *next = v->next;
     #ifdef DEBUG
-    printf("From LFRCDestroy %p\n", next);
+    printf("From LFRCDestroy %p %d", v, v->rc);
+    printf("From LFRCDestroy next %p\n", next);
     #endif
     LFRCDestroy(next);
     if (bench.free_node != NULL) {
       bench.free_node(v);
     } else {
-      printf("Free node \n");
       free(v);
     }
   }
