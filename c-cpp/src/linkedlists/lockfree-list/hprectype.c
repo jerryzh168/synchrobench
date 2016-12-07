@@ -10,6 +10,7 @@
 #include <string.h>
 #include "../../hashtables/lockfree-ht/smr.h"
 /* epoch is 30 ms */
+
 #define timer_nsec 30000
 
 static unsigned long epoch = 1;
@@ -31,6 +32,7 @@ void smr_global_init(int thread_cnt){
 	hp_init_global(thread_cnt);
 }
 
+#ifdef EPOCH_HP
 unsigned int inc_epoch(){
 	return ++epoch;
 }
@@ -39,8 +41,8 @@ unsigned int get_epoch(){
 }
 
 void broadcast(int signum){	
-//	inc_epoch();
-//	AO_nop_full();
+	inc_epoch();
+	AO_nop_full();
 }
 void *timer_handler(void *arg){
 	pthread_detach(pthread_self());
@@ -80,16 +82,17 @@ void *timer_handler(void *arg){
 	}
 }
 
+
 void flush_handler(int signum){	
 	AO_nop_full();
 	HP[K*thread_local_hpr.tid].epoch = get_epoch();
 }
+#endif
 
 void HPRecType_t::init(int maxThreadcount, pthread_t *peers, void (*lamda)(node_t*), void *(*alloc)(unsigned),int idx){
        this->Active = true;
        this->rcount = 0;
        list_init(&this->rlist);
-	   HP[K*idx].epoch = get_epoch();
        this->plist = (node_t**)malloc((maxThreadcount*K)*sizeof(node_t*));
        this->free_node = lamda;
        this->alloc_node = alloc;
@@ -97,6 +100,9 @@ void HPRecType_t::init(int maxThreadcount, pthread_t *peers, void (*lamda)(node_
        this->cur = next = NULL;
        this->tid = idx;
 	   /* register usr1 signal handling */
+#ifdef EPOCH_HP
+	   HP[K*idx].epoch = get_epoch();
+
 	   struct sigaction s_action;
 	   s_action.sa_handler = flush_handler;
 	   s_action.sa_flags = 0 | SA_RESTART;
@@ -112,6 +118,7 @@ void HPRecType_t::init(int maxThreadcount, pthread_t *peers, void (*lamda)(node_
             pthread_t sleeper;
             pthread_create(&sleeper, NULL, timer_handler, NULL);
        }
+#endif
 }
 
 void thread_local_init(thread_data_t *d){
@@ -140,6 +147,7 @@ void scan(HPRecType_t *myhprec){
 	//hprec = head;
 	AO_nop_full();
 	/* stage 1 */
+#ifdef EPOCH_HP
 	unsigned int remove_epoch;
     list_t *entry = NEXT(&thread_local_hpr.rlist);
 #define DELETABLE 		0
@@ -175,7 +183,9 @@ void scan(HPRecType_t *myhprec){
 		}
 		
 	}
-#if 0
+
+#else
+
 	for(int i = 0; i < K * maxThreadCount; i++){
 		node_t *hp = HP[i].ptr;
 		if(hp != NULL){

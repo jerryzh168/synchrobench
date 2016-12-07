@@ -73,8 +73,10 @@ try_again:
 	thread_local_hpr.cur = *(thread_local_hpr.prev);
 	int i = 0;
 	while(thread_local_hpr.cur != NULL){
-		HP[base + offset].ptr = thread_local_hpr.cur;					
-		//AO_nop_full();
+		HP[base + offset].ptr = thread_local_hpr.cur;	
+#ifndef EPOCH_HP				
+		AO_nop_full();
+#endif
 		// if(i++ % 10000 == 10000)
 		if(*thread_local_hpr.prev != thread_local_hpr.cur)
 			goto try_again;
