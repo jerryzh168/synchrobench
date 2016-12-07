@@ -156,7 +156,7 @@ struct malloc_list{
 
 void free_node(node_t *n){
 	free((void *)n);
-	//std::cout << "free"<<std::endl;
+	// std::cout << "free"<< malloc_list[get_thread_idx()].nb_malloc << std::endl;
 	malloc_list[get_thread_idx()].nb_malloc--;
 }
 

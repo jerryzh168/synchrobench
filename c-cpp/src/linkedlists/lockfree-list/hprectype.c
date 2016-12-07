@@ -130,10 +130,12 @@ int get_thread_idx(){
 }
 
 void retire_node(node_t *node){
+#ifdef EPOCH_HP
 	node->remove_epoch = get_epoch();
+#endif
 	list_add_tail(&thread_local_hpr.rlist, &node->r_entry);
 	thread_local_hpr.rcount++;
-	//std::cout<<"rcount is "<<thread_local_hpr.rcount<<std::endl;
+	// std::cout<<"rcount is "<<thread_local_hpr.rcount<<std::endl;
 	if(thread_local_hpr.rcount >= R(H)){
 		scan(&thread_local_hpr);
 		//help_scan(myprec);	
@@ -174,6 +176,7 @@ void scan(HPRecType_t *myhprec){
 				exit(1);
 			entry = NEXT(entry);
 			list_remv(PREV(entry));
+			myhprec->rcount--;
 			myhprec->free_node(node);
 		}else if(status == HAZARD){
 			entry = NEXT(entry);
