@@ -10,6 +10,6 @@
 #include "harris.h"
 
 sval_t set_contains(intset_t *set, skey_t key, int transactional);
-int set_add(intset_t *set, skey_t key, skey_t val, int transactional);
+int set_add(intset_t *set, skey_t key, int transactional);
 sval_t set_remove(intset_t *set, skey_t key, int transactional);
 

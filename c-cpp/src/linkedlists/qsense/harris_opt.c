@@ -67,7 +67,7 @@ try_again_search:
     
     while (1) {
 
-        HP[base + offset].p = right_node;
+      //HP[base + offset].p = right_node;
         if (right_node != left_node->next) {
             goto try_again_search;
         }
@@ -107,7 +107,7 @@ try_again_search:
     
     while (1) {
 
-        HP[base + offset].p = right_node;
+      //HP[base + offset].p = right_node;
         if (right_node != left_node->next) {
             goto try_again_search;
         }
@@ -146,7 +146,7 @@ int harris_insert(intset_t *the_list, skey_t key) {
             return 0;
         }
 
-        node_t* node_to_add = new_node(key, val, right_node, 0);
+        node_t* node_to_add = new_node(key, right_node, 0);
 
         int trials = 0;
         while (node_to_add == NULL) {
@@ -154,7 +154,7 @@ int harris_insert(intset_t *the_list, skey_t key) {
             allocate_fail(trials);
             trials++;
 
-            node_to_add = new_node(key, val, right_node, 0);
+            node_to_add = new_node(key, right_node, 0);
         }
 
         // Try to swing left_node's unmarked next pointer to a new node

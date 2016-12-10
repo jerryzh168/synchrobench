@@ -21,7 +21,7 @@ skey_t set_contains(intset_t *set, skey_t key, int transactional) {
 int set_add(intset_t *set, skey_t key, int transactional) {
     int result;
 
-    result = harris_insert(set, key, 0);// hashset
+    result = harris_insert(set, key);// hashset
     return result;
 }
 

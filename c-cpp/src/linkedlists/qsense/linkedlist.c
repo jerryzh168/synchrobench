@@ -12,7 +12,7 @@
 
 
 node_t*
-new_node(skey_t key, sval_t val, node_t *next, int initializing) {
+new_node(skey_t key, node_t *next, int initializing) {
     volatile node_t *node;
 
 
@@ -25,7 +25,7 @@ new_node(skey_t key, sval_t val, node_t *next, int initializing) {
     }
 
     node->key = key;
-    node->val = val;
+    //node->val = val;
     node->next = next;
     return (node_t*) node;
 }
@@ -42,8 +42,8 @@ set_new() {
         exit(1);
     }
 
-    max = new_node(KEY_MAX, 0, NULL, 1);
-    min = new_node(KEY_MIN, 0, max, 1);
+    max = new_node(KEY_MAX, NULL, 1);
+    min = new_node(KEY_MIN, max, 1);
     set->head = min;
 
     return set;

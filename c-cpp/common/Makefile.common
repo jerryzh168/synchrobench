@@ -257,6 +257,15 @@ LDFLAGS += -lpthread -lrt -lm
 ifeq ($(MALLOC), 1)
     LDFLAGS += -l:libtcmalloc_minimal.so.4
 endif
+# from master branch
+CFLAGS += -I$(LIBAO_INC) -I$(ROOT)/include
+CFLAGS += -I/usr/local/include
+
+#LDFLAGS += -L$(LIBAO)/lib -latomic_ops 
+LDFLAGS += -lpthread
+LDFLAGS += -L/usr/local/lib -lhwloc
+
+# from master branch
 
 ifdef STM
   ifneq ($(STM), SEQUENTIAL)

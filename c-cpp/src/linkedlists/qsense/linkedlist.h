@@ -35,14 +35,20 @@
 #define DEFAULT_ALTERNATE		0
 #define DEFAULT_EFFECTIVE		1
 
-static volatile int stop;
+//static volatile int stop;
+static volatile long unsigned int stop;
 
+#define DEFAULT_SEED                    0
+#define VAL_MIN                         INT_MIN
+#define VAL_MAX                         INT_MAX
 #define TRANSACTIONAL                   4
 
-typedef volatile struct node {
+//typedef volatile struct node {
+typedef struct node {
     skey_t key;
     sval_t val;
-    volatile struct node* next;
+  //volatile struct node* next;
+  struct node* next;
     uint8_t padding32[8];
 #if defined(DO_PAD)
     uint8_t padding[CACHE_LINE_SIZE - sizeof(sval_t) - sizeof(skey_t) - sizeof(struct node*)];
@@ -54,6 +60,6 @@ typedef ALIGNED(CACHE_LINE_SIZE) struct intset {
     uint8_t padding[CACHE_LINE_SIZE - sizeof(node_t *)];
 } intset_t;
 
-node_t *new_node(skey_t key, sval_t val, node_t *next, int initializing);
+node_t *new_node(skey_t key, node_t *next, int initializing);
 intset_t *set_new();
 void set_delete(intset_t *set);

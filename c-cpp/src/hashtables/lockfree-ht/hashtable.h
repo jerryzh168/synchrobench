@@ -21,7 +21,10 @@
  * GNU General Public License for more details.
  */
 
-#include "../../linkedlists/linkedlist-harris-qsense/intset.h"
+#ifndef _HASHTABLE_H
+#define _HASHTABLE_H
+#include "../../linkedlists/qsense/intset.h"
+
 
 #define DEFAULT_MOVE                    0
 #define DEFAULT_SNAPSHOT                0
@@ -50,3 +53,4 @@ void ht_delete(ht_intset_t *set);
 int ht_size(ht_intset_t *set);
 int floor_log_2(unsigned int n);
 ht_intset_t *ht_new();
+#endif
