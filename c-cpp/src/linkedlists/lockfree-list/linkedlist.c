@@ -11,6 +11,8 @@
 #include "linkedlist.h"
 #include "list.h"
 #include "hprectype.h"
+#include "../../hashtables/lockfree-ht/smr.h"
+__thread int thread_id;
 
 node_t *new_node(val_t val, node_t *next, int transactional)
 {
@@ -74,3 +76,5 @@ int set_size(intset_t *set)
 
   return size;
 }
+
+

@@ -31,6 +31,9 @@
 /* Hashtable length (# of buckets) */
 unsigned int maxhtlength;
 
+/* TOOD .. here? */
+#define CACHE_LINE_SIZE 64
+
 /* Hashtable seed */
 #ifdef TLS
 __thread unsigned int *rng_seed;
@@ -92,7 +95,7 @@ inline long rand_range(long r) {
 		v += 1 + (long)(d * ((double)lrand48()/((m+1.0))));
 		r -= m;
 	} while (r > 0);
-	// std::cout <<v<<std::endl;
+	 //std::cout <<v<<std::endl;
 	return v;
 
 
@@ -150,14 +153,15 @@ static int locate_pu_affinity(hwloc_obj_t root, int num_pu, int idx){
 }
 
 struct malloc_list{
-	long nb_malloc;
-	char padding[CACHE_LINE_SIZE - sizeof(long)];
+  long nb_malloc;
+  long nb_free;
+  char padding[CACHE_LINE_SIZE - sizeof(long) - sizeof(long)];
 } *malloc_list;
 
 void free_node(node_t *n){
 	free((void *)n);
-	// std::cout << "free"<< malloc_list[get_thread_idx()].nb_malloc << std::endl;
-	malloc_list[get_thread_idx()].nb_malloc--;
+	//std::cout << "free"<<std::endl;
+	malloc_list[get_thread_idx()].nb_free++;
 }
 
 void *malloc_node(unsigned int size){
@@ -180,7 +184,6 @@ void *test(void *data) {
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
 	CPU_SET(physical_idx, &cpuset);
-	//std::cout <<"thread "<<d->idx<<" on core "<<physical_idx<<std::endl;
 	int ret = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
 	if(ret != 0)
 		throw "set affinity fail\n";
@@ -218,6 +221,7 @@ void *test(void *data) {
 	    if (last < 0) { // add
 	      // std::cout<<val<<std::endl;	      
 	      val = rand_range_re(d->seed, d->range);
+		//  val = rand_range_re(d->seed, d->range);
 	      if (ht_add(d->set, val, TRANSACTIONAL)) {
 					d->nb_added++;
 					last = val;
@@ -229,10 +233,10 @@ void *test(void *data) {
 
 			/* Random computation only in non-alternated cases */
 			val = rand_range_re(d->seed, d->range);
-
+		//	val = rand_range_re(d->seed, d->range);
 
 			/* Remove one random value */
-	      // std::cout<<val << ":"<<last<<std::endl;
+	      //std::cout<<val << ":"<<last<<std::endl;
 			if (ht_remove(d->set, val, TRANSACTIONAL)) {
 				d->nb_removed++;
 				/* Repeat until successful, to avoid size variations */
@@ -282,6 +286,7 @@ void *test(void *data) {
 	/* Free transaction */
 	TM_THREAD_EXIT();
 	// std::cout<<"exit"<<std::endl;
+	thread_local_finit();
 	return NULL;
 }
 
@@ -716,6 +721,7 @@ int main(int argc, char **argv)
 		}
 	}
 	pthread_attr_destroy(&attr);
+
 	
 	sigset_t sig_set;
 	sigemptyset(&sig_set);
@@ -734,14 +740,16 @@ int main(int argc, char **argv)
 			int reads = 0;
 			int updates = 0;
 			int snapshots = 0;
-			int memory_use = 0;
+			int mallocs = 0;
+			int frees = 0;
 			for(int i = 0 ; i < nb_threads;i++){
 				reads += data[i].nb_contains;
 				updates += (data[i].nb_add + data[i].nb_remove);
-				memory_use += malloc_list[i].nb_malloc;
+				mallocs += malloc_list[i].nb_malloc;
+				frees += malloc_list[i].nb_free;
 			}
-			//std::cout << "sum"<<reads+updates+snapshots - last_sum <<std::endl;
-			// std::cout <<memory_use<<std::endl;
+			std::cout << "#profile: (txs, "<<reads+updates+snapshots<< ") (mallocs, " << mallocs << ") (frees, " << frees << ")" << std::endl;
+			// Add custome stats here, following the same format.
 			//std::cout << duration<<":"<<profile_rate<<std::endl;
 			last_sum = reads + updates + snapshots;
 		}
@@ -780,7 +788,7 @@ int main(int argc, char **argv)
 		printf("    #removed  : %lu\n", data[i].nb_removed);
 		printf("  #contains   : %lu\n", data[i].nb_contains);
 		printf("    #found    : %lu\n", data[i].nb_found);
-		printf("Memory Pressure: %ld\n", malloc_list[i].nb_malloc);
+		printf("Memory Pressure: %ld\n", malloc_list[i].nb_malloc - malloc_list[i].nb_free);
 		// printf("  #move       : %lu\n", data[i].nb_move);
 		// printf("  #moved      : %lu\n", data[i].nb_moved);
 		// printf("  #snapshot   : %lu\n", data[i].nb_snapshot);
@@ -817,7 +825,7 @@ int main(int argc, char **argv)
 		// snapshots += data[i].nb_snapshot;
 		// snapshoted += data[i].nb_snapshoted;
 		size += data[i].nb_added - data[i].nb_removed;
-		memory_pressure += malloc_list[i].nb_malloc;
+		memory_pressure += malloc_list[i].nb_malloc - malloc_list[i].nb_free;
 		// if (max_retries < data[i].max_retries)
 		// 	max_retries = data[i].max_retries;
 		printf("\n");

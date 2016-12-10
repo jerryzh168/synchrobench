@@ -5,7 +5,7 @@
 #include "harris.h"
 #include <pthread.h>
 
-#define EPOCH_HP
+//#define EPOCH_HP
 
 #define TIMER_SIGNAL SIGALRM
 
@@ -37,7 +37,7 @@ class HPRecType_t{
 	node_t *next;
 	int tid;
 	void init(int maxThreadcount, pthread_t *threads, void (*lamda)(node_t*), void *(*alloc)(unsigned),int idx);
-		
+	void finit();	
 	
 };
 void hp_init_global(int thread_cnt);

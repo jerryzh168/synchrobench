@@ -6,9 +6,9 @@
  *  Copyright 2009 __MyCompanyName__. All rights reserved.
  *
  */
-
 #ifndef _LINKEDLIST_H
 #define _LINKEDLIST_H
+
 #include <assert.h>
 #include <getopt.h>
 #include <limits.h>
@@ -19,11 +19,10 @@
 #include <sys/time.h>
 #include <time.h>
 #include <stdint.h>
-
+#include "list.h"
 #include <atomic_ops.h>
 
 #include "tm.h"
-#include "list.h"
 
 #ifdef DEBUG
 #define IO_FLUSH                        fflush(NULL)
@@ -44,7 +43,6 @@
 #define STR(s)                          #s
 
 #define ATOMIC_CAS_MB(a, e, v)          (AO_compare_and_swap_full((volatile AO_t *)(a), (AO_t)(e), (AO_t)(v)))
-#define ATOMIC_TAS(a) 			(AO_test_and_set((volatile AO_t *)(a)))
 
 static volatile AO_t stop;
 

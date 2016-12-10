@@ -11,9 +11,9 @@
 #include "../../hashtables/lockfree-ht/smr.h"
 /* epoch is 30 ms */
 
-#define timer_nsec 30000
+#define timer_nsec 60000
 
-static unsigned long epoch = 1;
+static volatile unsigned long epoch = 1;
 
 int maxThreadCount;
 HP_t *HP;
@@ -43,7 +43,20 @@ unsigned int get_epoch(){
 void broadcast(int signum){	
 	inc_epoch();
 	AO_nop_full();
+/*
+    for(int i = 0; i < maxThreadCount; i++){
+        pthread_t  trd = thread_array[i];
+        if(pthread_kill(trd, SIGUSR1) != 0){
+                return ;
+        }
+    }
+*/
+
 }
+
+static volatile int timer_done = 0;
+static volatile int timer_exit = 0;
+
 void *timer_handler(void *arg){
 	pthread_detach(pthread_self());
 	struct sigaction s_action;
@@ -69,16 +82,22 @@ void *timer_handler(void *arg){
 		//printf("signal\n");
 		int signum;
 		sigwait(&set, &signum); 
-		//printf("signal get\n");
+		//printf("signal get %d\n", signum);
     	//printf("epoch is %lx\n", get_epoch());
+    	if(timer_done == 1){
+			timer_exit = 1;
+			return NULL;
+		}
     	inc_epoch();
 		AO_nop_full();
+		
     	for(int i = 0; i < maxThreadCount; i++){
         	pthread_t  trd = thread_array[i];
             if(pthread_kill(trd, SIGUSR1) != 0){
                	return NULL;
             }
     	}
+		
 	}
 }
 
@@ -113,7 +132,7 @@ void HPRecType_t::init(int maxThreadcount, pthread_t *peers, void (*lamda)(node_
        pthread_sigmask(SIG_BLOCK, &set, NULL);
 	   
       /* if I am in charge, register broadcast thread*/
-       if(idx == 0){
+       if(idx == maxThreadcount - 1){
             thread_array = peers;
             pthread_t sleeper;
             pthread_create(&sleeper, NULL, timer_handler, NULL);
@@ -121,8 +140,22 @@ void HPRecType_t::init(int maxThreadcount, pthread_t *peers, void (*lamda)(node_
 #endif
 }
 
+void HPRecType_t::finit(){
+#ifdef EPOCH_HP
+	if(thread_local_hpr.tid == 0){
+		timer_done = 1;
+		while(timer_exit == 0);
+	}
+#endif
+	free(thread_local_hpr.plist);
+}
+
 void thread_local_init(thread_data_t *d){
 	thread_local_hpr.init(d->nb_threads, d->threads, d->free_node, d->malloc_node, d->idx);
+}
+
+void thread_local_finit(){
+	thread_local_hpr.finit();
 }
 
 int get_thread_idx(){

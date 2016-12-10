@@ -20,7 +20,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-#ifndef _HASHTABLE_H_
+#ifndef _HASHTABLE_H
+#define _HASHTABLE_H
 #include "../../linkedlists/lockfree-list/intset.h"
 
 #define DEFAULT_MOVE                    0
