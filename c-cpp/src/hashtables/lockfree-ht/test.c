@@ -175,6 +175,8 @@ void *test(void *data) {
 	unext = (r < d->update);
 	mnext = (r < d->move);
 	cnext = (r >= d->update + d->snapshot);
+	int qcount = 0;
+
 // #ifdef ICC
 	while (stop == 0) {
 // #else
@@ -255,6 +257,12 @@ void *test(void *data) {
 	  //   mnext = (r < d->move);
 	  //   cnext = (r >= d->update + d->snapshot);
 	  // }
+	    qcount++;
+
+	    if (qcount == QUIESCENCE_THRESHOLD) {
+	      quiescent_state(FUZZY);
+	      qcount = 0;
+	    }
 	  
 	}
 

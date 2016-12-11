@@ -180,7 +180,6 @@ void process_callbacks(mr_node_t **list)
  */
 void quiescent_state (int blocking)
 {
-  printf("%p\n", qd);
     qsbr_data_t *t = &(qd[qad.thread_index]);
     int epoch;
     int orig;
