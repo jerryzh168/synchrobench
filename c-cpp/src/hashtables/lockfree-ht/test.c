@@ -30,6 +30,7 @@
 
 
 #include <stdlib.h>
+#include <malloc.h>
 /* Hashtable length (# of buckets) */
 unsigned int maxhtlength;
 
@@ -793,7 +794,7 @@ int main(int argc, char **argv)
 		printf("    #removed  : %lu\n", data[i].nb_removed);
 		printf("  #contains   : %lu\n", data[i].nb_contains);
 		printf("    #found    : %lu\n", data[i].nb_found);
-		printf("Memory Pressure: %ld\n", malloc_list[i].nb_malloc - malloc_list[i].nb_free);
+		printf("#thread-memory pressure: %ld\n", malloc_list[i].nb_malloc - malloc_list[i].nb_free);
 		// printf("  #move       : %lu\n", data[i].nb_move);
 		// printf("  #moved      : %lu\n", data[i].nb_moved);
 		// printf("  #snapshot   : %lu\n", data[i].nb_snapshot);
@@ -830,14 +831,14 @@ int main(int argc, char **argv)
 		// snapshots += data[i].nb_snapshot;
 		// snapshoted += data[i].nb_snapshoted;
 		size += data[i].nb_added - data[i].nb_removed;
-		memory_pressure += malloc_list[i].nb_malloc;
+		memory_pressure += malloc_list[i].nb_malloc - malloc_list[i].nb_free;
 		// if (max_retries < data[i].max_retries)
 		// 	max_retries = data[i].max_retries;
 		printf("\n");
 	}
 	printf("Set size      : %d (expected: %d)\n", ht_size(set), size);
 	printf("Duration      : %d (ms)\n", duration);
-	printf("Memory pressure: %d\n",memory_pressure );
+	printf("#memory pressure: %d\n",memory_pressure );
 	printf("#txs          : %lu (%f / s)\n", reads + updates + snapshots, (reads + updates + snapshots) * 1000.0 / duration);
 	
 	printf("#read txs     : ");
