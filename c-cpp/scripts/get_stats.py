@@ -66,7 +66,7 @@ def main(args):
             lines.append(line)
         plt.legend(metrics, loc=1)
         plt.savefig(args.filename + '.png')
-    print args.filename, stats['#txs per second']
+    print args.filename, stats['#txs per second'], stats['#memory pressure']
     return stats
 
 
