@@ -14,7 +14,7 @@ do
 	    do
 		name=throughput'_'$thread'_'$lf'_'$update'_'$topo
 		echo "Thread: $thread LF: $lf Update: $update Topo:$topo"
-		bin/lockfree-hashtable -i $size -A $alternate -d $duration -t $thread -S $seed -u $update -l $lf -p $interval -L $topo > results/$name
+		bin/lockfree-hashtable -i $size -d $duration -t $thread -S $seed -u $update -l $lf -p $interval -L $topo > results/$name
 		python scripts/get_stats.py -e -f results/$name
 		python scripts/get_stats.py -f results/$name >> $report_name
 	    done
