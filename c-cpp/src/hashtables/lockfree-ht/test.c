@@ -208,28 +208,18 @@ void *test(void *data) {
 	mnext = (r < d->move);
 	cnext = (r >= d->update + d->snapshot);
 // #ifdef ICC
+	int i = 0;
 	while (stop == 0) {
+	  std::cout <<i++<<std::endl;
 // #else
 	// while (AO_load_full(&stop) == 0) {
 // #endif /* ICC */
 		
 	  if (unext) { // update
 	    
-	    // if (mnext) { // move
-	      
-	    //   if (last == -1) val = rand_range_re(&d->seed, d->range);
-	    //   else val = last;
-	    //   val2 = rand_range_re(&d->seed, d->range);
-	    //   if (ht_move(d->set, val, val2, TRANSACTIONAL)) {
-					// d->nb_moved++;
-					// last = -1;
-	    //   }
-	    //   d->nb_move++;
-	      
-	    // } else 
 	    if (last < 0) { // add
-	      // std::cout<<val<<std::endl;	      
 	      val = rand_range_re(d->seed, d->range);
+		printf("add\n");
 	      if (ht_add(d->set, val, TRANSACTIONAL)) {
 					d->nb_added++;
 					last = val;
@@ -242,9 +232,8 @@ void *test(void *data) {
 			/* Random computation only in non-alternated cases */
 			val = rand_range_re(d->seed, d->range);
 
-
+			printf("remove\n");
 			/* Remove one random value */
-	      // std::cout<<val << ":"<<last<<std::endl;
 			if (ht_remove(d->set, val, TRANSACTIONAL)) {
 				d->nb_removed++;
 				/* Repeat until successful, to avoid size variations */
@@ -256,22 +245,13 @@ void *test(void *data) {
 	    
 	  } else { // reads
 	    
-	    // if (cnext) { // contains (no snapshot)
 				
 		  val = rand_range_re(d->seed, d->range);
-			
+		printf("contains\n");	
 	      if (ht_contains(d->set, val, TRANSACTIONAL)) 
 					d->nb_found++;
 	      d->nb_contains++;
 	      
-	    // } 
-	 //    else { // snapshot
-	      
-	 //      if (ht_snapshot(d->set, TRANSACTIONAL))
-		// d->nb_snapshoted++;
-	 //      d->nb_snapshot++;
-	      
-	 //    }
 	  }
 	  
 	  /* Is the next op an update, a move, a contains? */
@@ -730,17 +710,17 @@ int main(int argc, char **argv)
 	pthread_attr_destroy(&attr);
 
 	
-	//sigset_t sig_set;
-	//sigemptyset(&sig_set);
-	//sigaddset(&sig_set, TIMER_SIGNAL);
-	//pthread_sigmask(SIG_BLOCK, &sig_set, NULL);
+	sigset_t sig_set;
+	sigemptyset(&sig_set);
+	sigaddset(&sig_set, SIGUSR1);
+	pthread_sigmask(SIG_BLOCK, &sig_set, NULL);
 	//Start threads 
 	barrier_cross(&barrier);
 	/* install alarm signal */
 	printf("STARTING...\n");
 	gettimeofday(&start, NULL);
 	if (duration > 0) {
-		int last_sum = 0;
+		int last_sum = 0;/*
 		while(greater_and_sub(&duration, profile_rate) > 0){	
 			nanosleep(&accounting_timeout, NULL);
 			int reads = 0;
@@ -758,7 +738,7 @@ int main(int argc, char **argv)
 			// Add custome stats here, following the same format.
 			//std::cout << duration<<":"<<profile_rate<<std::endl;
 			last_sum = reads + updates + snapshots;
-		}
+		}*/
 		timeout.tv_sec = duration/1000;
 		timeout.tv_nsec = (duration % 1000) * 1000000;
 		nanosleep(&timeout, NULL);
