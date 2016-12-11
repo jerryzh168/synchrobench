@@ -56,16 +56,16 @@
 updates=(0 20 50)
 
 # size
-size=100000
+size=5000
 
 # Load factor
-lfs=(1 100 10000)
+lfs=(1 10 100 1000)
 
 # numa
 topos=(0 1)
 
 # Threads
-threads=(1 2 4 8 16 32 40 64)
+threads=(1 2 3 4 5 6 7 8 9 10 12 14 16 18 20)
 
 # Duration
 duration=10000
@@ -74,10 +74,10 @@ duration=10000
 interval=10
 
 # Seed
-seed=1
+seed=17
 
 # Alternate
-alternate=0
+# alternate=0
 
 # for i in "${threads[@]}"
 # do
