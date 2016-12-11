@@ -567,16 +567,16 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (!is_power_of_two(initial)) {
-	  size_t initial_pow2 = pow2roundup(initial);
-	  printf(
-		 "** rounding up initial (to make it power of 2): old: %zu / new: %zu\n",
-		 initial, initial_pow2);
-	  initial = initial_pow2;
-	}
-	if (range < initial) {
-	  range = 2 * initial;
-	}
+// 	if (!is_power_of_two(initial)) {
+// 	  size_t initial_pow2 = pow2roundup(initial);
+// 	  printf(
+// 		 "** rounding up initial (to make it power of 2): old: %zu / new: %zu\n",
+// 		 initial, initial_pow2);
+// 	  initial = initial_pow2;
+// 	}
+// 	if (range < initial) {
+// 	  range = 2 * initial;
+// 	}
 	
 	hwloc_topology_t topology;
 	hwloc_topology_init(&topology);
