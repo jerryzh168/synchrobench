@@ -1,12 +1,6 @@
 #/bin/sh
 source scripts/bench.sh
 
-# on unix
-threads=(1 2 4 8 12)
-
-# on ziqi's machine
-# threads=(1 2 4 8 16 20)
-
 report_name=results/numa.report
 rm -f $report_name
 touch $report_name
