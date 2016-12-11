@@ -117,6 +117,8 @@ ifndef STM
     CFLAGS += -D$(LOCK)
 endif
 
+# FOR QSBR
+CFLAGS += -D$(LOCK)
 #################################
 # Management PC specific settings
 #################################

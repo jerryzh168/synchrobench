@@ -4,7 +4,7 @@
 #include <hwloc.h>
 #include "barrier.h"
 
-typedef  struct node node_t;
+//typedef  struct node node_t;
 typedef sval_t val_t;
 typedef struct thread_data {
   sval_t first;
@@ -46,7 +46,7 @@ typedef struct thread_data {
 	// unsigned long nb_aborts_invalid_memory;
 	// unsigned long nb_aborts_double_write;
 	// unsigned long max_retries;
-	unsigned int seed[3];
+	unsigned short seed[3];
 	ht_intset_t *set;
 	barrier_t *barrier;
 	// unsigned long failures_because_contention;

@@ -35,7 +35,6 @@ int ht_contains(ht_intset_t *set, int val, int transactional) {
 
 int ht_add(ht_intset_t *set, int val, int transactional) {
 	int addr;
-	
 	addr = val % maxhtlength;
 	if (transactional == 5)
 		return set_add(set->buckets[addr], val, 4);

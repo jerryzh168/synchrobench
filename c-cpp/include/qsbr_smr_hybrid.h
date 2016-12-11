@@ -5,7 +5,7 @@
 #include "lock_if.h"
 #include "sleeper_threads.h"
 #include "double_llist.h"
-#include "htlock.h"
+
 // QSBR 
 #define FUZZY 0
 #define NOT_FUZZY 1

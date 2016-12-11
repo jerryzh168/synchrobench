@@ -27,9 +27,10 @@
 #include <hwloc.h>
 #include <iostream>
 #include <stdexcept>      // std::invalid_argument
-
-
 #include <stdlib.h>
+
+#include "qsbr.h"
+
 /* Hashtable length (# of buckets) */
 unsigned int maxhtlength;
 
@@ -46,6 +47,39 @@ pthread_key_t rng_seed_key;
 
 #define DEFAULT_PROFILE_RATE 10    //in ms
 int nb_threads = 0;
+__thread unsigned long * seeds;
+
+/* 
+ * Returns a pseudo-random value in [1;range).
+ * Depending on the symbolic constant RAND_MAX>=32767 defined in stdlib.h,
+ * the granularity of rand() could be lower-bounded by the 32767^th which might 
+ * be too high for given values of range and initial.
+ */
+/* inline long rand_range(long r) { */
+/* 	int m = RAND_MAX; */
+/* 	long d, v = 0; */
+	
+/* 	do { */
+/* 		d = (m > r ? r : m); */
+/* 		v += 1 + (long)(d * ((double)rand()/((double)(m)+1.0))); */
+/* 		r -= m; */
+/* 	} while (r > 0); */
+/* 	return v; */
+/* } */
+
+/* /\* Re-entrant version of rand_range(r) *\/ */
+/* inline long rand_range_re(unsigned int *seed, long r) { */
+/* 	int m = RAND_MAX; */
+/* 	long d, v = 0; */
+	
+/* 	do { */
+/* 		d = (m > r ? r : m);		 */
+/* 		v += 1 + (long)(d * ((double)rand_r(seed)/((double)(m)+1.0))); */
+/* 		r -= m; */
+/* 	} while (r > 0); */
+/* 	return v; */
+/* } */
+
 
 static int locate_pu_affinity_helper(hwloc_obj_t root, int *child_found, int idx){
 	if(root->type == HWLOC_OBJ_PU){
@@ -111,17 +145,23 @@ void *test(void *data) {
 	thread_local_init(d);
 	// thread_local_hpr.init(d->nb_threads, d->threads, free_node, malloc_node, d->idx);
 	int physical_idx = locate_pu_affinity(d->topo_root, d->topo_pu_num, d->idx);
+	mr_init_local(d->idx, nb_threads);
 	/* set affinity according to topology */
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
 	CPU_SET(physical_idx, &cpuset);
 	int ret = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
-	if(ret != 0)
+	printf("In test %d\n", (int)d->idx);
+	if(ret != 0) {
+	  printf("set affinity fail\n");
 		throw "set affinity fail\n";
+	}
 	/* Create transaction */
-	//TM_THREAD_ENTER();
+
+	TM_THREAD_ENTER();
+
 	/* Wait on barrier */
-	r = rand_range_re(d->seed, 100) - 1;
+	r = rand_range_re(d->seed, (long)100) - 1;
 
 	barrier_cross(d->barrier);
 	
@@ -214,7 +254,7 @@ void *test(void *data) {
 
 	
 	/* Free transaction */
-	//TM_THREAD_EXIT();
+	TM_THREAD_EXIT();
 	// std::cout<<"exit"<<std::endl;
 	return NULL;
 }
@@ -292,26 +332,26 @@ void *test2(void *data)
 	return NULL;
 }
 #endif
-void print_set(intset_t *set) {
-	node_t *curr, *tmp;
+/* void print_set(intset_t *set) { */
+/* 	node_t *curr, *tmp; */
 	
-	curr = set->head;
-	tmp = curr;
-	do {
-		printf(" - v%d", (int) curr->val);
-		tmp = curr;
-		curr = tmp->next;
-	} while (curr->val != VAL_MAX);
-	printf(" - v%d", (int) curr->val);
-	printf("\n");
-}
+/* 	curr = set->head; */
+/* 	tmp = curr; */
+/* 	do { */
+/* 		printf(" - v%d", (int) curr->key); */
+/* 		tmp = curr; */
+/* 		curr = tmp->next; */
+/* 	} while (curr->key != VAL_MAX); */
+/* 	printf(" - v%d", (int) curr->key); */
+/* 	printf("\n"); */
+/* } */
 
-void print_ht(ht_intset_t *set) {
-	int i;
-	for (i=0; i < maxhtlength; i++) {
-		print_set(set->buckets[i]);
-	}
-}
+/* void print_ht(ht_intset_t *set) { */
+/* 	int i; */
+/* 	for (i=0; i < maxhtlength; i++) { */
+/* 		print_set(set->buckets[i]); */
+/* 	} */
+/* } */
 
 int greater_and_sub(int *sum_time, int delta){
 	if(*sum_time >= delta){	
@@ -337,6 +377,11 @@ static int sum_pu_num_under(hwloc_obj_t root){
 
 int main(int argc, char **argv)
 {
+  set_cpu(the_cores[0]);
+  ssalloc_init();
+  seeds = seed_rand();
+  
+
 	struct option long_options[] = {
 		// These options don't set a flag
 		{"help",                      no_argument,       NULL, 'h'},
@@ -507,6 +552,18 @@ int main(int argc, char **argv)
 					exit(1);
 		}
 	}
+
+	if (!is_power_of_two(initial)) {
+	  size_t initial_pow2 = pow2roundup(initial);
+	  printf(
+		 "** rounding up initial (to make it power of 2): old: %zu / new: %zu\n",
+		 initial, initial_pow2);
+	  initial = initial_pow2;
+	}
+	if (range < initial) {
+	  range = 2 * initial;
+	}
+	
 	hwloc_topology_t topology;
 	hwloc_topology_init(&topology);
 	hwloc_topology_load(topology);	
@@ -581,19 +638,22 @@ int main(int argc, char **argv)
 
 	
 	maxhtlength = (unsigned int) initial / load_factor;
+	printf("Before ht_new\n");
 	set = ht_new();
+	printf("After ht_new\n");
 	
 	stop = 0;
 	
 	// Init STM 
 	printf("Initializing STM\n");
 	
-	//TM_STARTUP();
+	TM_STARTUP();
 	
 	// Populate set 
 	printf("Adding %d entries to set\n", initial);
 	i = 0;
 	maxhtlength = (int) (initial / load_factor);
+	printf("maxhtlength: %d\n", maxhtlength);
 	while (i < initial) {
 		val = rand_range(range);
 		if (ht_add(set, val, 0)) {
@@ -797,7 +857,7 @@ int main(int argc, char **argv)
 	ht_delete(set);
 	
 	// Cleanup STM 
-	//TM_SHUTDOWN();
+	TM_SHUTDOWN();
 	
 	free(threads);
 	free(data);

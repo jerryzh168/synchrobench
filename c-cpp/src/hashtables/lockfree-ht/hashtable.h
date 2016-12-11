@@ -23,7 +23,8 @@
 
 #ifndef _HASHTABLE_H
 #define _HASHTABLE_H
-#include "../../linkedlists/qsense/intset.h"
+#include "../../linkedlist-harris-qsbr/intset.h"
+//#include "../../qsense/intset.h"
 
 
 #define DEFAULT_MOVE                    0
