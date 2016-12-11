@@ -262,12 +262,16 @@ endif
 # from master branch
 CFLAGS += -I$(LIBAO_INC) -I$(ROOT)/include
 CFLAGS += -I/usr/local/include
+CFLAGS +=  -fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free
 
 #LDFLAGS += -L$(LIBAO)/lib -latomic_ops 
 LDFLAGS += -lpthread
 LDFLAGS += -L/usr/local/lib -lhwloc
 
+
 # from master branch
+LDFLAGS += -ltcmalloc_minimal
+
 
 ifdef STM
   ifneq ($(STM), SEQUENTIAL)

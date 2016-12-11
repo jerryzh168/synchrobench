@@ -9,6 +9,7 @@ typedef sval_t val_t;
 typedef struct thread_data {
   sval_t first;
 	void *(*malloc_node)(unsigned int);
+	void *(*malloc_node_aligned)( size_t, size_t);// args: alignment, size
 	void (*free_node)(node_t *);
 
 	int idx;
