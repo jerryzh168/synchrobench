@@ -172,6 +172,12 @@ void *malloc_node(unsigned int size){
 	return ret;
 }
 
+void *malloc_node_aligned( size_t alignment, size_t size) {
+	void *ret= memalign(alignment, size);
+	malloc_list[get_thread_idx()].nb_malloc++;
+	return ret;
+}
+
 void *test(void *data) {
 	int val2, numtx, r;
 	long int last = -10;
