@@ -30,7 +30,6 @@
 #include <stdlib.h>
 
 #include "qsbr.h"
-
 /* Hashtable length (# of buckets) */
 unsigned int maxhtlength;
 

@@ -61,6 +61,7 @@ struct thread_local_info_t {
   void *(*malloc_node)(unsigned int);
   void (*free_node)(node_t *);
 };
+extern __thread thread_local_info_t bench;
 
 node_t *new_node(skey_t key, node_t *next, int initializing);
 intset_t *set_new();

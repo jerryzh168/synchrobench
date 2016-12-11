@@ -13,6 +13,8 @@
 
 #include "../include/ssalloc.h"
 #include "../include/measurements.h"
+#include "linkedlist-harris-qsbr/linkedlist.h"
+#define SSALLOC_USE_MALLOC
 
 #define SSMEM_CACHE_LINE_SIZE 64
 // #define SSALLOC_SIZE_BIG  1024 * 1024 * 1024
@@ -65,7 +67,12 @@ ssalloc_alloc(unsigned int allocator, size_t size) {
     void* ret = NULL;
 
 #if defined(SSALLOC_USE_MALLOC)
-    ret = (void*) malloc(size);
+    //ret = (void*) malloc(size);
+    if (bench.malloc_node != NULL) {
+      ret = (void*) bench.malloc_node(size);
+    } else {
+      ret = (void*) malloc(size);      
+    }
 #else
     if (ssalloc_free_num[allocator] > 2) {
         uint16_t spot = ssalloc_free_cur[allocator]
