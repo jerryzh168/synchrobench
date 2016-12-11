@@ -9,9 +9,9 @@
 #include <time.h>
 #include <string.h>
 #include "../../hashtables/lockfree-ht/smr.h"
-/* epoch is 30 ms */
+/* epoch is 60 ms */
 
-#define timer_nsec 60000
+#define timer_nsec 600000
 
 static volatile unsigned long epoch = 1;
 
@@ -25,6 +25,8 @@ __thread HPRecType_t thread_local_hpr;
 void hp_init_global(int thread_cnt){
 	maxThreadCount = thread_cnt;
 	HP = (HP_t *)aligned_alloc(CACHE_LINE_SIZE, sizeof(HP_t) * thread_cnt * K); 
+	//for(int i = 0; i < thread_cnt * K; i++)
+	//	std::cout << &HP[i] <<std::endl;
 	memset(HP, 0, sizeof(HP_t) * thread_cnt * K);
 }
 
@@ -33,10 +35,11 @@ void smr_global_init(int thread_cnt){
 }
 
 #ifdef EPOCH_HP
-unsigned int inc_epoch(){
+
+unsigned long inc_epoch(){
 	return ++epoch;
 }
-unsigned int get_epoch(){
+unsigned long int get_epoch(){
 	return epoch;
 }
 
@@ -77,6 +80,8 @@ void *timer_handler(void *arg){
     sigset_t set;
     sigemptyset(&set);
     sigaddset(&set, TIMER_SIGNAL);
+
+
 	//std::cout<<"SSSS"<<std::endl;
 	while(1){
 		//printf("signal\n");
@@ -90,21 +95,34 @@ void *timer_handler(void *arg){
 		}
     	inc_epoch();
 		AO_nop_full();
-		
+
     	for(int i = 0; i < maxThreadCount; i++){
         	pthread_t  trd = thread_array[i];
             if(pthread_kill(trd, SIGUSR1) != 0){
                	return NULL;
             }
     	}
+
 		
 	}
 }
 
+void assign_epoch(int tid, unsigned long epoch) __attribute__((noinline));
+
+void assign_epoch(int tid, unsigned long epoch){
+	HP[K*tid].epoch = epoch;
+}
 
 void flush_handler(int signum){	
 	AO_nop_full();
+	//get_epoch();
+	// register unsigned long  epoch_tmp = get_epoch();
+	//std::cout<<&HP[K*thread_local_hpr.tid].epoch<<std::endl;
+	// assign_epoch(thread_local_hpr.tid, epoch_tmp);
+	//thread_local_hpr.tid = thread_local_hpr.tid;
 	HP[K*thread_local_hpr.tid].epoch = get_epoch();
+	//std::cout<<epoch_tmp<<std::endl;
+	//std::cout<<thread_local_hpr.tid << ":"<<&HP[K*thread_local_hpr.tid].epoch<<std::endl;
 }
 #endif
 
@@ -129,6 +147,7 @@ void HPRecType_t::init(int maxThreadcount, pthread_t *peers, void (*lamda)(node_
 	   sigset_t set;
 	   sigemptyset(&set);
 	   sigaddset(&set, TIMER_SIGNAL);
+
        pthread_sigmask(SIG_BLOCK, &set, NULL);
 	   
       /* if I am in charge, register broadcast thread*/
@@ -185,40 +204,78 @@ void scan(HPRecType_t *myhprec){
 #ifdef EPOCH_HP
 	unsigned int remove_epoch;
     list_t *entry = NEXT(&thread_local_hpr.rlist);
-#define DELETABLE 		0
-#define EPOCH_ISSUE 	1
-#define HAZARD			2
-    while(entry != &thread_local_hpr.rlist){
-		node_t *node = LIST_ENTRY(entry, node_t, r_entry);
-		remove_epoch = node->remove_epoch;
-		int status = DELETABLE;
-		int i;
-		for(i = 0; i < K * maxThreadCount; i++){
-			if(HP[(i)/K*K].epoch <= remove_epoch){
-				status = EPOCH_ISSUE;
-				break;
-			}else{
-				if(HP[i].ptr == node){
-					status = HAZARD;
-					break;
-				}
+    if(entry == &thread_local_hpr.rlist)
+    	return;
+
+	node_t *node = LIST_ENTRY(entry, node_t, r_entry);
+
+    unsigned long const remove_min = node->remove_epoch;
+    unsigned long minimum = ((long)0 - 1);
+
+   	for(int i = 0; i < K * maxThreadCount; i++){
+		node_t *hp = HP[i].ptr;
+		if(i % K == 0){
+			unsigned long stmp = HP[i].epoch;
+			if(stmp <= remove_min)
+				return;
+			else if(stmp < minimum){
+				minimum = stmp;
 			}
 		}
-		if(status == DELETABLE){
-			if(entry->next == entry)
-				exit(1);
-			entry = NEXT(entry);
-			list_remv(PREV(entry));
-			myhprec->rcount--;
-			myhprec->free_node(node);
-		}else if(status == HAZARD){
-			entry = NEXT(entry);
-		}else{
-			//std::cout<< "epoch "<<i<<":"<<HP[i].epoch<< "remove epoch"<<get_epoch()<< std::endl;
-			break;
+
+		if(hp != NULL){
+			plist[cnt++] = hp;
 		}
-		
 	}
+
+	std::sort(plist, plist + cnt);
+	int deleted = 0;
+    while(entry != &thread_local_hpr.rlist){
+		node_t *node = LIST_ENTRY(entry, node_t, r_entry);
+		if(node->remove_epoch >= minimum)
+			break;
+		entry = NEXT(entry);
+		if(!std::binary_search(plist, plist + cnt, node)){
+			list_remv(PREV(entry));
+			myhprec->free_node(node);
+			deleted++;
+		}
+    }
+
+    if(deleted)
+	    myhprec->rcount -= deleted;
+	
+ //    while(entry != &thread_local_hpr.rlist){
+	// 	node_t *node = LIST_ENTRY(entry, node_t, r_entry);
+	// 	remove_epoch = node->remove_epoch;
+	// 	int status = DELETABLE;
+	// 	int i;
+	// 	for(i = 0; i < K * maxThreadCount; i++){
+	// 		if(HP[(i)/K*K].epoch <= remove_epoch){
+	// 			status = EPOCH_ISSUE;
+	// 			break;
+	// 		}else{
+	// 			if(HP[i].ptr == node){
+	// 				status = HAZARD;
+	// 				break;
+	// 			}
+	// 		}
+	// 	}
+	// 	if(status == DELETABLE){
+	// 		if(entry->next == entry)
+	// 			exit(1);
+	// 		entry = NEXT(entry);
+	// 		list_remv(PREV(entry));
+	// 		myhprec->rcount--;
+	// 		myhprec->free_node(node);
+	// 	}else if(status == HAZARD){
+	// 		entry = NEXT(entry);
+	// 	}else{
+	// 		//std::cout<< "epoch "<<i<<":"<<HP[i].epoch<< "remove epoch"<<get_epoch()<< std::endl;
+	// 		break;
+	// 	}
+		
+	// }
 
 #else
 

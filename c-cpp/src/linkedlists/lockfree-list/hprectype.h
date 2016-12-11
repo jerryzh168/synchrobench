@@ -5,7 +5,7 @@
 #include "harris.h"
 #include <pthread.h>
 
-//#define EPOCH_HP
+// #define EPOCH_HP
 
 #define TIMER_SIGNAL SIGALRM
 
@@ -14,9 +14,9 @@ typedef struct hp{
 	node_t *ptr;
 #ifdef EPOCH_HP
 	unsigned long epoch;
-	char padding[CACHE_LINE_SIZE - sizeof(node_t) - sizeof(unsigned long)];	
+	char padding[CACHE_LINE_SIZE - sizeof(node_t *) - sizeof(unsigned long)];	
 #else
-	char padding[CACHE_LINE_SIZE - sizeof(node_t) ];	
+	char padding[CACHE_LINE_SIZE - sizeof(node_t *) ];	
 #endif
 }HP_t;
 
