@@ -79,7 +79,7 @@ ht_intset_t *ht_new() {
 		perror("malloc");
 		exit(1);
 	}  
-        if ((set->buckets = (void *)malloc((maxhtlength + 1)* sizeof(intset_t *))) == NULL) {
+        if ((set->buckets = (intset_t **)malloc((maxhtlength + 1)* sizeof(intset_t *))) == NULL) {
 	perror("malloc");
 	exit(1);
 	}  
