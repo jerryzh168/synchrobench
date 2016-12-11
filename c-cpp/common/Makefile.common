@@ -195,6 +195,9 @@ ifeq ($(PC_NAME), oana-MacBookPro)
     CFLAGS += -DOANALAPTOPLINUX
 endif
 
+CFLAGS += -DIGORLAPTOPLINUX
+
+
 #################################
 # Architecture dependent settings
 #################################
