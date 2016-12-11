@@ -103,7 +103,11 @@ ssalloc_aligned_alloc(unsigned int allocator, size_t alignement, size_t size) {
     void* ret = NULL;
 
 #if defined(SSALLOC_USE_MALLOC)
-    ret = (void*) memalign(alignement, size);
+    if (bench.malloc_node_aligned != NULL) {
+      ret = (void *)bench.malloc_node_aligned(alignement, size);
+    } else {
+      ret = (void*) memalign(alignement, size);
+    }
 #else
     ret = (void*) (ssalloc_app_mem[allocator] + alloc_next[allocator]);
     uintptr_t retu = (uintptr_t) ret;
@@ -132,7 +136,11 @@ ssalloc_aligned(size_t alignment, size_t size) {
 
 void ssfree_alloc(unsigned int allocator, void* ptr) {
 #if defined(SSALLOC_USE_MALLOC)
+  if (bench.free_node != NULL) {
+    bench.free_node(ptr);
+  } else {
     free(ptr);
+  }
 #else
     ssalloc_free_num[allocator]++;
     if (ssalloc_free_num[allocator] == (uint16_t)0 && ssalloc_free_cur[allocator] +1 == (uint16_t)0) {

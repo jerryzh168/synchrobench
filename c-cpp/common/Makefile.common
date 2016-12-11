@@ -270,7 +270,7 @@ LDFLAGS += -L/usr/local/lib -lhwloc
 
 
 # from master branch
-LDFLAGS += -ltcmalloc_minimal
+LDFLAGS += -L$(ROOT)/../../gperftools/.libs -ltcmalloc_minimal
 
 
 ifdef STM

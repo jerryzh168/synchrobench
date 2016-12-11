@@ -122,8 +122,8 @@ struct malloc_list{
   char padding[CACHE_LINE_SIZE - sizeof(long) - sizeof(long)];
 } *malloc_list;
 
-void free_node(node_t *n){
-	free((void *)n);
+void free_node(void *n){
+	free(n);
 	//std::cout << "free"<<std::endl;
 	malloc_list[get_thread_idx()].nb_free++;
 }

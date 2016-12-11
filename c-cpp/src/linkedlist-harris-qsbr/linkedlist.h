@@ -59,7 +59,8 @@ typedef ALIGNED(CACHE_LINE_SIZE) struct intset {
 struct thread_local_info_t {
   int thread_id;
   void *(*malloc_node)(unsigned int);
-  void (*free_node)(node_t *);
+  void (*free_node)(void *);
+  void *(*malloc_node_aligned)(size_t, size_t);// args: alignment, size  
 };
 extern __thread thread_local_info_t bench;
 

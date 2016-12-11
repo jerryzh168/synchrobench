@@ -68,6 +68,7 @@ void thread_local_init(thread_data_t *d) {
   bench.thread_id = d->idx;
   bench.malloc_node = d->malloc_node;
   bench.free_node = d->free_node;
+  bench.malloc_node_aligned = d->malloc_node_aligned;
   ssalloc_init();
   return;
 }
