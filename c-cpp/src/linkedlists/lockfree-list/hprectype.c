@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <time.h>
 #include <string.h>
+#include "../../hashtables/lockfree-ht/smr.h"
 /* epoch is 30 ms */
 #define timer_nsec 30000
 
@@ -24,6 +25,10 @@ void hp_init_global(int thread_cnt){
 	maxThreadCount = thread_cnt;
 	HP = (HP_t *)aligned_alloc(CACHE_LINE_SIZE, sizeof(HP_t) * thread_cnt * K); 
 	memset(HP, 0, sizeof(HP_t) * thread_cnt * K);
+}
+
+void smr_global_init(int thread_cnt){
+	hp_init_global(thread_cnt);
 }
 
 unsigned int inc_epoch(){
@@ -69,7 +74,6 @@ void *timer_handler(void *arg){
     	for(int i = 0; i < maxThreadCount; i++){
         	pthread_t  trd = thread_array[i];
             if(pthread_kill(trd, SIGUSR1) != 0){
-               	printf("pthread_kill fail\n");
                	return NULL;
             }
     	}
@@ -108,6 +112,14 @@ void HPRecType_t::init(int maxThreadcount, pthread_t *peers, void (*lamda)(node_
             pthread_t sleeper;
             pthread_create(&sleeper, NULL, timer_handler, NULL);
        }
+}
+
+void thread_local_init(thread_data_t *d){
+	thread_local_hpr.init(d->nb_threads, d->threads, d->free_node, d->malloc_node, d->idx);
+}
+
+int get_thread_idx(){
+	return thread_local_hpr.tid;
 }
 
 void retire_node(node_t *node){

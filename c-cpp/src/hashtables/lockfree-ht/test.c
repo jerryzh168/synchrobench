@@ -22,8 +22,10 @@
  */
 
 #include "intset.h"
+#include "smr.h"
 #include <unistd.h>
 #include <hwloc.h>
+#include <stdlib.h>
 #include "../../linkedlists/lockfree-list/hprectype.h"
 #include "../../linkedlists/lockfree-list/linkedlist.h"
 /* Hashtable length (# of buckets) */
@@ -36,12 +38,6 @@ __thread unsigned int *rng_seed;
 pthread_key_t rng_seed_key;
 #endif /* ! TLS */
 
-typedef struct barrier {
-	pthread_cond_t complete;
-	pthread_mutex_t mutex;
-	int count;
-	int crossing;
-} barrier_t;
 
 #define DEFAULT_PROFILE_RATE 10    //in ms
 int nb_threads = 0;
@@ -79,71 +75,43 @@ void barrier_cross(barrier_t *b)
  * Note: this is not thread-safe and will introduce futex locks
  */
 inline long rand_range(long r) {
-	int m = RAND_MAX;
-	long d, v = 0;
+	// int m = RAND_MAX;
+	// long d, v = 0;
 	
-	do {
-		d = (m > r ? r : m);
-		v += 1 + (long)(d * ((double)rand()/((double)(m)+1.0)));
-		r -= m;
-	} while (r > 0);
-	return v;
-}
-
-/* Thread-safe, re-entrant version of rand_range(r) */
-inline long rand_range_re(unsigned int *seed, long r) {
-	int m = RAND_MAX;
+	// do {
+	// 	d = (m > r ? r : m);
+	// 	v += 1 + (long)(d * ((double)rand()/((double)(m)+1.0)));
+	// 	r -= m;
+	// } while (r > 0);
+	// return v;
+	long int m = (((long)1)<<31);
 	long d, v = 0;
 	
 	do {
 		d = (m > r ? r : m);		
-		v += 1 + (long)(d * ((double)rand_r(seed)/((double)(m)+1.0)));
+		v += 1 + (long)(d * ((double)lrand48()/((m+1.0))));
 		r -= m;
 	} while (r > 0);
+	// std::cout <<v<<std::endl;
+	return v;
+
+
+}
+
+/* Thread-safe, re-entrant version of rand_range(r) */
+inline long rand_range_re(unsigned short *seed, long r) {
+	long int m = (((long)1)<<31);
+	long d, v = 0;
+	
+	do {
+		d = (m > r ? r : m);		
+		v += 1 + (long)(d * ((double)nrand48(seed)/((m+1.0))));
+		r -= m;
+	} while (r > 0);
+	// std::cout <<v<<std::endl;
 	return v;
 }
 
-typedef struct thread_data {
-  val_t first;
-	int idx;
-	int nb_threads;
-	pthread_t *threads;
-	hwloc_obj_t topo_root;
-	int topo_pu_num;
-	long range;
-	int update;
-	int move;
-	int snapshot;
-	int unit_tx;
-	int alternate;
-	int effective;
-	unsigned long nb_add;
-	unsigned long nb_added;
-	unsigned long nb_remove;
-	unsigned long nb_removed;
-	unsigned long nb_contains;
-	/* added for HashTables */
-	unsigned long load_factor;
-	unsigned long nb_move;
-	unsigned long nb_moved;
-	unsigned long nb_snapshot;
-	unsigned long nb_snapshoted;
-	/* end: added for HashTables */
-	unsigned long nb_found;
-	unsigned long nb_aborts;
-	unsigned long nb_aborts_locked_read;
-	unsigned long nb_aborts_locked_write;
-	unsigned long nb_aborts_validate_read;
-	unsigned long nb_aborts_validate_write;
-	unsigned long nb_aborts_validate_commit;
-	unsigned long nb_aborts_invalid_memory;
-	unsigned long nb_aborts_double_write;
-	unsigned long max_retries;
-	unsigned int seed;
-	ht_intset_t *set;
-	barrier_t *barrier;
-	unsigned long failures_because_contention;
-} thread_data_t;
 
 static int locate_pu_affinity_helper(hwloc_obj_t root, int *child_found, int idx){
 	if(root->type == HWLOC_OBJ_PU){
@@ -182,29 +150,31 @@ static int locate_pu_affinity(hwloc_obj_t root, int num_pu, int idx){
 }
 
 struct malloc_list{
-	int nb_malloc;
-	char padding[CACHE_LINE_SIZE - sizeof(int)];
+	long nb_malloc;
+	char padding[CACHE_LINE_SIZE - sizeof(long)];
 } *malloc_list;
 
 void free_node(node_t *n){
 	free((void *)n);
 	//std::cout << "free"<<std::endl;
-	malloc_list[thread_local_hpr.tid].nb_malloc--;
+	malloc_list[get_thread_idx()].nb_malloc--;
 }
 
 void *malloc_node(unsigned int size){
 	void *ret = malloc(size);
-	malloc_list[thread_local_hpr.tid].nb_malloc++;
+	malloc_list[get_thread_idx()].nb_malloc++;
 	return ret;
 }
 
 void *test(void *data) {
-	int val2, numtx, r, last = -1;
+	int val2, numtx, r;
+	long int last = -10;
 	val_t val = 0;
 	int unext, mnext, cnext;
 	
 	thread_data_t *d = (thread_data_t *)data;
-	thread_local_hpr.init(d->nb_threads, d->threads, free_node, malloc_node, d->idx);
+	thread_local_init(d);
+	// thread_local_hpr.init(d->nb_threads, d->threads, free_node, malloc_node, d->idx);
 	int physical_idx = locate_pu_affinity(d->topo_root, d->topo_pu_num, d->idx);
 	/* set affinity according to topology */
 	cpu_set_t cpuset;
@@ -217,121 +187,101 @@ void *test(void *data) {
 	/* Create transaction */
 	TM_THREAD_ENTER();
 	/* Wait on barrier */
+	r = rand_range_re(d->seed, 100) - 1;
+
 	barrier_cross(d->barrier);
 	
 	/* Is the first op an update, a move? */
-	r = rand_range_re(&d->seed, 100) - 1;
 	unext = (r < d->update);
 	mnext = (r < d->move);
 	cnext = (r >= d->update + d->snapshot);
-	
-#ifdef ICC
+// #ifdef ICC
 	while (stop == 0) {
-#else
-	while (AO_load_full(&stop) == 0) {
-#endif /* ICC */
+// #else
+	// while (AO_load_full(&stop) == 0) {
+// #endif /* ICC */
 		
 	  if (unext) { // update
 	    
-	    if (mnext) { // move
+	    // if (mnext) { // move
 	      
-	      if (last == -1) val = rand_range_re(&d->seed, d->range);
-	      else val = last;
-	      val2 = rand_range_re(&d->seed, d->range);
-	      if (ht_move(d->set, val, val2, TRANSACTIONAL)) {
-					d->nb_moved++;
-					last = -1;
-	      }
-	      d->nb_move++;
+	    //   if (last == -1) val = rand_range_re(&d->seed, d->range);
+	    //   else val = last;
+	    //   val2 = rand_range_re(&d->seed, d->range);
+	    //   if (ht_move(d->set, val, val2, TRANSACTIONAL)) {
+					// d->nb_moved++;
+					// last = -1;
+	    //   }
+	    //   d->nb_move++;
 	      
-	    } else if (last < 0) { // add
-	      
-	      val = rand_range_re(&d->seed, d->range);
+	    // } else 
+	    if (last < 0) { // add
+	      // std::cout<<val<<std::endl;	      
+	      val = rand_range_re(d->seed, d->range);
 	      if (ht_add(d->set, val, TRANSACTIONAL)) {
 					d->nb_added++;
 					last = val;
-	      } 				
+	      }		
 	      d->nb_add++;
 	      
 	    } else { // remove
 	      
-	      if (d->alternate) { // alternate mode
-					if (ht_remove(d->set, last, TRANSACTIONAL)) {
-						d->nb_removed++;
-						last = -1;
-					}
-	      } else {
-					/* Random computation only in non-alternated cases */
-					val = rand_range_re(&d->seed, d->range);
-					/* Remove one random value */
-					if (ht_remove(d->set, val, TRANSACTIONAL)) {
-						d->nb_removed++;
-						/* Repeat until successful, to avoid size variations */
-						last = -1;
-					} 
-	      }
-	      d->nb_remove++;
+
+			/* Random computation only in non-alternated cases */
+			val = rand_range_re(d->seed, d->range);
+
+
+			/* Remove one random value */
+	      // std::cout<<val << ":"<<last<<std::endl;
+			if (ht_remove(d->set, val, TRANSACTIONAL)) {
+				d->nb_removed++;
+				/* Repeat until successful, to avoid size variations */
+				last = -1;
+			}
+	      
+			d->nb_remove++;
 	    }
 	    
 	  } else { // reads
 	    
-	    if (cnext) { // contains (no snapshot)
+	    // if (cnext) { // contains (no snapshot)
 				
-	      if (d->alternate) {
-					if (d->update == 0) {
-						if (last < 0) {
-							val = d->first;
-							last = val;
-						} else { // last >= 0
-							val = rand_range_re(&d->seed, d->range);
-							last = -1;
-						}
-					} else { // update != 0
-						if (last < 0) {
-							val = rand_range_re(&d->seed, d->range);
-							//last = val;
-						} else {
-							val = last;
-						}
-					}
-	      }	else val = rand_range_re(&d->seed, d->range);
+		  val = rand_range_re(d->seed, d->range);
 			
 	      if (ht_contains(d->set, val, TRANSACTIONAL)) 
 					d->nb_found++;
 	      d->nb_contains++;
 	      
-	    } else { // snapshot
+	    // } 
+	 //    else { // snapshot
 	      
-	      if (ht_snapshot(d->set, TRANSACTIONAL))
-		d->nb_snapshoted++;
-	      d->nb_snapshot++;
+	 //      if (ht_snapshot(d->set, TRANSACTIONAL))
+		// d->nb_snapshoted++;
+	 //      d->nb_snapshot++;
 	      
-	    }
+	 //    }
 	  }
 	  
 	  /* Is the next op an update, a move, a contains? */
-	  if (d->effective) { // a failed remove/add is a read-only tx
-	    numtx = d->nb_contains + d->nb_add + d->nb_remove + d->nb_move + d->nb_snapshot;
-	    unext = ((100 * (d->nb_added + d->nb_removed + d->nb_moved)) < (d->update * numtx));
-	    //std::cout <<   (d->nb_added + d->nb_removed + d->nb_moved)<<":"<<d->update*numtx<<std::endl;
-	    mnext = ((100 * d->nb_moved) < (d->move * numtx));
-	    cnext = !((100 * d->nb_snapshoted) < (d->snapshot * numtx)); 
-	  } else { // remove/add (even failed) is considered as an update
-	    r = rand_range_re(&d->seed, 100) - 1;
-	    unext = (r < d->update);
-	    mnext = (r < d->move);
-	    cnext = (r >= d->update + d->snapshot);
-	  }
+	  // if (d->effective) { // a failed remove/add is a read-only tx
+	    numtx = d->nb_contains + d->nb_add + d->nb_remove ;
+	    unext = ((100 * (d->nb_added + d->nb_removed )) < (d->update * numtx));
+	    // std::cout <<   (d->nb_added + d->nb_removed + d->nb_moved)<<":"<<d->update*numtx<<std::endl;
+	    // mnext = ((100 * d->nb_moved) < (d->move * numtx));
+	    // cnext = !((100 * d->nb_snapshoted) < (d->snapshot * numtx)); 
+	  // } else { // remove/add (even failed) is considered as an update
+	  //   r = rand_range_re(d->seed, 100) - 1;
+	  //   unext = (r < d->update);
+	  //   mnext = (r < d->move);
+	  //   cnext = (r >= d->update + d->snapshot);
+	  // }
 	  
-#ifdef ICC
 	}
-#else
-	}
-#endif /* ICC */
+
 	
 	/* Free transaction */
 	TM_THREAD_EXIT();
-	
+	// std::cout<<"exit"<<std::endl;
 	return NULL;
 }
 
@@ -491,12 +441,14 @@ int main(int argc, char **argv)
 	int initial = DEFAULT_INITIAL;
 	nb_threads = DEFAULT_NB_THREADS;
 //	long range = DEFAULT_RANGE;
-	long range = initial*2;
+
 	int topo_level = 0;
 	int topo_num = 0;
 
 	int seed = DEFAULT_SEED;
 	int update = DEFAULT_UPDATE;
+	long range = initial*2;
+
 	int load_factor = DEFAULT_LOAD;
 	int move = DEFAULT_MOVE;
 	int snapshot = DEFAULT_SNAPSHOT;
@@ -662,7 +614,7 @@ int main(int argc, char **argv)
 				 (int)sizeof(long),
 				 (int)sizeof(void *),
 				 (int)sizeof(uintptr_t));
-	hp_init_global(nb_threads);
+	smr_global_init(nb_threads);
 	timeout.tv_sec = duration / 1000;
 	timeout.tv_nsec = (duration % 1000) * 1000000;
 	accounting_timeout.tv_sec = profile_rate/1000;
@@ -683,10 +635,16 @@ int main(int argc, char **argv)
 	}
 	memset(malloc_list, 0, nb_threads*sizeof(struct malloc_list));
 
+	// if (seed == 0)
+	// 	srand((int)time(0));
+	// else
+	// 	srand(seed);
+
 	if (seed == 0)
-		srand((int)time(0));
+		srand48((long)time(0));
 	else
-		srand(seed);
+		srand48(seed);
+
 	
 	maxhtlength = (unsigned int) initial / load_factor;
 	set = ht_new();
@@ -705,6 +663,7 @@ int main(int argc, char **argv)
 	while (i < initial) {
 		val = rand_range(range);
 		if (ht_add(set, val, 0)) {
+		  // std::cout <<"init:"<<val<<std::endl;
 		  last = val;
 		  i++;			
 		}
@@ -723,6 +682,8 @@ int main(int argc, char **argv)
 		printf("Creating thread %d\n", i);
 		data[i].threads = threads;
 		data[i].nb_threads = nb_threads;
+		data[i].malloc_node = malloc_node;
+		data[i].free_node = free_node;
 		data[i].idx = i;
 		data[i].topo_root = topo_start_parent;
 		data[i].topo_pu_num = topo_pu_num;
@@ -739,25 +700,16 @@ int main(int argc, char **argv)
 		data[i].nb_added = 0;
 		data[i].nb_remove = 0;
 		data[i].nb_removed = 0;
-		data[i].nb_move = 0;
-		data[i].nb_moved = 0;
-		data[i].nb_snapshot = 0;
-		data[i].nb_snapshoted = 0;
+
 		data[i].nb_contains = 0;
 		data[i].nb_found = 0;
-		data[i].nb_aborts = 0;
-		data[i].nb_aborts_locked_read = 0;
-		data[i].nb_aborts_locked_write = 0;
-		data[i].nb_aborts_validate_read = 0;
-		data[i].nb_aborts_validate_write = 0;
-		data[i].nb_aborts_validate_commit = 0;
-		data[i].nb_aborts_invalid_memory = 0;
-		data[i].nb_aborts_double_write = 0;
-		data[i].max_retries = 0;
-		data[i].seed = rand();
+
+		data[i].seed[0] = rand_range(range);
+		data[i].seed[1] = rand_range(range);
+		data[i].seed[2] = rand_range(range);
 		data[i].set = set;
 		data[i].barrier = &barrier;
-		data[i].failures_because_contention = 0;
+		// data[i].failures_because_contention = 0;
 		if (pthread_create(&threads[i], &attr, test, (void *)(&data[i])) != 0) {
 			fprintf(stderr, "Error creating thread\n");
 			exit(1);
@@ -785,12 +737,11 @@ int main(int argc, char **argv)
 			int memory_use = 0;
 			for(int i = 0 ; i < nb_threads;i++){
 				reads += data[i].nb_contains;
-				snapshots += data[i].nb_snapshot;
-				updates += (data[i].nb_add + data[i].nb_remove + data[i].nb_move);
+				updates += (data[i].nb_add + data[i].nb_remove);
 				memory_use += malloc_list[i].nb_malloc;
 			}
 			//std::cout << "sum"<<reads+updates+snapshots - last_sum <<std::endl;
-			//std::cout <<memory_use<<std::endl;
+			// std::cout <<memory_use<<std::endl;
 			//std::cout << duration<<":"<<profile_rate<<std::endl;
 			last_sum = reads + updates + snapshots;
 		}
@@ -816,24 +767,11 @@ int main(int argc, char **argv)
 		}
 	}
 	duration = (end.tv_sec * 1000 + end.tv_usec / 1000) - (start.tv_sec * 1000 + start.tv_usec / 1000);
-	aborts = 0;
-	aborts_locked_read = 0;
-	aborts_locked_write = 0;
-	aborts_validate_read = 0;
-	aborts_validate_write = 0;
-	aborts_validate_commit = 0;
-	aborts_invalid_memory = 0;
-	aborts_double_write = 0;
-	failures_because_contention = 0;
 	reads = 0;
 	effreads = 0;
 	updates = 0;
 	effupds = 0;
-	moves = 0;
-	moved = 0;
-	snapshots = 0;
-	snapshoted = 0;
-	max_retries = 0;
+	int memory_pressure = 0;
 	for (i = 0; i < nb_threads; i++) {
 		printf("Thread %d\n", i);
 		printf("  #add        : %lu\n", data[i].nb_add);
@@ -842,47 +780,51 @@ int main(int argc, char **argv)
 		printf("    #removed  : %lu\n", data[i].nb_removed);
 		printf("  #contains   : %lu\n", data[i].nb_contains);
 		printf("    #found    : %lu\n", data[i].nb_found);
-		printf("  #move       : %lu\n", data[i].nb_move);
-		printf("  #moved      : %lu\n", data[i].nb_moved);
-		printf("  #snapshot   : %lu\n", data[i].nb_snapshot);
-		printf("  #snapshoted : %lu\n", data[i].nb_snapshoted);
-		printf("  #aborts     : %lu\n", data[i].nb_aborts);
-		printf("    #lock-r   : %lu\n", data[i].nb_aborts_locked_read);
-		printf("    #lock-w   : %lu\n", data[i].nb_aborts_locked_write);
-		printf("    #val-r    : %lu\n", data[i].nb_aborts_validate_read);
-		printf("    #val-w    : %lu\n", data[i].nb_aborts_validate_write);
-		printf("    #val-c    : %lu\n", data[i].nb_aborts_validate_commit);
-		printf("    #inv-mem  : %lu\n", data[i].nb_aborts_invalid_memory);
-		printf("    #dup-w  : %lu\n", data[i].nb_aborts_double_write);
-		printf("    #failures : %lu\n", data[i].failures_because_contention);
-		printf("  Max retries : %lu\n", data[i].max_retries);
-		aborts += data[i].nb_aborts;
-		aborts_locked_read += data[i].nb_aborts_locked_read;
-		aborts_locked_write += data[i].nb_aborts_locked_write;
-		aborts_validate_read += data[i].nb_aborts_validate_read;
-		aborts_validate_write += data[i].nb_aborts_validate_write;
-		aborts_validate_commit += data[i].nb_aborts_validate_commit;
-		aborts_invalid_memory += data[i].nb_aborts_invalid_memory;
-		aborts_double_write += data[i].nb_aborts_double_write;
-		failures_because_contention += data[i].failures_because_contention;
+		printf("Memory Pressure: %ld\n", malloc_list[i].nb_malloc);
+		// printf("  #move       : %lu\n", data[i].nb_move);
+		// printf("  #moved      : %lu\n", data[i].nb_moved);
+		// printf("  #snapshot   : %lu\n", data[i].nb_snapshot);
+		// printf("  #snapshoted : %lu\n", data[i].nb_snapshoted);
+		// printf("  #aborts     : %lu\n", data[i].nb_aborts);
+		// printf("    #lock-r   : %lu\n", data[i].nb_aborts_locked_read);
+		// printf("    #lock-w   : %lu\n", data[i].nb_aborts_locked_write);
+		// printf("    #val-r    : %lu\n", data[i].nb_aborts_validate_read);
+		// printf("    #val-w    : %lu\n", data[i].nb_aborts_validate_write);
+		// printf("    #val-c    : %lu\n", data[i].nb_aborts_validate_commit);
+		// printf("    #inv-mem  : %lu\n", data[i].nb_aborts_invalid_memory);
+		// printf("    #dup-w  : %lu\n", data[i].nb_aborts_double_write);
+		// printf("    #failures : %lu\n", data[i].failures_because_contention);
+		// printf("  Max retries : %lu\n", data[i].max_retries);
+		// aborts += data[i].nb_aborts;
+		// aborts_locked_read += data[i].nb_aborts_locked_read;
+		// aborts_locked_write += data[i].nb_aborts_locked_write;
+		// aborts_validate_read += data[i].nb_aborts_validate_read;
+		// aborts_validate_write += data[i].nb_aborts_validate_write;
+		// aborts_validate_commit += data[i].nb_aborts_validate_commit;
+		// aborts_invalid_memory += data[i].nb_aborts_invalid_memory;
+		// aborts_double_write += data[i].nb_aborts_double_write;
+		// failures_because_contention += data[i].failures_because_contention;
 		reads += data[i].nb_contains;
 		effreads += data[i].nb_contains + 
 		(data[i].nb_add - data[i].nb_added) + 
-		(data[i].nb_remove - data[i].nb_removed) + 
-		(data[i].nb_move - data[i].nb_moved) +
-		data[i].nb_snapshoted;
-		updates += (data[i].nb_add + data[i].nb_remove + data[i].nb_move);
-		effupds += data[i].nb_removed + data[i].nb_added + data[i].nb_moved; 
-		moves += data[i].nb_move;
-		moved += data[i].nb_moved;
-		snapshots += data[i].nb_snapshot;
-		snapshoted += data[i].nb_snapshoted;
+		(data[i].nb_remove - data[i].nb_removed);
+		// (data[i].nb_move - data[i].nb_moved) +
+		// data[i].nb_snapshoted;
+		updates += (data[i].nb_add + data[i].nb_remove );
+		effupds += data[i].nb_removed + data[i].nb_added; 
+		// moves += data[i].nb_move;
+		// moved += data[i].nb_moved;
+		// snapshots += data[i].nb_snapshot;
+		// snapshoted += data[i].nb_snapshoted;
 		size += data[i].nb_added - data[i].nb_removed;
-		if (max_retries < data[i].max_retries)
-			max_retries = data[i].max_retries;
+		memory_pressure += malloc_list[i].nb_malloc;
+		// if (max_retries < data[i].max_retries)
+		// 	max_retries = data[i].max_retries;
+		printf("\n");
 	}
 	printf("Set size      : %d (expected: %d)\n", ht_size(set), size);
 	printf("Duration      : %d (ms)\n", duration);
+	printf("Memory pressure: %d\n",memory_pressure );
 	printf("#txs          : %lu (%f / s)\n", reads + updates + snapshots, (reads + updates + snapshots) * 1000.0 / duration);
 	
 	printf("#read txs     : ");
@@ -900,20 +842,20 @@ int main(int argc, char **argv)
 					 duration);
 	} else printf("%lu (%f / s)\n", updates, updates * 1000.0 / duration);
 	
-	printf("#move txs     : %lu (%f / s)\n", moves, moves * 1000.0 / duration);
-	printf("  #moved      : %lu (%f / s)\n", moved, moved * 1000.0 / duration);
-	printf("#snapshot txs : %lu (%f / s)\n", snapshots, snapshots * 1000.0 / duration);
-	printf("  #snapshoted : %lu (%f / s)\n", snapshoted, snapshoted * 1000.0 / duration);
-	printf("#aborts       : %lu (%f / s)\n", aborts, aborts * 1000.0 / duration);
-	printf("  #lock-r     : %lu (%f / s)\n", aborts_locked_read, aborts_locked_read * 1000.0 / duration);
-	printf("  #lock-w     : %lu (%f / s)\n", aborts_locked_write, aborts_locked_write * 1000.0 / duration);
-	printf("  #val-r      : %lu (%f / s)\n", aborts_validate_read, aborts_validate_read * 1000.0 / duration);
-	printf("  #val-w      : %lu (%f / s)\n", aborts_validate_write, aborts_validate_write * 1000.0 / duration);
-	printf("  #val-c      : %lu (%f / s)\n", aborts_validate_commit, aborts_validate_commit * 1000.0 / duration);
-	printf("  #inv-mem    : %lu (%f / s)\n", aborts_invalid_memory, aborts_invalid_memory * 1000.0 / duration);
-	printf("  #dup-w      : %lu (%f / s)\n", aborts_double_write, aborts_double_write * 1000.0 / duration);
-	printf("  #failures   : %lu\n",  failures_because_contention);
-	printf("Max retries   : %lu\n", max_retries);
+	// printf("#move txs     : %lu (%f / s)\n", moves, moves * 1000.0 / duration);
+	// printf("  #moved      : %lu (%f / s)\n", moved, moved * 1000.0 / duration);
+	// printf("#snapshot txs : %lu (%f / s)\n", snapshots, snapshots * 1000.0 / duration);
+	// printf("  #snapshoted : %lu (%f / s)\n", snapshoted, snapshoted * 1000.0 / duration);
+	// printf("#aborts       : %lu (%f / s)\n", aborts, aborts * 1000.0 / duration);
+	// printf("  #lock-r     : %lu (%f / s)\n", aborts_locked_read, aborts_locked_read * 1000.0 / duration);
+	// printf("  #lock-w     : %lu (%f / s)\n", aborts_locked_write, aborts_locked_write * 1000.0 / duration);
+	// printf("  #val-r      : %lu (%f / s)\n", aborts_validate_read, aborts_validate_read * 1000.0 / duration);
+	// printf("  #val-w      : %lu (%f / s)\n", aborts_validate_write, aborts_validate_write * 1000.0 / duration);
+	// printf("  #val-c      : %lu (%f / s)\n", aborts_validate_commit, aborts_validate_commit * 1000.0 / duration);
+	// printf("  #inv-mem    : %lu (%f / s)\n", aborts_invalid_memory, aborts_invalid_memory * 1000.0 / duration);
+	// printf("  #dup-w      : %lu (%f / s)\n", aborts_double_write, aborts_double_write * 1000.0 / duration);
+	// printf("  #failures   : %lu\n",  failures_because_contention);
+	// printf("Max retries   : %lu\n", max_retries);
 	
 	// Delete set 
 	ht_delete(set);
