@@ -161,7 +161,7 @@ struct malloc_list{
   char padding[CACHE_LINE_SIZE - sizeof(long) - sizeof(long)];
 } *malloc_list;
 
-void free_node(node_t *n){
+void free_node(void *n){
 	free((void *)n);
 	//std::cout << "free"<<std::endl;
 	malloc_list[get_thread_idx()].nb_free++;
@@ -170,6 +170,7 @@ void free_node(node_t *n){
 void *malloc_node(unsigned int size){
 	void *ret = malloc(size);
 	malloc_list[get_thread_idx()].nb_malloc++;
+//	std::cout<<"malloc"<<std::endl;
 	return ret;
 }
 
@@ -665,7 +666,7 @@ int main(int argc, char **argv)
 	printf("Load         : %d\n", load_factor);
 	
 	// Access set from all threads 
-	proc_init();
+	proc_init(free_node);
 	barrier_init(&barrier, nb_threads + 1);
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);

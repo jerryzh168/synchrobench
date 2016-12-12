@@ -12,15 +12,15 @@
 #include "../../hashtables/lockfree-ht/smr.h"
 __thread int thread_id;
 
+void *(*__malloc)(unsigned int) = NULL;
+
 node_t *new_node(val_t val, node_t *next, int transactional)
 {
   node_t *node;
-
-  if (transactional) {
-	node = (node_t *)MALLOC(sizeof(node_t));
-  } else {
-	node = (node_t *)malloc(sizeof(node_t));
-  }
+  if(!__malloc)
+    node = (node_t *)malloc(sizeof(node_t));
+  else
+  	node = (node_t *)__malloc(sizeof(node_t));
   if (node == NULL) {
 	perror("malloc");
 	exit(1);
@@ -85,6 +85,7 @@ int get_thread_idx() {
 /* you can have a chance to do thread local init */
 void thread_local_init(thread_data_t *d) {
   thread_id = d->idx;
+  __malloc = d->malloc_node;
   return;
 }
 /* you can have a chance to do global init before any smr threads are spawned */
