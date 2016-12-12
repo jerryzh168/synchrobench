@@ -1,6 +1,6 @@
 import argparse
 import re
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import os
 import collections
 
@@ -63,11 +63,11 @@ def process_result(filename, enable_metrics=False, metrics=[]):
         get_profile(stats, metrics)
         del stats['#profile']
         lines = []
-        for metric in metrics:
-            line, = plt.plot(stats['#profile-'+metric], label=metric)
-            lines.append(line)
-        plt.legend(metrics, loc=1)
-        plt.savefig(filename + '.png')
+        #for metric in metrics:
+        #    line, = plt.plot(stats['#profile-'+metric], label=metric)
+        #    lines.append(line)
+        #plt.legend(metrics, loc=1)
+        #plt.savefig(filename + '.png')
     # print args.filename, stats['#txs per second'], stats['#mallocs'], \
     #    stats['#frees'], stats['#memory pressure']
     return stats
