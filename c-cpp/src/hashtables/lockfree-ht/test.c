@@ -779,6 +779,8 @@ int main(int argc, char **argv)
 	effreads = 0;
 	updates = 0;
 	effupds = 0;
+	int mallocs = 0;
+	int frees = 0;
 	int memory_pressure = 0;
 	for (i = 0; i < nb_threads; i++) {
 		printf("Thread %d\n", i);
@@ -788,7 +790,9 @@ int main(int argc, char **argv)
 		printf("    #removed  : %lu\n", data[i].nb_removed);
 		printf("  #contains   : %lu\n", data[i].nb_contains);
 		printf("    #found    : %lu\n", data[i].nb_found);
-		printf("Memory Pressure: %ld\n", malloc_list[i].nb_malloc - malloc_list[i].nb_free);
+		printf("#thread-mallocs: %ld\n", malloc_list[i].nb_malloc);
+		printf("#thread-frees: %ld\n", malloc_list[i].nb_free);
+		printf("#thread-memory pressure: %ld\n", malloc_list[i].nb_malloc - malloc_list[i].nb_free);
 		// printf("  #move       : %lu\n", data[i].nb_move);
 		// printf("  #moved      : %lu\n", data[i].nb_moved);
 		// printf("  #snapshot   : %lu\n", data[i].nb_snapshot);
@@ -825,6 +829,8 @@ int main(int argc, char **argv)
 		// snapshots += data[i].nb_snapshot;
 		// snapshoted += data[i].nb_snapshoted;
 		size += data[i].nb_added - data[i].nb_removed;
+		mallocs += malloc_list[i].nb_malloc;
+		frees += malloc_list[i].nb_free;
 		memory_pressure += malloc_list[i].nb_malloc - malloc_list[i].nb_free;
 		// if (max_retries < data[i].max_retries)
 		// 	max_retries = data[i].max_retries;
@@ -832,7 +838,9 @@ int main(int argc, char **argv)
 	}
 	printf("Set size      : %d (expected: %d)\n", ht_size(set), size);
 	printf("Duration      : %d (ms)\n", duration);
-	printf("Memory pressure: %d\n",memory_pressure );
+	printf("#mallocs: %d\n", mallocs);
+	printf("#frees: %d\n", frees);
+	printf("#memory pressure: %d\n",memory_pressure );
 	printf("#txs          : %lu (%f / s)\n", reads + updates + snapshots, (reads + updates + snapshots) * 1000.0 / duration);
 	
 	printf("#read txs     : ");
