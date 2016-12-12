@@ -27,7 +27,7 @@
 #include <hwloc.h>
 #include <iostream>
 #include <stdexcept>      // std::invalid_argument
-
+#include <threadscan.h>
 
 #include <stdlib.h>
 #include <malloc.h>
@@ -210,7 +210,6 @@ void *test(void *data) {
 // #ifdef ICC
 	int i = 0;
 	while (stop == 0) {
-	  std::cout <<i++<<std::endl;
 // #else
 	// while (AO_load_full(&stop) == 0) {
 // #endif /* ICC */
@@ -219,7 +218,7 @@ void *test(void *data) {
 	    
 	    if (last < 0) { // add
 	      val = rand_range_re(d->seed, d->range);
-		printf("add\n");
+		//printf("add\n");
 	      if (ht_add(d->set, val, TRANSACTIONAL)) {
 					d->nb_added++;
 					last = val;
@@ -232,7 +231,7 @@ void *test(void *data) {
 			/* Random computation only in non-alternated cases */
 			val = rand_range_re(d->seed, d->range);
 
-			printf("remove\n");
+		//	printf("remove\n");
 			/* Remove one random value */
 			if (ht_remove(d->set, val, TRANSACTIONAL)) {
 				d->nb_removed++;
@@ -247,7 +246,7 @@ void *test(void *data) {
 	    
 				
 		  val = rand_range_re(d->seed, d->range);
-		printf("contains\n");	
+		//printf("contains\n");	
 	      if (ht_contains(d->set, val, TRANSACTIONAL)) 
 					d->nb_found++;
 	      d->nb_contains++;
@@ -666,6 +665,7 @@ int main(int argc, char **argv)
 	printf("Load         : %d\n", load_factor);
 	
 	// Access set from all threads 
+	proc_init();
 	barrier_init(&barrier, nb_threads + 1);
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
@@ -720,7 +720,7 @@ int main(int argc, char **argv)
 	printf("STARTING...\n");
 	gettimeofday(&start, NULL);
 	if (duration > 0) {
-		int last_sum = 0;/*
+		int last_sum = 0;
 		while(greater_and_sub(&duration, profile_rate) > 0){	
 			nanosleep(&accounting_timeout, NULL);
 			int reads = 0;
@@ -738,7 +738,7 @@ int main(int argc, char **argv)
 			// Add custome stats here, following the same format.
 			//std::cout << duration<<":"<<profile_rate<<std::endl;
 			last_sum = reads + updates + snapshots;
-		}*/
+		}
 		timeout.tv_sec = duration/1000;
 		timeout.tv_nsec = (duration % 1000) * 1000000;
 		nanosleep(&timeout, NULL);
