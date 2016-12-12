@@ -1,5 +1,5 @@
 #/bin/bash
-./smr_overhead.sh
-./rw_dominant.sh
-./op_len.sh
-./contention.sh
+./scripts/smr_overhead.sh
+./scripts/rw_dominant.sh
+./scripts/op_len.sh
+./scripts/contention.sh
