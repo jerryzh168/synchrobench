@@ -157,7 +157,7 @@ void *test(void *data) {
 	CPU_ZERO(&cpuset);
 	CPU_SET(physical_idx, &cpuset);
 	int ret = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
-	printf("In test %d\n", (int)d->idx);
+	printf("In test %d, on cpu %d\n", (int)d->idx, physical_idx);
 	if(ret != 0) {
 	  printf("set affinity fail\n");
 		throw "set affinity fail\n";
