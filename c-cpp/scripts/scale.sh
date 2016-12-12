@@ -1,7 +1,8 @@
 #/bin/sh
 source scripts/bench.sh
 
-report_name=results/scale.report
+test_name=scale
+report_name=results/$test_name.report
 rm -f $report_name
 touch $report_name
 

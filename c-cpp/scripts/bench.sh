@@ -65,7 +65,6 @@ lfs=(1 10 100 1000)
 topos=(0 1)
 
 # Threads
-#threads=(1 2 4 8 16 32 40 64)
 threads=(1 2 3 4 5 6 7 8 9 10 12 14 16 18 20)
 
 # Duration
@@ -77,8 +76,10 @@ interval=10
 # Seed
 seed=17
 
+#iteration
+itr=(0 1 2)
 # Alternate
-#alternate=0
+# alternate=0
 
 # for i in "${threads[@]}"
 # do
