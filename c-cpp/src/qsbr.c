@@ -212,16 +212,6 @@ void process_callbacks(mr_node_t **list)
 }
 
 /*
- * free_garbage_node() - Frees garbage nodes for all threads
- *
- * This function goes through all thread's local data and then free them
- */
-void free_garbage_node() 
-{
-    
-}
-
-/*
  * compute_smallest_epoch() - This function computes smallest epoch
  *                            and return it
  */
@@ -244,6 +234,25 @@ int compute_smallest_epoch()
 
     return min_epoch;
 }
+
+/*
+ * free_garbage_node() - Frees garbage nodes for all threads
+ *
+ * This function goes through all thread's local data and then free them
+ */
+void free_garbage_node() 
+{
+    int min_epoch = compute_smallest_epoch();
+
+     // Go through all threads' local data
+    for (i = 1; i < nthreads; i++) {
+        if(qd[i].min_epoch < min_epoch) {
+            min_epoch = qd[i].local_epoch;
+        }
+    }
+   
+}
+
 
 /* 
  * quiescent_state() - Informs other threads that this thread has passed 
