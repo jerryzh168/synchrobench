@@ -248,11 +248,12 @@ void free_garbage_node()
 
      // Go through all threads' local data
     for (i = 0; i < nthreads; i++) {
-        if(i == 0) {
-            quiescent_state()
+        if((i == 0) || NEED_CLEAN(i, min_epoch) == 1) {
+            quiescent_state(FUZZY);
         }
     }
    
+    return;
 }
 
 
