@@ -13,6 +13,7 @@
 __thread int thread_id;
 
 void *(*__malloc)(unsigned int) = NULL;
+void (*__free)(void *) = NULL;
 
 node_t *new_node(val_t val, node_t *next, int transactional)
 {
@@ -86,6 +87,7 @@ int get_thread_idx() {
 void thread_local_init(thread_data_t *d) {
   thread_id = d->idx;
   __malloc = d->malloc_node;
+  __free = d->free_node;
   return;
 }
 /* you can have a chance to do global init before any smr threads are spawned */

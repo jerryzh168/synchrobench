@@ -25,6 +25,7 @@
 
 #include "harris.h"
 #include <threadscan.h>
+extern void (*__free)(void *);
 /*
  * The five following functions handle the low-order mark bit that indicates
  * whether a node is logically deleted (1) or not (0).
@@ -123,16 +124,22 @@ int harris_find(intset_t *set, val_t val) {
  * (if the value was absent) or does nothing (if the value is already present).
  */
 int harris_insert(intset_t *set, val_t val) {
-	node_t *newnode, *right_node, *left_node;
+	node_t *newnode = NULL, *right_node, *left_node;
 	left_node = set->head;
 	
 	do {
 		right_node = harris_search(set, val, &left_node);
-		if (right_node->val == val)
+		if (right_node->val == val){
+			if(newnode){
+				if(__free)
+					__free(newnode);
+				else
+					free(newnode);
+			}
 			return 0;
+		}
 		newnode = new_node(val, right_node, 0);
 		/* mem-bar between node creation and insertion */
-		AO_nop_full(); 
 		if (ATOMIC_CAS_MB(&left_node->next, right_node, newnode))
 			return 1;
 	} while(1);
