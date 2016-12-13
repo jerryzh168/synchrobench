@@ -15,6 +15,7 @@
  *
  * Copyright (c) Thomas E. Hart.
  */
+#define NEED_CLEAN(x, y) (0)
 #include <iostream>
 #include "qsbr.h"
 #include "mr.h"
@@ -59,6 +60,7 @@ struct qsbr_data {
 
     int local_epoch;
 };
+
 
 struct qsbr_aux_data {
 
