@@ -77,7 +77,7 @@ interval=10
 seed=17
 
 #iteration
-itr=(0)
+itr=(0 1 2)
 # Alternate
 # alternate=0
 
