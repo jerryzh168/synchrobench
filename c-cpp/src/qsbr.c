@@ -221,8 +221,10 @@ void process_callbacks(mr_node_t **list)
  */
 int compute_smallest_epoch() 
 {
+    int i;
+
     // if there is no thread in the system return INT_MAX as epoch (recycle everything)
-    if(nthreads == 0) {
+    if(qad.nthreads == 0) {
         return 0x7FFFFFFF;
     }
 
@@ -230,7 +232,7 @@ int compute_smallest_epoch()
     int min_epoch = qd[0].local_epoch;
 
     // Go through all threads' local data
-    for (i = 1; i < nthreads; i++) {
+    for (i = 1; i < qad.nthreads; i++) {
         if(qd[i].min_epoch < min_epoch) {
             min_epoch = qd[i].local_epoch;
         }
@@ -247,9 +249,10 @@ int compute_smallest_epoch()
 void free_garbage_node() 
 {
     int min_epoch = compute_smallest_epoch();
+    int i;
 
      // Go through all threads' local data
-    for (i = 0; i < nthreads; i++) {
+    for (i = 0; i < qad.nthreads; i++) {
         if((i == 0) || NEED_CLEAN(i, min_epoch) == 1) {
             quiescent_state(FUZZY);
         }
