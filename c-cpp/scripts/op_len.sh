@@ -8,7 +8,8 @@ touch $report_name
 
 mkdir -p results/$test_name
 
-bucket_num=20
+#bucket_num=20
+bucket_num=50
 thread=20
 update=20
 for lf in "${lfs[@]}"
