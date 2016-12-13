@@ -133,7 +133,10 @@ int harris_insert(intset_t *set, val_t val) {
 				free(newnode);
 			return 0;
 		}
-		newnode = new_node(val, right_node, 0);
+		if(newnode == NULL)
+			newnode = new_node(val, right_node, 0);
+		else
+			newnode->next = right_node;
 		/* mem-bar between node creation and insertion */
 		if (ATOMIC_CAS_MB(&left_node->next, right_node, newnode))
 			return 1;

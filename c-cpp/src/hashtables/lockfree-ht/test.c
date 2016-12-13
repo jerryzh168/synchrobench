@@ -177,6 +177,7 @@ void *test(void *data) {
 	cnext = (r >= d->update + d->snapshot);
 	int qcount = 0;
 	int txs_cnt = 0;
+	const int my_quiesent_state = d->idx == 1? QUIESCENCE_THRESHOLD: QUIESCENCE_THRESHOLD;
 // #ifdef ICC
 	while (stop == 0) {
 // #else
@@ -259,7 +260,7 @@ void *test(void *data) {
 	  //   cnext = (r >= d->update + d->snapshot);
 	  // }
 	    qcount++;
-	    if (qcount == QUIESCENCE_THRESHOLD) {
+	    if (qcount == my_quiesent_state) {
 	      quiescent_state(FUZZY);
 	      qcount = 0;
 	    }
