@@ -224,6 +224,9 @@ void process_callbacks(mr_node_t **list)
  */
 void quiescent_state(int blocking)
 {
+    // This updates local epoch
+    update_local_epoch();
+
     qsbr_data_t *t = &(qd[qad.thread_index]);
     int epoch;
     int orig;
