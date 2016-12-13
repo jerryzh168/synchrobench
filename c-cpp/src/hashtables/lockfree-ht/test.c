@@ -259,9 +259,14 @@ void *test(void *data) {
 	  // }
 	    qcount++;
 	    if (qcount == QUIESCENCE_THRESHOLD) {
-	      quiescent_state(FUZZY);
+              // NOTE: WE DO NOT CALL IT HERE IF WE USE EPOCH!!!!!!!!!!
+	      //quiescent_state(FUZZY);
 
+              // Update local counter for a thread
               update_gc_epoch();
+
+              // And then try to see whether any node could be freed
+              free_garbage_node();
 
 	      qcount = 0;
 	    }
