@@ -1,6 +1,6 @@
 import argparse
 import re
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import os
 import collections
 
@@ -9,7 +9,7 @@ def parse_args():
     parser.add_argument('-f', '--filename', action='store', help='input file name', type=str)
     parser.add_argument('-d', '--directory', action='store', help='result directory', type=str)
     parser.add_argument('-e', '--enable_metrics', action='store_true', help='enable profile', default=False)
-    parser.add_argument('-m', '--metrics', nargs='+', help = 'list of metrics', required=False, type=list, default=[])
+    parser.add_argument('-m', '--metrics', nargs='+', help = 'list of metrics', required=False, type=str, default=[])
     return parser.parse_args()
 
 def get_persec(s):
@@ -28,17 +28,20 @@ def get_profile(stats, metrics):
         lines = stats['#profile']
         for line in lines:
             for metric in metrics:
-                nums = re.findall('\(' + metric + ', (\d+)\)', line)
-                if len(nums) > 0:
-                    pname = '#profile-' + metric
-                    if pname in stats:
-                        stats['#profile-' + metric].append(int(nums[0]))
-                    else:
-                        stats['#profile-' + metric] = [int(nums[0])]
+                if metric == 'memory_pressure':
+                    mallocs = re.findall('\(' + 'mallocs' + ', (\d+)\)', line)
+                    frees = re.findall('\(' + 'frees' + ', (\d+)\)', line)
+                    nums = float(mallocs[0]) - float(frees[0])
                 else:
-                    print 'Metric:' + metric + 'Not found'
+                    nums = re.findall('\(' + metric + ', (\d+)\)', line)[0]
+                pname = '#profile-' + metric
+                if pname in stats:
+                    stats['#profile-' + metric].append(int(nums))
+                else:
+                    stats['#profile-' + metric] = [int(nums)]
 
 def process_result(filename, enable_metrics=False, metrics=[]):
+    print 'filename', filename
     with open(filename, 'r') as handle:
         lines = handle.readlines()
     stats = dict()
@@ -46,9 +49,11 @@ def process_result(filename, enable_metrics=False, metrics=[]):
     # TODO add more reporting options
     for i in xrange(len(lines)):
         result = lines[i].split(':')
+
         if len(result) == 2:
             key, value = result
             k = key.strip()
+
             if k in stats:
                 if type(stats[k]) == type([]):
                     stats[k].append(value.strip())
@@ -59,15 +64,14 @@ def process_result(filename, enable_metrics=False, metrics=[]):
     stats['Nb threads'] = int(stats['Nb threads'])
     to_persec(stats, '#txs')
     if enable_metrics:
-        metrics = ['txs', 'mallocs', 'frees'] + metrics
         get_profile(stats, metrics)
         del stats['#profile']
         lines = []
-        #for metric in metrics:
-        #    line, = plt.plot(stats['#profile-'+metric], label=metric)
-        #    lines.append(line)
-        #plt.legend(metrics, loc=1)
-        #plt.savefig(filename + '.png')
+        for metric in metrics:
+            line, = plt.plot(stats['#profile-'+metric], label=metric)
+            lines.append(line)
+        plt.legend(metrics, loc=1)
+        plt.savefig(filename + '.png')
     # print args.filename, stats['#txs per second'], stats['#mallocs'], \
     #    stats['#frees'], stats['#memory pressure']
     return stats
@@ -105,7 +109,6 @@ def main(args):
                     results[f][metric].append(float(stats[metric]))
         for metric in metrics:
             results[f][metric] = sum(results[f][metric]) / float(num_runs)
-    #print results
     results = results.items()
     results.sort(key=lambda x:natural_keys(x[0]))
     for test, res in results:
