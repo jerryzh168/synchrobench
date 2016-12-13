@@ -56,6 +56,8 @@ struct qsbr_data {
     int in_critical;
     int rcount;
     char padding[CACHE_LINE_SIZE - 4 * sizeof(int) - N_EPOCHS * sizeof(mr_node_t*)];
+
+    int local_epoch;
 };
 
 struct qsbr_aux_data {
@@ -126,6 +128,9 @@ void mr_init_global(uint8_t nthreads) {
 
     for (i = 0; i < nthreads; i++) {
         qd[i].epoch = 0;
+        // Local epoch is initialized to 0 to be consistent 
+        // with the init value of the global GC epoch
+        qd[i].local_epoch = 0;
         qd[i].in_critical = 1;
         qd[i].rcount = 0;
         for (j = 0; j < N_EPOCHS; j++)
@@ -134,6 +139,7 @@ void mr_init_global(uint8_t nthreads) {
     
     qg->global_epoch = 1;
 
+    // This will be increased for certain amount of operations
     qg->gc_epoch = 0;
 
     INIT_LOCK(&(qg->update_lock));
@@ -157,6 +163,7 @@ void mr_reinitialize()
     
     for (i = 0; i < qad.nthreads; i++) {
         qd[i].epoch = 0;
+        qd[i].local_epoch = 0;
         qd[i].in_critical = 1;
         qd[i].rcount = 0;
     }

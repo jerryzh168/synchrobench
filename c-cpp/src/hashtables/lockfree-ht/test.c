@@ -260,6 +260,9 @@ void *test(void *data) {
 	    qcount++;
 	    if (qcount == QUIESCENCE_THRESHOLD) {
 	      quiescent_state(FUZZY);
+
+              update_gc_epoch();
+
 	      qcount = 0;
 	    }
 	  
