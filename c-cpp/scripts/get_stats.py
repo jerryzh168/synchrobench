@@ -9,6 +9,7 @@ def parse_args():
     parser.add_argument('-f', '--filename', action='store', help='input file name', type=str)
     parser.add_argument('-d', '--directory', action='store', help='result directory', type=str)
     parser.add_argument('-e', '--enable_metrics', action='store_true', help='enable profile', default=False)
+    parser.add_argument('-s', '--swap', action='store_true', help='adjust file nmae', default=False)
     parser.add_argument('-m', '--metrics', nargs='+', help = 'list of metrics', required=False, type=list, default=[])
     return parser.parse_args()
 
@@ -22,6 +23,10 @@ def to_persec(stats, key):
     if key in stats:
         per_sec = get_persec(stats[key])
         stats[key + ' per second'] = per_sec
+
+def swap(text):
+    items = text.split('_')
+    return '_'.join([items[0], items[2], items[1]])
 
 def get_profile(stats, metrics):
     if '#profile' in stats:
@@ -107,6 +112,8 @@ def main(args):
             results[f][metric] = sum(results[f][metric]) / float(num_runs)
     print results
     results = results.items()
+    if args.swap:
+        results = map(lambda x: (swap(x[0]),x[1]), results)
     results.sort(key=lambda x:natural_keys(x[0]))
     for test, res in results:
         show = [test]

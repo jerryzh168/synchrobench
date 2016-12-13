@@ -36,6 +36,7 @@ clean-build:
 clean:
 	$(MAKE) -C src/utils/estm-0.3.0 clean
 	rm -rf build bin
+	rm -rf results/*
 
 $(BENCHS):
 	$(MAKE) -C $@ $(TARGET)
