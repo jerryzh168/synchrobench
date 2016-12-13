@@ -25,7 +25,7 @@
 
 #include "harris.h"
 #include "qsbr.h"
-
+#include <iostream>
 /*
  * The five following functions handle the low-order mark bit that indicates
  * whether a node is logically deleted (1) or not (0).
@@ -130,22 +130,26 @@ int harris_insert(intset_t *set, skey_t key) {
   do {
     right_node = harris_search(set, key, &left_node);
     if (right_node->key == key) {
-      if (newnode != NULL) {
-	if (bench.free_node) {
-	  bench.free_node(newnode);
-	} else {
-	  free(newnode);
-	}
+      if(newnode){
+	if(bench.free_node){
+        	bench.free_node(newnode);
+     	}else{
+        	free(newnode);
+     	}
       }
       return 0;
     }
-    newnode = new_node(key, right_node, 0);
+    if(newnode == NULL)
+    	newnode = new_node(key, right_node, 0);
+    else{
+	newnode->next = right_node;
+    }
     while (newnode == NULL) {
       quiescent_state(NOT_FUZZY);
       newnode = new_node(key, right_node, 0);
     }
     /* mem-bar between node creation and insertion */
-    //AO_nop_full(); 
+//    AO_nop_full(); 
     if (ATOMIC_CAS_MB(&left_node->next, right_node, newnode))
       return 1;
   } while(1);

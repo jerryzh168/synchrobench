@@ -15,9 +15,9 @@ __thread thread_local_info_t bench;
 
 node_t*
 new_node(skey_t key, node_t *next, int initializing) {
-    volatile node_t *node;
+    node_t *node;
 
-    node = (volatile node_t *) ssalloc_alloc(0, sizeof(node_t));
+    node = (node_t *) ssalloc_alloc(0, sizeof(node_t));
     
     if (node == NULL) {
         return NULL;

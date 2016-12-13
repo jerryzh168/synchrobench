@@ -176,13 +176,14 @@ void *test(void *data) {
 	mnext = (r < d->move);
 	cnext = (r >= d->update + d->snapshot);
 	int qcount = 0;
-
+	int txs_cnt = 0;
 // #ifdef ICC
 	while (stop == 0) {
 // #else
 	// while (AO_load_full(&stop) == 0) {
 // #endif /* ICC */
-		
+	//if(txs_cnt++ > 1000000)
+	//	last = 0;
 	  if (unext) { // update
 	    
 	    // if (mnext) { // move
@@ -749,7 +750,7 @@ int main(int argc, char **argv)
 				mallocs += malloc_list[i].nb_malloc;
 				frees += malloc_list[i].nb_free;
 			}
-			std::cout << "#profile: (txs, "<<reads+updates+snapshots<< ") (mallocs, " << mallocs << ") (frees, " << frees << ")" << std::endl;
+			std::cout << "#profile: (txs, "<<reads+updates+snapshots<< ") (mallocs, " << mallocs << ") (frees, " << frees << ")" << mallocs-frees << std::endl;
 			// Add custome stats here, following the same format.
 			//std::cout << duration<<":"<<profile_rate<<std::endl;
 			last_sum = reads + updates + snapshots;
