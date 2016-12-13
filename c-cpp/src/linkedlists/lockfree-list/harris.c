@@ -95,7 +95,7 @@ search_again:
 		if (ATOMIC_CAS_MB(&(*left_node)->next, 
 						  left_node_next, 
 						  right_node)) {
-			free(left_node_next);
+			//free(left_node_next);
 			if (right_node->next && is_marked_ref((long) right_node->next))
 				goto search_again;
 			else return right_node;
@@ -162,8 +162,8 @@ int harris_delete(intset_t *set, val_t val) {
 	} while(1);
 	if (!ATOMIC_CAS_MB(&left_node->next, right_node, right_node_next))
 		right_node = harris_search(set, right_node->val, &left_node);
-	else
-		free(right_node);
+	//else
+	//	free(right_node);
 	return 1;
 }
 
