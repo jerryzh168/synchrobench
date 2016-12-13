@@ -259,7 +259,8 @@ void quiescent_state (int blocking)
     return;
 }
 
-/* Links the node into the per-thread list of pending deletions.
+/* 
+ * free_node_later() - Links the node into the per-thread list of pending deletions
  */
 void free_node_later (void *q)
 {
@@ -273,6 +274,7 @@ void free_node_later (void *q)
         quiescent_state(NOT_FUZZY);
         wrapper_node = (mr_node_t *)ssalloc_alloc(1, sizeof(mr_node_t));
     }
+
     wrapper_node->actual_node = q;
 
     wrapper_node->mr_next = t->limbo_list[t->epoch];
