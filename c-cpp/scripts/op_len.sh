@@ -9,6 +9,7 @@ touch $report_name
 mkdir -p results/$test_name
 
 #bucket_num=20
+lfs=(1 50 100)
 bucket_num=50
 thread=20
 update=20
