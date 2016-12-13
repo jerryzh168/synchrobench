@@ -263,13 +263,15 @@ void *test(void *data) {
 	      //quiescent_state(FUZZY);
 
               // Update local counter for a thread
-              update_gc_epoch();
+              update_global_epoch();
 
               // And then try to see whether any node could be freed
               free_garbage_node();
 
 	      qcount = 0;
-	    }
+	    } else {
+              update_local_epoch(d->idx);
+            }
 	  
 	}
 
