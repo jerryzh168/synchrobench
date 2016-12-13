@@ -59,7 +59,7 @@ updates=(0 20 50)
 size=5000
 
 # Load factor
-lfs=(1 10 100 1000)
+#lfs=(1 50 100)
 
 # numa
 topos=(0 1)

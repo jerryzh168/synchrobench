@@ -8,7 +8,7 @@ touch $report_name
 
 mkdir -p results/$test_name
 
-lf=100
+lf=50
 bucket_num=5
 for thread in "${threads[@]}"
 do
