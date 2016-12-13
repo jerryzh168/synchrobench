@@ -79,9 +79,22 @@ __thread qsbr_aux_data_t qad;
  * This function does not require any memory barrier since by default epoch
  * prevents reclaiming, and it is only used to guarantee progress
  */
-int update_gc_epoch() 
+void update_gc_epoch() 
 {
     qg->gc_epoch += 1;
+    return;
+}
+
+/*
+ * update_local_epoch() - Updates the local epoch for each thread
+ */
+void update_local_epoch(int thread_id) 
+{
+    // Copies it from the global epoch
+    // This also does not need memory barrier because even if this write is
+    // delayed the worst is to have delaied deallocation
+    qd[thread_id]->local_epoch = qg->global_epoch;
+
     return;
 }
 
@@ -163,12 +176,15 @@ void mr_reinitialize()
     
     for (i = 0; i < qad.nthreads; i++) {
         qd[i].epoch = 0;
+        // We also set global epoch to 0
         qd[i].local_epoch = 0;
         qd[i].in_critical = 1;
         qd[i].rcount = 0;
     }
 
     qg->global_epoch = 1;
+    // This is set to 0 to be consistent with local epoch
+    qg->gc_epoch = 0;
     INIT_LOCK(&(qg->update_lock));
 }
 
