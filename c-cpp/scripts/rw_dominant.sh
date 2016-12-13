@@ -8,6 +8,7 @@ touch $report_name
 
 mkdir -p results/$test_name
 
+updates=(0 10 20 30 40 50)
 lf=100
 bucket_num=50
 thread=20
