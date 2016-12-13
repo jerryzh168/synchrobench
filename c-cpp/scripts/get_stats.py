@@ -105,7 +105,7 @@ def main(args):
                     results[f][metric].append(float(stats[metric]))
         for metric in metrics:
             results[f][metric] = sum(results[f][metric]) / float(num_runs)
-    print results
+    #print results
     results = results.items()
     results.sort(key=lambda x:natural_keys(x[0]))
     for test, res in results:
