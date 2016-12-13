@@ -37,7 +37,7 @@ void quiescent_state (int flag);
 void free_node_later(void * q);
 
 void update_local_epoch(int index);
-void update_global_epoch();
+void update_gc_epoch();
 void free_garbage_node();
 
 #endif
