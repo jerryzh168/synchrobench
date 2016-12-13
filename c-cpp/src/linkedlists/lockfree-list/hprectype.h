@@ -5,7 +5,7 @@
 #include "harris.h"
 #include <pthread.h>
 
-//#define EPOCH_HP
+#define EPOCH_HP
 
 #define TIMER_SIGNAL SIGALRM
 

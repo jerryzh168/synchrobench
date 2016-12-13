@@ -16,7 +16,7 @@ clean-build:
 	rm -rf build
 
 clean:
-	rm -rf build bin
+	rm -rf build bin results/*
 
 $(BENCHS):
 	$(MAKE) -C $@ $(TARGET)
