@@ -15,7 +15,7 @@
  *
  * Copyright (c) Thomas E. Hart.
  */
-
+#include <iostream>
 #include "qsbr.h"
 #include "mr.h"
 #include <stdio.h>
@@ -186,6 +186,7 @@ void quiescent_state (int blocking)
 
  retry:    
     epoch = qg->global_epoch;
+	//std::cout <<"epoch:"<< epoch <<std::endl;
     if (t->epoch != epoch) { /* New epoch. */
         /* Process callbacks for old 'incarnation' of this epoch. */
         process_callbacks(&(t->limbo_list[epoch]));

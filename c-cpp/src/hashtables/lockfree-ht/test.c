@@ -258,7 +258,6 @@ void *test(void *data) {
 	  //   cnext = (r >= d->update + d->snapshot);
 	  // }
 	    qcount++;
-
 	    if (qcount == QUIESCENCE_THRESHOLD) {
 	      quiescent_state(FUZZY);
 	      qcount = 0;

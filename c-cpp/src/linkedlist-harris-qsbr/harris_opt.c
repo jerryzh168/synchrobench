@@ -96,6 +96,7 @@ node_t *harris_search(intset_t *set, skey_t key, node_t **left_node) {
     if (ATOMIC_CAS_MB(&(*left_node)->next, 
 		      left_node_next, 
 		      right_node)) {
+	free_node_later(left_node_next);
       if (right_node->next && is_marked_ref((long) right_node->next))
 	goto search_again;
       else return right_node;
@@ -144,7 +145,7 @@ int harris_insert(intset_t *set, skey_t key) {
       newnode = new_node(key, right_node, 0);
     }
     /* mem-bar between node creation and insertion */
-    //AO_nop_full(); 
+    AO_nop_full(); 
     if (ATOMIC_CAS_MB(&left_node->next, right_node, newnode))
       return 1;
   } while(1);
@@ -172,5 +173,7 @@ int harris_delete(intset_t *set, skey_t key) {
   } while(1);
   if (!ATOMIC_CAS_MB(&left_node->next, right_node, right_node_next))
     right_node = harris_search(set, right_node->key, &left_node);
+  else
+	free_node_later(right_node);
   return 1;
 }
