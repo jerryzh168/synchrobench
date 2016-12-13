@@ -93,7 +93,7 @@ void update_local_epoch(int thread_id)
     // Copies it from the global epoch
     // This also does not need memory barrier because even if this write is
     // delayed the worst is to have delaied deallocation
-    qd[thread_id]->local_epoch = qg->global_epoch;
+    qd[thread_id]->local_epoch = qg->gc_epoch;
 
     return;
 }
@@ -212,12 +212,17 @@ void process_callbacks(mr_node_t **list)
 }
 
 /* 
- * Informs other threads that this thread has passed through a quiescent 
- * state.
+ * quiescent_state() - Informs other threads that this thread has passed 
+ *                     through a quiescent state
+ *
  * If all threads have passed through a quiescent state since the last time
- * this thread processed it's callbacks, proceed to process pending callbacks.
+ * this thread processed it's callbacks, proceed to process pending callbacks
+ *
+ * This function does not wait for other threads; instead it checks whether
+ * other threads have passed the quiescent state, and if they are just free
+ * all garbage since the last moment
  */
-void quiescent_state (int blocking)
+void quiescent_state(int blocking)
 {
     qsbr_data_t *t = &(qd[qad.thread_index]);
     int epoch;
