@@ -33,6 +33,8 @@ struct qsbr_globals {
     ALIGNED(CACHE_LINE_SIZE) int global_epoch ;
     char padding[CACHE_LINE_SIZE - sizeof(ptlock_t) - sizeof(int)];
     // OANA IGOR Should we pad here? It's not clear how big the padding should be...
+
+    ALIGNED(CACHE_LINE_SIZE) int gc_epoch;
 };
 
 ALIGNED(CACHE_LINE_SIZE) struct qsbr_globals *qg ;
@@ -69,6 +71,17 @@ typedef ALIGNED(CACHE_LINE_SIZE) struct qsbr_aux_data qsbr_aux_data_t;
 qsbr_data_t *qd;
 __thread qsbr_aux_data_t qad;
 
+/*
+ * update_gc_epoch() - Updates the GC epoch counter
+ *
+ * This function does not require any memory barrier since by default epoch
+ * prevents reclaiming, and it is only used to guarantee progress
+ */
+int update_gc_epoch() 
+{
+    qg->gc_epoch += 1;
+    return;
+}
 
 int update_epoch()
 {
@@ -120,6 +133,9 @@ void mr_init_global(uint8_t nthreads) {
     }
     
     qg->global_epoch = 1;
+
+    qg->gc_epoch = 0;
+
     INIT_LOCK(&(qg->update_lock));
 }
 
