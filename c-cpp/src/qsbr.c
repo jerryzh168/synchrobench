@@ -15,7 +15,7 @@
  *
  * Copyright (c) Thomas E. Hart.
  */
-#define NEED_CLEAN(x, y) (0)
+#define NEED_CLEAN(x, y) ((x + y) == 0xFFFFFFFF)
 #include <iostream>
 #include "qsbr.h"
 #include "mr.h"
@@ -95,7 +95,7 @@ void update_local_epoch(int thread_id)
     // Copies it from the global epoch
     // This also does not need memory barrier because even if this write is
     // delayed the worst is to have delaied deallocation
-    qd[thread_id]->local_epoch = qg->gc_epoch;
+    qd[thread_id].local_epoch = qg->gc_epoch;
 
     return;
 }
