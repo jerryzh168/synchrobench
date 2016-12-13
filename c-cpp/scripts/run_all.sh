@@ -11,4 +11,4 @@ python scripts/get_stats.py -d results/smr_overhead/
 python scripts/get_stats.py -d results/rw_dominant/
 python scripts/get_stats.py -d results/op_len/
 rm -r ../../results/$TEST
-cp results ../../results/%TEST
+cp results ../../results/$TEST
