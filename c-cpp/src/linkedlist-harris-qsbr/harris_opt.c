@@ -1,16 +1,30 @@
 /*
- *  linkedlist.c
- *
- *  Description:
+ * File:
+ *   harris.c
+ * Author(s):
+ *   Vincent Gramoli <vincent.gramoli@epfl.ch>
+ * Description:
  *   Lock-free linkedlist implementation of Harris' algorithm
  *   "A Pragmatic Implementation of Non-Blocking Linked Lists" 
  *   T. Harris, p. 300-314, DISC 2001.
+ *
+ * Copyright (c) 2009-2010.
+ *
+ * harris.c is part of Synchrobench
+ * 
+ * Synchrobench is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, version 2
+ * of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
-#include "linkedlist.h"
+#include "harris.h"
 #include "qsbr.h"
-
-RETRY_STATS_VARS;
 
 /*
  * The five following functions handle the low-order mark bit that indicates
@@ -19,166 +33,144 @@ RETRY_STATS_VARS;
  *  - (un)set_marked changes the mark,
  *  - get_(un)marked_ref sets the mark before returning the node.
  */
-inline int is_marked_ref(node_t* i) {
-    return ((uintptr_t) i & 0x1L);
+inline int is_marked_ref(long i) {
+  return (int) (i & (LONG_MIN+1));
 }
 
-inline node_t*
-get_unmarked_ref(node_t* w) {
-    return (node_t*) ((uintptr_t) w & ~0x1L);
+inline long unset_mark(long i) {
+  i &= LONG_MAX-1;
+  return i;
 }
 
-inline node_t*
-get_marked_ref(node_t* w) {
-    return (node_t*) ((uintptr_t) w | 0x1L);
+inline long set_mark(long i) {
+  i = unset_mark(i);
+  i += 1;
+  return i;
 }
 
-static inline int physical_delete_right(node_t* left_node, node_t* right_node) {
-    node_t* new_next = get_unmarked_ref(right_node->next);
-    node_t* res = CAS_PTR(&left_node->next, right_node, new_next);
-    int removed = (res == right_node);
+inline long get_unmarked_ref(long w) {
+  return unset_mark(w);
+}
 
-    if (likely(removed))
-    {
-        free_node_later((void*) res);
-    }
-
-    return removed;
+inline long get_marked_ref(long w) {
+  return set_mark(w);
 }
 
 /*
- * list_search looks for value val, it
- *  - returns right_node owning val (if present) or its immediately higher 
- *    value present in the list (otherwise) and 
- *  - sets the left_node to the node owning the value immediately lower than val. 
+ * harris_search looks for keyue key, it
+ *  - returns right_node owning key (if present) or its immediately higher 
+ *    keyue present in the list (otherwise) and 
+ *  - sets the left_node to the node owning the keyue immediately lower than key. 
  * Encountered nodes that are marked as logically deleted are physically removed
  * from the list, yet not garbage collected.
  */
-static inline node_t*
-list_search(intset_t* set, skey_t key, node_t** left_node_ptr) {
-    PARSE_TRY();
-    node_t* left_node = set->head;
-    node_t* right_node = set->head->next;
-    while (1) {
-        if (right_node->key == 600000) {
-            printf("touched illegal node in search\n");
-        }
-        if (likely(!is_marked_ref(right_node->next))) {
-            if (unlikely(right_node->key >= key)) {
-                break;
-            }
-            left_node = right_node;
-        } else {
-            CLEANUP_TRY();
-            physical_delete_right(left_node, right_node);
-        }
-        right_node = get_unmarked_ref(right_node->next);
-    }
-    *left_node_ptr = left_node;
-    return right_node;
-}
-
-/*
- * returns a value different from 0 if there is a node in the list owning value val.
- */
-int harris_find(intset_t* the_list, skey_t key) {
- 
-    node_t* node = the_list->head->next;
-    PARSE_TRY();
-    if (node->key == 600000) {
-            printf("touched illegal node in find\n");
-    }
-
-    while (likely(node->key < key)) {
-        node = get_unmarked_ref(node->next);
-        
-        if (node->key == 600000) {
-            printf("touched illegal node in find\n");
-        }
-    }
-
-    if (node->key == key && !is_marked_ref(node->next)) {
-        return 1;
-    }
-    return 0;
-}
-
-/*
- * inserts a new node with the given value val in the list
- * (if the value was absent) or does nothing (if the value is already present).
- */
-int harris_insert(intset_t *the_list, skey_t key) {
+node_t *harris_search(intset_t *set, skey_t key, node_t **left_node) {
+  node_t *left_node_next, *right_node;
+  left_node_next = set->head;
+  
+ search_again:
+  do {
+    node_t *t = set->head;
+    node_t *t_next = set->head->next;
+    
+    /* Find left_node and right_node */
     do {
-        UPDATE_TRY();
-        node_t* left_node;
-        node_t* right_node = list_search(the_list, key, &left_node);
-	
-        if (right_node->key == key) {
-            return 0;
-        }
-        node_t* node_to_add = new_node(key, right_node, 0);
-        while (node_to_add == NULL) {
-            // fprintf(stderr, "Could not allocate regular node\n");
-            quiescent_state(NOT_FUZZY);
-            node_to_add = new_node(key, right_node, 0);
-        }
-
-        // Try to swing left_node's unmarked next pointer to a new node
-
-        if (CAS_PTR(&left_node->next, right_node, node_to_add) == right_node) {
-            return 1;
-        }
-
-        ssfree_alloc(0, (void*) node_to_add);
-
-    } while (1);
-}
-
-/*
- * deletes a node with the given value val (if the value is present) 
- * or does nothing (if the value is already present).
- * The deletion is logical and consists of setting the node mark bit to 1.
- */
-sval_t harris_delete(intset_t *the_list, skey_t key) {
-    node_t* cas_result;
-    node_t* unmarked_ref;
-    node_t* left_node;
-    node_t* right_node;
-
-    do {
-        UPDATE_TRY();
-        right_node = list_search(the_list, key, &left_node);
-
-        if (right_node->key != key) {
-            return 0;
-        }
-
-        // Try to mark right_node as logically deleted
-        unmarked_ref = get_unmarked_ref(right_node->next);
-        node_t* marked_ref = get_marked_ref(unmarked_ref);
-        cas_result = CAS_PTR(&right_node->next, unmarked_ref, marked_ref);
-    } while (cas_result != unmarked_ref);
-
-    int ret = 1;//right_node->val;
-
-    if (!physical_delete_right(left_node, right_node)) {
-        list_search(the_list, key, &left_node);
+      if (!is_marked_ref((long) t_next)) {
+	(*left_node) = t;
+	left_node_next = t_next;
+      }
+      t = (node_t *) get_unmarked_ref((long) t_next);
+      if (!t->next) break;
+      t_next = t->next;
+    } while (is_marked_ref((long) t_next) || (t->key < key));
+    right_node = t;
+    
+    /* Check that nodes are adjacent */
+    if (left_node_next == right_node) {
+      if (right_node->next && is_marked_ref((long) right_node->next))
+	goto search_again;
+      else return right_node;
     }
     
-    return ret;
+    /* Remove one or more marked nodes */
+    if (ATOMIC_CAS_MB(&(*left_node)->next, 
+		      left_node_next, 
+		      right_node)) {
+      if (right_node->next && is_marked_ref((long) right_node->next))
+	goto search_again;
+      else return right_node;
+    } 
+    
+  } while (1);
 }
 
-int set_size(intset_t *set) {
-    size_t size = 0;
-    node_t* node;
+/*
+ * harris_find returns whether there is a node in the list owning keyue key.
+ */
+int harris_find(intset_t *set, skey_t key) {
+  node_t *right_node, *left_node;
+  left_node = set->head;
+  
+  right_node = harris_search(set, key, &left_node);
+  if ((!right_node->next) || right_node->key != key)
+    return 0;
+  else 
+    return 1;
+}
 
-    /* We have at least 2 elements */
-    node = get_unmarked_ref(set->head->next);
-    while (get_unmarked_ref(node->next) != NULL) {
-        if (!is_marked_ref(node->next))
-            size++;
-        node = get_unmarked_ref(node->next);
+/*
+ * harris_find inserts a new node with the given keyue key in the list
+ * (if the keyue was absent) or does nothing (if the keyue is already present).
+ */
+int harris_insert(intset_t *set, skey_t key) {
+  node_t *newnode = NULL, *right_node, *left_node;
+  left_node = set->head;
+  
+  do {
+    right_node = harris_search(set, key, &left_node);
+    if (right_node->key == key) {
+      if (newnode != NULL) {
+	if (bench.free_node) {
+	  bench.free_node(newnode);
+	} else {
+	  free(newnode);
+	}
+      }
+      return 0;
     }
+    newnode = new_node(key, right_node, 0);
+    while (newnode == NULL) {
+      quiescent_state(NOT_FUZZY);
+      newnode = new_node(key, right_node, 0);
+    }
+    /* mem-bar between node creation and insertion */
+    //AO_nop_full(); 
+    if (ATOMIC_CAS_MB(&left_node->next, right_node, newnode))
+      return 1;
+  } while(1);
+}
 
-    return size;
+/*
+ * harris_find deletes a node with the given keyue key (if the keyue is present) 
+ * or does nothing (if the keyue is already present).
+ * The deletion is logical and consists of setting the node mark bit to 1.
+ */
+int harris_delete(intset_t *set, skey_t key) {
+  node_t *right_node, *right_node_next, *left_node;
+  left_node = set->head;
+  
+  do {
+    right_node = harris_search(set, key, &left_node);
+    if (right_node->key != key)
+      return 0;
+    right_node_next = right_node->next;
+    if (!is_marked_ref((long) right_node_next))
+      if (ATOMIC_CAS_MB(&right_node->next, 
+			right_node_next, 
+			get_marked_ref((long) right_node_next)))
+	break;
+  } while(1);
+  if (!ATOMIC_CAS_MB(&left_node->next, right_node, right_node_next))
+    right_node = harris_search(set, right_node->key, &left_node);
+  return 1;
 }

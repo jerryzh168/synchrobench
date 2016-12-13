@@ -42,9 +42,11 @@ static volatile long unsigned int stop;
 
 #define TRANSACTIONAL                   4
 
-typedef volatile struct node {
+//typedef volatile struct node {
+typedef struct node {
     skey_t key;
-    volatile struct node* next;
+  //volatile struct node* next;
+    struct node* next;
     uint8_t padding32[8];
 #if defined(DO_PAD)
     uint8_t padding[CACHE_LINE_SIZE - sizeof(sval_t) - sizeof(skey_t) - sizeof(struct node*)];
