@@ -95,6 +95,7 @@ search_again:
 		if (ATOMIC_CAS_MB(&(*left_node)->next, 
 						  left_node_next, 
 						  right_node)) {
+			free(left_node_next);
 			if (right_node->next && is_marked_ref((long) right_node->next))
 				goto search_again;
 			else return right_node;
@@ -122,13 +123,16 @@ int harris_find(intset_t *set, val_t val) {
  * (if the value was absent) or does nothing (if the value is already present).
  */
 int harris_insert(intset_t *set, val_t val) {
-	node_t *newnode, *right_node, *left_node;
+	node_t *newnode = NULL, *right_node, *left_node;
 	left_node = set->head;
 	
 	do {
 		right_node = harris_search(set, val, &left_node);
-		if (right_node->val == val)
+		if (right_node->val == val){
+			if(newnode)
+				free(newnode);
 			return 0;
+		}
 		newnode = new_node(val, right_node, 0);
 		/* mem-bar between node creation and insertion */
 		if (ATOMIC_CAS_MB(&left_node->next, right_node, newnode))
@@ -158,6 +162,8 @@ int harris_delete(intset_t *set, val_t val) {
 	} while(1);
 	if (!ATOMIC_CAS_MB(&left_node->next, right_node, right_node_next))
 		right_node = harris_search(set, right_node->val, &left_node);
+	else
+		free(right_node);
 	return 1;
 }
 
