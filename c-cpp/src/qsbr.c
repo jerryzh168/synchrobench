@@ -233,7 +233,7 @@ int compute_smallest_epoch()
 
     // Go through all threads' local data
     for (i = 1; i < qad.nthreads; i++) {
-        if(qd[i].min_epoch < min_epoch) {
+        if(qd[i].local_epoch < min_epoch) {
             min_epoch = qd[i].local_epoch;
         }
     }
