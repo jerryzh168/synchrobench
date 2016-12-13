@@ -209,6 +209,8 @@ void process_callbacks(mr_node_t **list)
 
     /* Update our accounting information. */
     qd[qad.thread_index].rcount -= num;
+
+    return;
 }
 
 /*
@@ -245,9 +247,9 @@ void free_garbage_node()
     int min_epoch = compute_smallest_epoch();
 
      // Go through all threads' local data
-    for (i = 1; i < nthreads; i++) {
-        if(qd[i].min_epoch < min_epoch) {
-            min_epoch = qd[i].local_epoch;
+    for (i = 0; i < nthreads; i++) {
+        if(i == 0) {
+            quiescent_state()
         }
     }
    
