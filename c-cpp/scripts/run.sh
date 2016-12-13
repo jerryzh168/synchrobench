@@ -2,4 +2,4 @@
 
 make clean && make lockfree
 ./scripts/rw_dominant.sh
-python scripts/get_status.py -d results/rw_dominant/
+python scripts/get_stats.py -d results/rw_dominant/
