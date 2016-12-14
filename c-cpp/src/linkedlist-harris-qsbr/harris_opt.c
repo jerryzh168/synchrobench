@@ -139,7 +139,11 @@ int harris_insert(intset_t *set, skey_t key) {
       }
       return 0;
     }
-    newnode = new_node(key, right_node, 0);
+    if (newnode == NULL) {
+      newnode = new_node(key, right_node, 0);
+    } else {
+      newnode->next = right_node;
+    }
     while (newnode == NULL) {
       quiescent_state(NOT_FUZZY);
       newnode = new_node(key, right_node, 0);
