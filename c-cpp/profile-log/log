@@ -1,0 +1,1293 @@
+Set type     : lock-free hash table
+Duration     : 10000
+Initial size : 250
+Nb threads   : 20
+Value range  : 500
+Seed         : 17
+Update rate  : 0
+Load factor  : 50
+Move rate    : 0
+Snapshot rate: 0
+Elasticity   : 4
+Alternate    : 0
+Effective    : 1
+Profile	     : 10 ms
+Type sizes   : int=4/long=8/ptr=8/word=8
+Initializing STM
+Adding 250 entries to set
+Set size     : 250
+Bucket amount: 5
+Load         : 50
+Creating thread 0
+user stack 0x7f7fbb003000, high 0x7f7fbb203000
+Creating thread 1
+user stack 0x7f7fbae03000, high 0x7f7fbb003000
+Creating thread 2
+user stack 0x7f7fbac03000, high 0x7f7fbae03000
+Creating thread 3
+user stack 0x7f7fbaa03000, high 0x7f7fbac03000
+Creating thread 4
+user stack 0x7f7fba803000, high 0x7f7fbaa03000
+Creating thread 5
+user stack 0x7f7fba603000, high 0x7f7fba803000
+Creating thread 6
+user stack 0x7f7fba403000, high 0x7f7fba603000
+Creating thread 7
+user stack 0x7f7fba203000, high 0x7f7fba403000
+Creating thread 8
+user stack 0x7f7fba003000, high 0x7f7fba203000
+Creating thread 9
+user stack 0x7f7fb9e03000, high 0x7f7fba003000
+Creating thread 10
+user stack 0x7f7fb9c03000, high 0x7f7fb9e03000
+Creating thread 11
+user stack 0x7f7fb9a03000, high 0x7f7fb9c03000
+Creating thread 12
+user stack 0x7f7fb9803000, high 0x7f7fb9a03000
+Creating thread 13
+user stack 0x7f7fb9603000, high 0x7f7fb9803000
+Creating thread 14
+user stack 0x7f7fb9403000, high 0x7f7fb9603000
+Creating thread 15
+user stack 0x7f7fb9203000, high 0x7f7fb9403000
+Creating thread 16
+user stack 0x7f7fb9003000, high 0x7f7fb9203000
+Creating thread 17
+user stack 0x7f7fb8e03000, high 0x7f7fb9003000
+Creating thread 18
+user stack 0x7f7fb8c03000, high 0x7f7fb8e03000
+Creating thread 19
+user stack 0x7f7fb8a03000, high 0x7f7fb8c03000
+STARTING...
+#profile: (txs, 475472) (mallocs, 0) (frees, 0)
+#profile: (txs, 861484) (mallocs, 0) (frees, 0)
+#profile: (txs, 1242467) (mallocs, 0) (frees, 0)
+#profile: (txs, 1638527) (mallocs, 0) (frees, 0)
+#profile: (txs, 2052091) (mallocs, 0) (frees, 0)
+#profile: (txs, 2451266) (mallocs, 0) (frees, 0)
+#profile: (txs, 2842145) (mallocs, 0) (frees, 0)
+#profile: (txs, 3214983) (mallocs, 0) (frees, 0)
+#profile: (txs, 3588154) (mallocs, 0) (frees, 0)
+#profile: (txs, 3960138) (mallocs, 0) (frees, 0)
+#profile: (txs, 4332056) (mallocs, 0) (frees, 0)
+#profile: (txs, 4705941) (mallocs, 0) (frees, 0)
+#profile: (txs, 5084737) (mallocs, 0) (frees, 0)
+#profile: (txs, 5483753) (mallocs, 0) (frees, 0)
+#profile: (txs, 5876594) (mallocs, 0) (frees, 0)
+#profile: (txs, 6270160) (mallocs, 0) (frees, 0)
+#profile: (txs, 6673182) (mallocs, 0) (frees, 0)
+#profile: (txs, 7084275) (mallocs, 0) (frees, 0)
+#profile: (txs, 7500477) (mallocs, 0) (frees, 0)
+#profile: (txs, 7899123) (mallocs, 0) (frees, 0)
+#profile: (txs, 8287012) (mallocs, 0) (frees, 0)
+#profile: (txs, 8712438) (mallocs, 0) (frees, 0)
+#profile: (txs, 9141090) (mallocs, 0) (frees, 0)
+#profile: (txs, 9561232) (mallocs, 0) (frees, 0)
+#profile: (txs, 9984497) (mallocs, 0) (frees, 0)
+#profile: (txs, 10419591) (mallocs, 0) (frees, 0)
+#profile: (txs, 10866659) (mallocs, 0) (frees, 0)
+#profile: (txs, 11318247) (mallocs, 0) (frees, 0)
+#profile: (txs, 11761384) (mallocs, 0) (frees, 0)
+#profile: (txs, 12214036) (mallocs, 0) (frees, 0)
+#profile: (txs, 12655322) (mallocs, 0) (frees, 0)
+#profile: (txs, 13108232) (mallocs, 0) (frees, 0)
+#profile: (txs, 13566604) (mallocs, 0) (frees, 0)
+#profile: (txs, 14025843) (mallocs, 0) (frees, 0)
+#profile: (txs, 14468224) (mallocs, 0) (frees, 0)
+#profile: (txs, 14915204) (mallocs, 0) (frees, 0)
+#profile: (txs, 15362944) (mallocs, 0) (frees, 0)
+#profile: (txs, 15817088) (mallocs, 0) (frees, 0)
+#profile: (txs, 16271988) (mallocs, 0) (frees, 0)
+#profile: (txs, 16728528) (mallocs, 0) (frees, 0)
+#profile: (txs, 17184275) (mallocs, 0) (frees, 0)
+#profile: (txs, 17633876) (mallocs, 0) (frees, 0)
+#profile: (txs, 18089757) (mallocs, 0) (frees, 0)
+#profile: (txs, 18541780) (mallocs, 0) (frees, 0)
+#profile: (txs, 19012585) (mallocs, 0) (frees, 0)
+#profile: (txs, 19486707) (mallocs, 0) (frees, 0)
+#profile: (txs, 19955050) (mallocs, 0) (frees, 0)
+#profile: (txs, 20415101) (mallocs, 0) (frees, 0)
+#profile: (txs, 20880955) (mallocs, 0) (frees, 0)
+#profile: (txs, 21338191) (mallocs, 0) (frees, 0)
+#profile: (txs, 21780438) (mallocs, 0) (frees, 0)
+#profile: (txs, 22210087) (mallocs, 0) (frees, 0)
+#profile: (txs, 22635267) (mallocs, 0) (frees, 0)
+#profile: (txs, 23066774) (mallocs, 0) (frees, 0)
+#profile: (txs, 23458259) (mallocs, 0) (frees, 0)
+#profile: (txs, 23841039) (mallocs, 0) (frees, 0)
+#profile: (txs, 24225446) (mallocs, 0) (frees, 0)
+#profile: (txs, 24619860) (mallocs, 0) (frees, 0)
+#profile: (txs, 25044800) (mallocs, 0) (frees, 0)
+#profile: (txs, 25474326) (mallocs, 0) (frees, 0)
+#profile: (txs, 25898865) (mallocs, 0) (frees, 0)
+#profile: (txs, 26323016) (mallocs, 0) (frees, 0)
+#profile: (txs, 26748786) (mallocs, 0) (frees, 0)
+#profile: (txs, 27174695) (mallocs, 0) (frees, 0)
+#profile: (txs, 27609359) (mallocs, 0) (frees, 0)
+#profile: (txs, 28033750) (mallocs, 0) (frees, 0)
+#profile: (txs, 28467689) (mallocs, 0) (frees, 0)
+#profile: (txs, 28881990) (mallocs, 0) (frees, 0)
+#profile: (txs, 29294738) (mallocs, 0) (frees, 0)
+#profile: (txs, 29729784) (mallocs, 0) (frees, 0)
+#profile: (txs, 30151997) (mallocs, 0) (frees, 0)
+#profile: (txs, 30576078) (mallocs, 0) (frees, 0)
+#profile: (txs, 30990425) (mallocs, 0) (frees, 0)
+#profile: (txs, 31405073) (mallocs, 0) (frees, 0)
+#profile: (txs, 31840723) (mallocs, 0) (frees, 0)
+#profile: (txs, 32247760) (mallocs, 0) (frees, 0)
+#profile: (txs, 32639881) (mallocs, 0) (frees, 0)
+#profile: (txs, 33017780) (mallocs, 0) (frees, 0)
+#profile: (txs, 33396133) (mallocs, 0) (frees, 0)
+#profile: (txs, 33939183) (mallocs, 0) (frees, 0)
+#profile: (txs, 35147613) (mallocs, 0) (frees, 0)
+#profile: (txs, 36404946) (mallocs, 0) (frees, 0)
+#profile: (txs, 37664126) (mallocs, 0) (frees, 0)
+#profile: (txs, 38870029) (mallocs, 0) (frees, 0)
+#profile: (txs, 40024431) (mallocs, 0) (frees, 0)
+#profile: (txs, 41200511) (mallocs, 0) (frees, 0)
+#profile: (txs, 42212218) (mallocs, 0) (frees, 0)
+#profile: (txs, 43198110) (mallocs, 0) (frees, 0)
+#profile: (txs, 44184789) (mallocs, 0) (frees, 0)
+#profile: (txs, 45175784) (mallocs, 0) (frees, 0)
+#profile: (txs, 46142089) (mallocs, 0) (frees, 0)
+#profile: (txs, 47110728) (mallocs, 0) (frees, 0)
+#profile: (txs, 48084490) (mallocs, 0) (frees, 0)
+#profile: (txs, 49051328) (mallocs, 0) (frees, 0)
+#profile: (txs, 50025721) (mallocs, 0) (frees, 0)
+#profile: (txs, 50999746) (mallocs, 0) (frees, 0)
+#profile: (txs, 51973619) (mallocs, 0) (frees, 0)
+#profile: (txs, 52946535) (mallocs, 0) (frees, 0)
+#profile: (txs, 53926355) (mallocs, 0) (frees, 0)
+#profile: (txs, 55084073) (mallocs, 0) (frees, 0)
+#profile: (txs, 56249430) (mallocs, 0) (frees, 0)
+#profile: (txs, 57431594) (mallocs, 0) (frees, 0)
+#profile: (txs, 58599198) (mallocs, 0) (frees, 0)
+#profile: (txs, 59777006) (mallocs, 0) (frees, 0)
+#profile: (txs, 60963875) (mallocs, 0) (frees, 0)
+#profile: (txs, 62139362) (mallocs, 0) (frees, 0)
+#profile: (txs, 63310096) (mallocs, 0) (frees, 0)
+#profile: (txs, 64500479) (mallocs, 0) (frees, 0)
+#profile: (txs, 65679679) (mallocs, 0) (frees, 0)
+#profile: (txs, 66871011) (mallocs, 0) (frees, 0)
+#profile: (txs, 68066440) (mallocs, 0) (frees, 0)
+#profile: (txs, 69241020) (mallocs, 0) (frees, 0)
+#profile: (txs, 70425854) (mallocs, 0) (frees, 0)
+#profile: (txs, 71598114) (mallocs, 0) (frees, 0)
+#profile: (txs, 72783736) (mallocs, 0) (frees, 0)
+#profile: (txs, 73959083) (mallocs, 0) (frees, 0)
+#profile: (txs, 75156233) (mallocs, 0) (frees, 0)
+#profile: (txs, 76339989) (mallocs, 0) (frees, 0)
+#profile: (txs, 77498732) (mallocs, 0) (frees, 0)
+#profile: (txs, 78663349) (mallocs, 0) (frees, 0)
+#profile: (txs, 79767896) (mallocs, 0) (frees, 0)
+#profile: (txs, 80865026) (mallocs, 0) (frees, 0)
+#profile: (txs, 81968685) (mallocs, 0) (frees, 0)
+#profile: (txs, 83092324) (mallocs, 0) (frees, 0)
+#profile: (txs, 84195488) (mallocs, 0) (frees, 0)
+#profile: (txs, 85297456) (mallocs, 0) (frees, 0)
+#profile: (txs, 86381374) (mallocs, 0) (frees, 0)
+#profile: (txs, 87362802) (mallocs, 0) (frees, 0)
+#profile: (txs, 88341892) (mallocs, 0) (frees, 0)
+#profile: (txs, 89282504) (mallocs, 0) (frees, 0)
+#profile: (txs, 90222522) (mallocs, 0) (frees, 0)
+#profile: (txs, 91178524) (mallocs, 0) (frees, 0)
+#profile: (txs, 92143286) (mallocs, 0) (frees, 0)
+#profile: (txs, 93134465) (mallocs, 0) (frees, 0)
+#profile: (txs, 94156449) (mallocs, 0) (frees, 0)
+#profile: (txs, 95188195) (mallocs, 0) (frees, 0)
+#profile: (txs, 96359974) (mallocs, 0) (frees, 0)
+#profile: (txs, 97549020) (mallocs, 0) (frees, 0)
+#profile: (txs, 98731136) (mallocs, 0) (frees, 0)
+#profile: (txs, 99907950) (mallocs, 0) (frees, 0)
+#profile: (txs, 101109095) (mallocs, 0) (frees, 0)
+#profile: (txs, 102301816) (mallocs, 0) (frees, 0)
+#profile: (txs, 103482966) (mallocs, 0) (frees, 0)
+#profile: (txs, 104674193) (mallocs, 0) (frees, 0)
+#profile: (txs, 105870065) (mallocs, 0) (frees, 0)
+#profile: (txs, 107016466) (mallocs, 0) (frees, 0)
+#profile: (txs, 108176715) (mallocs, 0) (frees, 0)
+#profile: (txs, 109360426) (mallocs, 0) (frees, 0)
+#profile: (txs, 110508053) (mallocs, 0) (frees, 0)
+#profile: (txs, 111571293) (mallocs, 0) (frees, 0)
+#profile: (txs, 112679476) (mallocs, 0) (frees, 0)
+#profile: (txs, 113750913) (mallocs, 0) (frees, 0)
+#profile: (txs, 114840153) (mallocs, 0) (frees, 0)
+#profile: (txs, 115909249) (mallocs, 0) (frees, 0)
+#profile: (txs, 116985909) (mallocs, 0) (frees, 0)
+#profile: (txs, 118052544) (mallocs, 0) (frees, 0)
+#profile: (txs, 119146903) (mallocs, 0) (frees, 0)
+#profile: (txs, 120234140) (mallocs, 0) (frees, 0)
+#profile: (txs, 121294080) (mallocs, 0) (frees, 0)
+#profile: (txs, 122373020) (mallocs, 0) (frees, 0)
+#profile: (txs, 123453171) (mallocs, 0) (frees, 0)
+#profile: (txs, 124530768) (mallocs, 0) (frees, 0)
+#profile: (txs, 125616446) (mallocs, 0) (frees, 0)
+#profile: (txs, 126690690) (mallocs, 0) (frees, 0)
+#profile: (txs, 127772260) (mallocs, 0) (frees, 0)
+#profile: (txs, 128847000) (mallocs, 0) (frees, 0)
+#profile: (txs, 129920195) (mallocs, 0) (frees, 0)
+#profile: (txs, 130994889) (mallocs, 0) (frees, 0)
+#profile: (txs, 132088083) (mallocs, 0) (frees, 0)
+#profile: (txs, 133160504) (mallocs, 0) (frees, 0)
+#profile: (txs, 134236160) (mallocs, 0) (frees, 0)
+#profile: (txs, 135304603) (mallocs, 0) (frees, 0)
+#profile: (txs, 136379882) (mallocs, 0) (frees, 0)
+#profile: (txs, 137470931) (mallocs, 0) (frees, 0)
+#profile: (txs, 138539977) (mallocs, 0) (frees, 0)
+#profile: (txs, 139609632) (mallocs, 0) (frees, 0)
+#profile: (txs, 140701625) (mallocs, 0) (frees, 0)
+#profile: (txs, 141795745) (mallocs, 0) (frees, 0)
+#profile: (txs, 142859742) (mallocs, 0) (frees, 0)
+#profile: (txs, 143943927) (mallocs, 0) (frees, 0)
+#profile: (txs, 145045165) (mallocs, 0) (frees, 0)
+#profile: (txs, 146142073) (mallocs, 0) (frees, 0)
+#profile: (txs, 147234867) (mallocs, 0) (frees, 0)
+#profile: (txs, 148333128) (mallocs, 0) (frees, 0)
+#profile: (txs, 149353467) (mallocs, 0) (frees, 0)
+#profile: (txs, 150366892) (mallocs, 0) (frees, 0)
+#profile: (txs, 151386295) (mallocs, 0) (frees, 0)
+#profile: (txs, 152470806) (mallocs, 0) (frees, 0)
+#profile: (txs, 153563185) (mallocs, 0) (frees, 0)
+#profile: (txs, 154639730) (mallocs, 0) (frees, 0)
+#profile: (txs, 155730294) (mallocs, 0) (frees, 0)
+#profile: (txs, 156819721) (mallocs, 0) (frees, 0)
+#profile: (txs, 157906443) (mallocs, 0) (frees, 0)
+#profile: (txs, 159004156) (mallocs, 0) (frees, 0)
+#profile: (txs, 160109364) (mallocs, 0) (frees, 0)
+#profile: (txs, 161197231) (mallocs, 0) (frees, 0)
+#profile: (txs, 162287762) (mallocs, 0) (frees, 0)
+#profile: (txs, 163363506) (mallocs, 0) (frees, 0)
+#profile: (txs, 164336520) (mallocs, 0) (frees, 0)
+#profile: (txs, 165333282) (mallocs, 0) (frees, 0)
+#profile: (txs, 166325193) (mallocs, 0) (frees, 0)
+#profile: (txs, 167317944) (mallocs, 0) (frees, 0)
+#profile: (txs, 168308682) (mallocs, 0) (frees, 0)
+#profile: (txs, 169314173) (mallocs, 0) (frees, 0)
+#profile: (txs, 170367402) (mallocs, 0) (frees, 0)
+#profile: (txs, 171396117) (mallocs, 0) (frees, 0)
+#profile: (txs, 172426071) (mallocs, 0) (frees, 0)
+#profile: (txs, 173445023) (mallocs, 0) (frees, 0)
+#profile: (txs, 174452226) (mallocs, 0) (frees, 0)
+#profile: (txs, 175478324) (mallocs, 0) (frees, 0)
+#profile: (txs, 176501733) (mallocs, 0) (frees, 0)
+#profile: (txs, 177541780) (mallocs, 0) (frees, 0)
+#profile: (txs, 178584915) (mallocs, 0) (frees, 0)
+#profile: (txs, 179610214) (mallocs, 0) (frees, 0)
+#profile: (txs, 180642836) (mallocs, 0) (frees, 0)
+#profile: (txs, 181700244) (mallocs, 0) (frees, 0)
+#profile: (txs, 182886712) (mallocs, 0) (frees, 0)
+#profile: (txs, 184062280) (mallocs, 0) (frees, 0)
+#profile: (txs, 185254352) (mallocs, 0) (frees, 0)
+#profile: (txs, 186420071) (mallocs, 0) (frees, 0)
+#profile: (txs, 187568876) (mallocs, 0) (frees, 0)
+#profile: (txs, 188679865) (mallocs, 0) (frees, 0)
+#profile: (txs, 189790251) (mallocs, 0) (frees, 0)
+#profile: (txs, 190896420) (mallocs, 0) (frees, 0)
+#profile: (txs, 191996963) (mallocs, 0) (frees, 0)
+#profile: (txs, 193100328) (mallocs, 0) (frees, 0)
+#profile: (txs, 194267558) (mallocs, 0) (frees, 0)
+#profile: (txs, 195439927) (mallocs, 0) (frees, 0)
+#profile: (txs, 196558116) (mallocs, 0) (frees, 0)
+#profile: (txs, 197743474) (mallocs, 0) (frees, 0)
+#profile: (txs, 198927394) (mallocs, 0) (frees, 0)
+#profile: (txs, 200079065) (mallocs, 0) (frees, 0)
+#profile: (txs, 201118181) (mallocs, 0) (frees, 0)
+#profile: (txs, 202150131) (mallocs, 0) (frees, 0)
+#profile: (txs, 203151881) (mallocs, 0) (frees, 0)
+#profile: (txs, 204107634) (mallocs, 0) (frees, 0)
+#profile: (txs, 205057126) (mallocs, 0) (frees, 0)
+#profile: (txs, 206100758) (mallocs, 0) (frees, 0)
+#profile: (txs, 207211563) (mallocs, 0) (frees, 0)
+#profile: (txs, 208323632) (mallocs, 0) (frees, 0)
+#profile: (txs, 209422080) (mallocs, 0) (frees, 0)
+#profile: (txs, 210531223) (mallocs, 0) (frees, 0)
+#profile: (txs, 211624402) (mallocs, 0) (frees, 0)
+#profile: (txs, 212727159) (mallocs, 0) (frees, 0)
+#profile: (txs, 213869153) (mallocs, 0) (frees, 0)
+#profile: (txs, 215055719) (mallocs, 0) (frees, 0)
+#profile: (txs, 216225679) (mallocs, 0) (frees, 0)
+#profile: (txs, 217412389) (mallocs, 0) (frees, 0)
+#profile: (txs, 218612792) (mallocs, 0) (frees, 0)
+#profile: (txs, 219784516) (mallocs, 0) (frees, 0)
+#profile: (txs, 220972928) (mallocs, 0) (frees, 0)
+#profile: (txs, 222188622) (mallocs, 0) (frees, 0)
+#profile: (txs, 223384654) (mallocs, 0) (frees, 0)
+#profile: (txs, 224557386) (mallocs, 0) (frees, 0)
+#profile: (txs, 225726565) (mallocs, 0) (frees, 0)
+#profile: (txs, 226904226) (mallocs, 0) (frees, 0)
+#profile: (txs, 228035324) (mallocs, 0) (frees, 0)
+#profile: (txs, 229120612) (mallocs, 0) (frees, 0)
+#profile: (txs, 230207699) (mallocs, 0) (frees, 0)
+#profile: (txs, 231290324) (mallocs, 0) (frees, 0)
+#profile: (txs, 232390958) (mallocs, 0) (frees, 0)
+#profile: (txs, 233483474) (mallocs, 0) (frees, 0)
+#profile: (txs, 234575689) (mallocs, 0) (frees, 0)
+#profile: (txs, 235667852) (mallocs, 0) (frees, 0)
+#profile: (txs, 236763062) (mallocs, 0) (frees, 0)
+#profile: (txs, 237854826) (mallocs, 0) (frees, 0)
+#profile: (txs, 238939187) (mallocs, 0) (frees, 0)
+#profile: (txs, 240035603) (mallocs, 0) (frees, 0)
+#profile: (txs, 241130322) (mallocs, 0) (frees, 0)
+#profile: (txs, 242230414) (mallocs, 0) (frees, 0)
+#profile: (txs, 243315675) (mallocs, 0) (frees, 0)
+#profile: (txs, 244412078) (mallocs, 0) (frees, 0)
+#profile: (txs, 245544137) (mallocs, 0) (frees, 0)
+#profile: (txs, 246647690) (mallocs, 0) (frees, 0)
+#profile: (txs, 247744649) (mallocs, 0) (frees, 0)
+#profile: (txs, 248841135) (mallocs, 0) (frees, 0)
+#profile: (txs, 249939833) (mallocs, 0) (frees, 0)
+#profile: (txs, 251001922) (mallocs, 0) (frees, 0)
+#profile: (txs, 252005734) (mallocs, 0) (frees, 0)
+#profile: (txs, 253003202) (mallocs, 0) (frees, 0)
+#profile: (txs, 253999607) (mallocs, 0) (frees, 0)
+#profile: (txs, 254996304) (mallocs, 0) (frees, 0)
+#profile: (txs, 255992112) (mallocs, 0) (frees, 0)
+#profile: (txs, 256988542) (mallocs, 0) (frees, 0)
+#profile: (txs, 257984822) (mallocs, 0) (frees, 0)
+#profile: (txs, 258981244) (mallocs, 0) (frees, 0)
+#profile: (txs, 259977628) (mallocs, 0) (frees, 0)
+#profile: (txs, 260974954) (mallocs, 0) (frees, 0)
+#profile: (txs, 261972018) (mallocs, 0) (frees, 0)
+#profile: (txs, 262967847) (mallocs, 0) (frees, 0)
+#profile: (txs, 263965688) (mallocs, 0) (frees, 0)
+#profile: (txs, 264964978) (mallocs, 0) (frees, 0)
+#profile: (txs, 265962281) (mallocs, 0) (frees, 0)
+#profile: (txs, 266964575) (mallocs, 0) (frees, 0)
+#profile: (txs, 267961091) (mallocs, 0) (frees, 0)
+#profile: (txs, 268956959) (mallocs, 0) (frees, 0)
+#profile: (txs, 269704722) (mallocs, 0) (frees, 0)
+#profile: (txs, 270759088) (mallocs, 0) (frees, 0)
+#profile: (txs, 271850163) (mallocs, 0) (frees, 0)
+#profile: (txs, 273062878) (mallocs, 0) (frees, 0)
+#profile: (txs, 274315769) (mallocs, 0) (frees, 0)
+#profile: (txs, 275471669) (mallocs, 0) (frees, 0)
+#profile: (txs, 276634506) (mallocs, 0) (frees, 0)
+#profile: (txs, 277784272) (mallocs, 0) (frees, 0)
+#profile: (txs, 278988259) (mallocs, 0) (frees, 0)
+#profile: (txs, 280239176) (mallocs, 0) (frees, 0)
+#profile: (txs, 281498289) (mallocs, 0) (frees, 0)
+#profile: (txs, 282700662) (mallocs, 0) (frees, 0)
+#profile: (txs, 283878857) (mallocs, 0) (frees, 0)
+#profile: (txs, 285068247) (mallocs, 0) (frees, 0)
+#profile: (txs, 286237204) (mallocs, 0) (frees, 0)
+#profile: (txs, 287416295) (mallocs, 0) (frees, 0)
+#profile: (txs, 288595748) (mallocs, 0) (frees, 0)
+#profile: (txs, 289789511) (mallocs, 0) (frees, 0)
+#profile: (txs, 290956805) (mallocs, 0) (frees, 0)
+#profile: (txs, 292024885) (mallocs, 0) (frees, 0)
+#profile: (txs, 293077212) (mallocs, 0) (frees, 0)
+#profile: (txs, 294117096) (mallocs, 0) (frees, 0)
+#profile: (txs, 295157069) (mallocs, 0) (frees, 0)
+#profile: (txs, 296164073) (mallocs, 0) (frees, 0)
+#profile: (txs, 297155465) (mallocs, 0) (frees, 0)
+#profile: (txs, 298142685) (mallocs, 0) (frees, 0)
+#profile: (txs, 299155480) (mallocs, 0) (frees, 0)
+#profile: (txs, 300164263) (mallocs, 0) (frees, 0)
+#profile: (txs, 301168474) (mallocs, 0) (frees, 0)
+#profile: (txs, 302175702) (mallocs, 0) (frees, 0)
+#profile: (txs, 303181238) (mallocs, 0) (frees, 0)
+#profile: (txs, 304320395) (mallocs, 0) (frees, 0)
+#profile: (txs, 305506807) (mallocs, 0) (frees, 0)
+#profile: (txs, 306609831) (mallocs, 0) (frees, 0)
+#profile: (txs, 307665521) (mallocs, 0) (frees, 0)
+#profile: (txs, 308719445) (mallocs, 0) (frees, 0)
+#profile: (txs, 309765433) (mallocs, 0) (frees, 0)
+#profile: (txs, 310820065) (mallocs, 0) (frees, 0)
+#profile: (txs, 311881678) (mallocs, 0) (frees, 0)
+#profile: (txs, 312937170) (mallocs, 0) (frees, 0)
+#profile: (txs, 313994399) (mallocs, 0) (frees, 0)
+#profile: (txs, 315052601) (mallocs, 0) (frees, 0)
+#profile: (txs, 316109528) (mallocs, 0) (frees, 0)
+#profile: (txs, 317156091) (mallocs, 0) (frees, 0)
+#profile: (txs, 318208459) (mallocs, 0) (frees, 0)
+#profile: (txs, 319262416) (mallocs, 0) (frees, 0)
+#profile: (txs, 320356331) (mallocs, 0) (frees, 0)
+#profile: (txs, 321522705) (mallocs, 0) (frees, 0)
+#profile: (txs, 322683534) (mallocs, 0) (frees, 0)
+#profile: (txs, 323846244) (mallocs, 0) (frees, 0)
+#profile: (txs, 325025266) (mallocs, 0) (frees, 0)
+#profile: (txs, 326206007) (mallocs, 0) (frees, 0)
+#profile: (txs, 327339661) (mallocs, 0) (frees, 0)
+#profile: (txs, 328418438) (mallocs, 0) (frees, 0)
+#profile: (txs, 329511199) (mallocs, 0) (frees, 0)
+#profile: (txs, 330584392) (mallocs, 0) (frees, 0)
+#profile: (txs, 331671991) (mallocs, 0) (frees, 0)
+#profile: (txs, 332791278) (mallocs, 0) (frees, 0)
+#profile: (txs, 333976016) (mallocs, 0) (frees, 0)
+#profile: (txs, 335060427) (mallocs, 0) (frees, 0)
+#profile: (txs, 336132092) (mallocs, 0) (frees, 0)
+#profile: (txs, 337193545) (mallocs, 0) (frees, 0)
+#profile: (txs, 338261828) (mallocs, 0) (frees, 0)
+#profile: (txs, 339367683) (mallocs, 0) (frees, 0)
+#profile: (txs, 340440508) (mallocs, 0) (frees, 0)
+#profile: (txs, 341466962) (mallocs, 0) (frees, 0)
+#profile: (txs, 342492515) (mallocs, 0) (frees, 0)
+#profile: (txs, 343523538) (mallocs, 0) (frees, 0)
+#profile: (txs, 344555804) (mallocs, 0) (frees, 0)
+#profile: (txs, 345569391) (mallocs, 0) (frees, 0)
+#profile: (txs, 346600536) (mallocs, 0) (frees, 0)
+#profile: (txs, 347605876) (mallocs, 0) (frees, 0)
+#profile: (txs, 348638637) (mallocs, 0) (frees, 0)
+#profile: (txs, 349672438) (mallocs, 0) (frees, 0)
+#profile: (txs, 350697184) (mallocs, 0) (frees, 0)
+#profile: (txs, 351723878) (mallocs, 0) (frees, 0)
+#profile: (txs, 352758230) (mallocs, 0) (frees, 0)
+#profile: (txs, 353764441) (mallocs, 0) (frees, 0)
+#profile: (txs, 354775491) (mallocs, 0) (frees, 0)
+#profile: (txs, 355777634) (mallocs, 0) (frees, 0)
+#profile: (txs, 356762093) (mallocs, 0) (frees, 0)
+#profile: (txs, 357735225) (mallocs, 0) (frees, 0)
+#profile: (txs, 358790001) (mallocs, 0) (frees, 0)
+#profile: (txs, 359889610) (mallocs, 0) (frees, 0)
+#profile: (txs, 360968611) (mallocs, 0) (frees, 0)
+#profile: (txs, 362049656) (mallocs, 0) (frees, 0)
+#profile: (txs, 363159810) (mallocs, 0) (frees, 0)
+#profile: (txs, 364251881) (mallocs, 0) (frees, 0)
+#profile: (txs, 365361234) (mallocs, 0) (frees, 0)
+#profile: (txs, 366478069) (mallocs, 0) (frees, 0)
+#profile: (txs, 367569176) (mallocs, 0) (frees, 0)
+#profile: (txs, 368725303) (mallocs, 0) (frees, 0)
+#profile: (txs, 369892599) (mallocs, 0) (frees, 0)
+#profile: (txs, 371053583) (mallocs, 0) (frees, 0)
+#profile: (txs, 372238170) (mallocs, 0) (frees, 0)
+#profile: (txs, 373394947) (mallocs, 0) (frees, 0)
+#profile: (txs, 374562830) (mallocs, 0) (frees, 0)
+#profile: (txs, 375759311) (mallocs, 0) (frees, 0)
+#profile: (txs, 376941730) (mallocs, 0) (frees, 0)
+#profile: (txs, 378112562) (mallocs, 0) (frees, 0)
+#profile: (txs, 379312475) (mallocs, 0) (frees, 0)
+#profile: (txs, 380492702) (mallocs, 0) (frees, 0)
+#profile: (txs, 381660309) (mallocs, 0) (frees, 0)
+#profile: (txs, 382857935) (mallocs, 0) (frees, 0)
+#profile: (txs, 384025821) (mallocs, 0) (frees, 0)
+#profile: (txs, 385195058) (mallocs, 0) (frees, 0)
+#profile: (txs, 386374834) (mallocs, 0) (frees, 0)
+#profile: (txs, 387556493) (mallocs, 0) (frees, 0)
+#profile: (txs, 388731079) (mallocs, 0) (frees, 0)
+#profile: (txs, 389908605) (mallocs, 0) (frees, 0)
+#profile: (txs, 390985157) (mallocs, 0) (frees, 0)
+#profile: (txs, 392052902) (mallocs, 0) (frees, 0)
+#profile: (txs, 393149553) (mallocs, 0) (frees, 0)
+#profile: (txs, 394282865) (mallocs, 0) (frees, 0)
+#profile: (txs, 395355417) (mallocs, 0) (frees, 0)
+#profile: (txs, 396381412) (mallocs, 0) (frees, 0)
+#profile: (txs, 397367977) (mallocs, 0) (frees, 0)
+#profile: (txs, 398365043) (mallocs, 0) (frees, 0)
+#profile: (txs, 399441071) (mallocs, 0) (frees, 0)
+#profile: (txs, 400493968) (mallocs, 0) (frees, 0)
+#profile: (txs, 401549975) (mallocs, 0) (frees, 0)
+#profile: (txs, 402612601) (mallocs, 0) (frees, 0)
+#profile: (txs, 403668065) (mallocs, 0) (frees, 0)
+#profile: (txs, 404628450) (mallocs, 0) (frees, 0)
+#profile: (txs, 405589768) (mallocs, 0) (frees, 0)
+#profile: (txs, 406561638) (mallocs, 0) (frees, 0)
+#profile: (txs, 407539223) (mallocs, 0) (frees, 0)
+#profile: (txs, 408495540) (mallocs, 0) (frees, 0)
+#profile: (txs, 409444065) (mallocs, 0) (frees, 0)
+#profile: (txs, 410393426) (mallocs, 0) (frees, 0)
+#profile: (txs, 411464010) (mallocs, 0) (frees, 0)
+#profile: (txs, 412558667) (mallocs, 0) (frees, 0)
+#profile: (txs, 413665625) (mallocs, 0) (frees, 0)
+#profile: (txs, 414768358) (mallocs, 0) (frees, 0)
+#profile: (txs, 415929070) (mallocs, 0) (frees, 0)
+#profile: (txs, 417125634) (mallocs, 0) (frees, 0)
+#profile: (txs, 418307175) (mallocs, 0) (frees, 0)
+#profile: (txs, 419500522) (mallocs, 0) (frees, 0)
+#profile: (txs, 420694806) (mallocs, 0) (frees, 0)
+#profile: (txs, 421853857) (mallocs, 0) (frees, 0)
+#profile: (txs, 423037443) (mallocs, 0) (frees, 0)
+#profile: (txs, 424227996) (mallocs, 0) (frees, 0)
+#profile: (txs, 425414993) (mallocs, 0) (frees, 0)
+#profile: (txs, 426595735) (mallocs, 0) (frees, 0)
+#profile: (txs, 427766119) (mallocs, 0) (frees, 0)
+#profile: (txs, 428956421) (mallocs, 0) (frees, 0)
+#profile: (txs, 430143541) (mallocs, 0) (frees, 0)
+#profile: (txs, 431326112) (mallocs, 0) (frees, 0)
+#profile: (txs, 432505406) (mallocs, 0) (frees, 0)
+#profile: (txs, 433690223) (mallocs, 0) (frees, 0)
+#profile: (txs, 434861462) (mallocs, 0) (frees, 0)
+#profile: (txs, 436034719) (mallocs, 0) (frees, 0)
+#profile: (txs, 437216257) (mallocs, 0) (frees, 0)
+#profile: (txs, 438408722) (mallocs, 0) (frees, 0)
+#profile: (txs, 439595497) (mallocs, 0) (frees, 0)
+#profile: (txs, 440786987) (mallocs, 0) (frees, 0)
+#profile: (txs, 441979908) (mallocs, 0) (frees, 0)
+#profile: (txs, 443167121) (mallocs, 0) (frees, 0)
+#profile: (txs, 444344120) (mallocs, 0) (frees, 0)
+#profile: (txs, 445522204) (mallocs, 0) (frees, 0)
+#profile: (txs, 446711422) (mallocs, 0) (frees, 0)
+#profile: (txs, 447909656) (mallocs, 0) (frees, 0)
+#profile: (txs, 449098609) (mallocs, 0) (frees, 0)
+#profile: (txs, 450288991) (mallocs, 0) (frees, 0)
+#profile: (txs, 451461923) (mallocs, 0) (frees, 0)
+#profile: (txs, 452648694) (mallocs, 0) (frees, 0)
+#profile: (txs, 453812950) (mallocs, 0) (frees, 0)
+#profile: (txs, 454994974) (mallocs, 0) (frees, 0)
+#profile: (txs, 456159800) (mallocs, 0) (frees, 0)
+#profile: (txs, 457337095) (mallocs, 0) (frees, 0)
+#profile: (txs, 458510433) (mallocs, 0) (frees, 0)
+#profile: (txs, 459683403) (mallocs, 0) (frees, 0)
+#profile: (txs, 460851689) (mallocs, 0) (frees, 0)
+#profile: (txs, 462031431) (mallocs, 0) (frees, 0)
+#profile: (txs, 463198148) (mallocs, 0) (frees, 0)
+#profile: (txs, 464393480) (mallocs, 0) (frees, 0)
+#profile: (txs, 465577882) (mallocs, 0) (frees, 0)
+#profile: (txs, 466781261) (mallocs, 0) (frees, 0)
+#profile: (txs, 467959318) (mallocs, 0) (frees, 0)
+#profile: (txs, 469130150) (mallocs, 0) (frees, 0)
+#profile: (txs, 470296282) (mallocs, 0) (frees, 0)
+#profile: (txs, 471473496) (mallocs, 0) (frees, 0)
+#profile: (txs, 472654574) (mallocs, 0) (frees, 0)
+#profile: (txs, 473836999) (mallocs, 0) (frees, 0)
+#profile: (txs, 475031292) (mallocs, 0) (frees, 0)
+#profile: (txs, 476211775) (mallocs, 0) (frees, 0)
+#profile: (txs, 477403370) (mallocs, 0) (frees, 0)
+#profile: (txs, 478610783) (mallocs, 0) (frees, 0)
+#profile: (txs, 479867766) (mallocs, 0) (frees, 0)
+#profile: (txs, 481088916) (mallocs, 0) (frees, 0)
+#profile: (txs, 482253772) (mallocs, 0) (frees, 0)
+#profile: (txs, 483424609) (mallocs, 0) (frees, 0)
+#profile: (txs, 484598993) (mallocs, 0) (frees, 0)
+#profile: (txs, 485780616) (mallocs, 0) (frees, 0)
+#profile: (txs, 486976022) (mallocs, 0) (frees, 0)
+#profile: (txs, 488160566) (mallocs, 0) (frees, 0)
+#profile: (txs, 489343706) (mallocs, 0) (frees, 0)
+#profile: (txs, 490515794) (mallocs, 0) (frees, 0)
+#profile: (txs, 491650198) (mallocs, 0) (frees, 0)
+#profile: (txs, 492725189) (mallocs, 0) (frees, 0)
+#profile: (txs, 493768566) (mallocs, 0) (frees, 0)
+#profile: (txs, 494846234) (mallocs, 0) (frees, 0)
+#profile: (txs, 495929429) (mallocs, 0) (frees, 0)
+#profile: (txs, 497027320) (mallocs, 0) (frees, 0)
+#profile: (txs, 498207106) (mallocs, 0) (frees, 0)
+#profile: (txs, 499396555) (mallocs, 0) (frees, 0)
+#profile: (txs, 500550227) (mallocs, 0) (frees, 0)
+#profile: (txs, 501655660) (mallocs, 0) (frees, 0)
+#profile: (txs, 502761942) (mallocs, 0) (frees, 0)
+#profile: (txs, 503826220) (mallocs, 0) (frees, 0)
+#profile: (txs, 504918331) (mallocs, 0) (frees, 0)
+#profile: (txs, 505925482) (mallocs, 0) (frees, 0)
+#profile: (txs, 506898084) (mallocs, 0) (frees, 0)
+#profile: (txs, 507846792) (mallocs, 0) (frees, 0)
+#profile: (txs, 508826847) (mallocs, 0) (frees, 0)
+#profile: (txs, 509831392) (mallocs, 0) (frees, 0)
+#profile: (txs, 510824445) (mallocs, 0) (frees, 0)
+#profile: (txs, 511789484) (mallocs, 0) (frees, 0)
+#profile: (txs, 512894149) (mallocs, 0) (frees, 0)
+#profile: (txs, 513967571) (mallocs, 0) (frees, 0)
+#profile: (txs, 515049923) (mallocs, 0) (frees, 0)
+#profile: (txs, 516168812) (mallocs, 0) (frees, 0)
+#profile: (txs, 517267274) (mallocs, 0) (frees, 0)
+#profile: (txs, 518415132) (mallocs, 0) (frees, 0)
+#profile: (txs, 519599193) (mallocs, 0) (frees, 0)
+#profile: (txs, 520767161) (mallocs, 0) (frees, 0)
+#profile: (txs, 521941732) (mallocs, 0) (frees, 0)
+#profile: (txs, 523103689) (mallocs, 0) (frees, 0)
+#profile: (txs, 524273234) (mallocs, 0) (frees, 0)
+#profile: (txs, 525420170) (mallocs, 0) (frees, 0)
+#profile: (txs, 526585834) (mallocs, 0) (frees, 0)
+#profile: (txs, 527742730) (mallocs, 0) (frees, 0)
+#profile: (txs, 528914094) (mallocs, 0) (frees, 0)
+#profile: (txs, 530112821) (mallocs, 0) (frees, 0)
+#profile: (txs, 531296416) (mallocs, 0) (frees, 0)
+#profile: (txs, 532484014) (mallocs, 0) (frees, 0)
+#profile: (txs, 533659538) (mallocs, 0) (frees, 0)
+#profile: (txs, 534830954) (mallocs, 0) (frees, 0)
+#profile: (txs, 536013193) (mallocs, 0) (frees, 0)
+#profile: (txs, 537200228) (mallocs, 0) (frees, 0)
+#profile: (txs, 538376936) (mallocs, 0) (frees, 0)
+#profile: (txs, 539560923) (mallocs, 0) (frees, 0)
+#profile: (txs, 540722904) (mallocs, 0) (frees, 0)
+#profile: (txs, 541856474) (mallocs, 0) (frees, 0)
+#profile: (txs, 542936680) (mallocs, 0) (frees, 0)
+#profile: (txs, 543994341) (mallocs, 0) (frees, 0)
+#profile: (txs, 545084468) (mallocs, 0) (frees, 0)
+#profile: (txs, 546174232) (mallocs, 0) (frees, 0)
+#profile: (txs, 547163288) (mallocs, 0) (frees, 0)
+#profile: (txs, 548138568) (mallocs, 0) (frees, 0)
+#profile: (txs, 549123826) (mallocs, 0) (frees, 0)
+#profile: (txs, 550109468) (mallocs, 0) (frees, 0)
+#profile: (txs, 551083035) (mallocs, 0) (frees, 0)
+#profile: (txs, 552057494) (mallocs, 0) (frees, 0)
+#profile: (txs, 553049118) (mallocs, 0) (frees, 0)
+#profile: (txs, 554029522) (mallocs, 0) (frees, 0)
+#profile: (txs, 555007140) (mallocs, 0) (frees, 0)
+#profile: (txs, 555990459) (mallocs, 0) (frees, 0)
+#profile: (txs, 556983867) (mallocs, 0) (frees, 0)
+#profile: (txs, 557970258) (mallocs, 0) (frees, 0)
+#profile: (txs, 558959359) (mallocs, 0) (frees, 0)
+#profile: (txs, 559938034) (mallocs, 0) (frees, 0)
+#profile: (txs, 560991490) (mallocs, 0) (frees, 0)
+#profile: (txs, 562099578) (mallocs, 0) (frees, 0)
+#profile: (txs, 563199283) (mallocs, 0) (frees, 0)
+#profile: (txs, 564276086) (mallocs, 0) (frees, 0)
+#profile: (txs, 565356781) (mallocs, 0) (frees, 0)
+#profile: (txs, 566463396) (mallocs, 0) (frees, 0)
+#profile: (txs, 567651112) (mallocs, 0) (frees, 0)
+#profile: (txs, 568829988) (mallocs, 0) (frees, 0)
+#profile: (txs, 570008375) (mallocs, 0) (frees, 0)
+#profile: (txs, 571188742) (mallocs, 0) (frees, 0)
+#profile: (txs, 572357997) (mallocs, 0) (frees, 0)
+#profile: (txs, 573537093) (mallocs, 0) (frees, 0)
+#profile: (txs, 574740472) (mallocs, 0) (frees, 0)
+#profile: (txs, 575917119) (mallocs, 0) (frees, 0)
+#profile: (txs, 577094868) (mallocs, 0) (frees, 0)
+#profile: (txs, 578271475) (mallocs, 0) (frees, 0)
+#profile: (txs, 579355021) (mallocs, 0) (frees, 0)
+#profile: (txs, 580355102) (mallocs, 0) (frees, 0)
+#profile: (txs, 581354604) (mallocs, 0) (frees, 0)
+#profile: (txs, 582356381) (mallocs, 0) (frees, 0)
+#profile: (txs, 583372919) (mallocs, 0) (frees, 0)
+#profile: (txs, 584385631) (mallocs, 0) (frees, 0)
+#profile: (txs, 585399285) (mallocs, 0) (frees, 0)
+#profile: (txs, 586417753) (mallocs, 0) (frees, 0)
+#profile: (txs, 587432352) (mallocs, 0) (frees, 0)
+#profile: (txs, 588447471) (mallocs, 0) (frees, 0)
+#profile: (txs, 589475187) (mallocs, 0) (frees, 0)
+#profile: (txs, 590490306) (mallocs, 0) (frees, 0)
+#profile: (txs, 591506163) (mallocs, 0) (frees, 0)
+#profile: (txs, 592523095) (mallocs, 0) (frees, 0)
+#profile: (txs, 593537243) (mallocs, 0) (frees, 0)
+#profile: (txs, 594550056) (mallocs, 0) (frees, 0)
+#profile: (txs, 595564294) (mallocs, 0) (frees, 0)
+#profile: (txs, 596579674) (mallocs, 0) (frees, 0)
+#profile: (txs, 597592779) (mallocs, 0) (frees, 0)
+#profile: (txs, 598612019) (mallocs, 0) (frees, 0)
+#profile: (txs, 599609128) (mallocs, 0) (frees, 0)
+#profile: (txs, 600558682) (mallocs, 0) (frees, 0)
+#profile: (txs, 601506595) (mallocs, 0) (frees, 0)
+#profile: (txs, 602455688) (mallocs, 0) (frees, 0)
+#profile: (txs, 603403750) (mallocs, 0) (frees, 0)
+#profile: (txs, 604350614) (mallocs, 0) (frees, 0)
+#profile: (txs, 605298247) (mallocs, 0) (frees, 0)
+#profile: (txs, 606255574) (mallocs, 0) (frees, 0)
+#profile: (txs, 607301244) (mallocs, 0) (frees, 0)
+#profile: (txs, 608276342) (mallocs, 0) (frees, 0)
+#profile: (txs, 609242423) (mallocs, 0) (frees, 0)
+#profile: (txs, 610204447) (mallocs, 0) (frees, 0)
+#profile: (txs, 611179334) (mallocs, 0) (frees, 0)
+#profile: (txs, 612153228) (mallocs, 0) (frees, 0)
+#profile: (txs, 613210419) (mallocs, 0) (frees, 0)
+#profile: (txs, 614342757) (mallocs, 0) (frees, 0)
+#profile: (txs, 615528082) (mallocs, 0) (frees, 0)
+#profile: (txs, 616698354) (mallocs, 0) (frees, 0)
+#profile: (txs, 617864644) (mallocs, 0) (frees, 0)
+#profile: (txs, 619048687) (mallocs, 0) (frees, 0)
+#profile: (txs, 620176275) (mallocs, 0) (frees, 0)
+#profile: (txs, 621276018) (mallocs, 0) (frees, 0)
+#profile: (txs, 622370465) (mallocs, 0) (frees, 0)
+#profile: (txs, 623476580) (mallocs, 0) (frees, 0)
+#profile: (txs, 624599372) (mallocs, 0) (frees, 0)
+#profile: (txs, 625779984) (mallocs, 0) (frees, 0)
+#profile: (txs, 626965542) (mallocs, 0) (frees, 0)
+#profile: (txs, 628157156) (mallocs, 0) (frees, 0)
+#profile: (txs, 629342647) (mallocs, 0) (frees, 0)
+#profile: (txs, 630516277) (mallocs, 0) (frees, 0)
+#profile: (txs, 631709784) (mallocs, 0) (frees, 0)
+#profile: (txs, 632890616) (mallocs, 0) (frees, 0)
+#profile: (txs, 634078585) (mallocs, 0) (frees, 0)
+#profile: (txs, 635189227) (mallocs, 0) (frees, 0)
+#profile: (txs, 636315358) (mallocs, 0) (frees, 0)
+#profile: (txs, 637481947) (mallocs, 0) (frees, 0)
+#profile: (txs, 638664290) (mallocs, 0) (frees, 0)
+#profile: (txs, 639828833) (mallocs, 0) (frees, 0)
+#profile: (txs, 641013478) (mallocs, 0) (frees, 0)
+#profile: (txs, 642203376) (mallocs, 0) (frees, 0)
+#profile: (txs, 643371556) (mallocs, 0) (frees, 0)
+#profile: (txs, 644544546) (mallocs, 0) (frees, 0)
+#profile: (txs, 645635450) (mallocs, 0) (frees, 0)
+#profile: (txs, 646678328) (mallocs, 0) (frees, 0)
+#profile: (txs, 647785148) (mallocs, 0) (frees, 0)
+#profile: (txs, 648884582) (mallocs, 0) (frees, 0)
+#profile: (txs, 649943030) (mallocs, 0) (frees, 0)
+#profile: (txs, 651019779) (mallocs, 0) (frees, 0)
+#profile: (txs, 652134556) (mallocs, 0) (frees, 0)
+#profile: (txs, 653312659) (mallocs, 0) (frees, 0)
+#profile: (txs, 654495143) (mallocs, 0) (frees, 0)
+#profile: (txs, 655662243) (mallocs, 0) (frees, 0)
+#profile: (txs, 656827253) (mallocs, 0) (frees, 0)
+#profile: (txs, 657993840) (mallocs, 0) (frees, 0)
+#profile: (txs, 658971350) (mallocs, 0) (frees, 0)
+#profile: (txs, 659946820) (mallocs, 0) (frees, 0)
+#profile: (txs, 660922470) (mallocs, 0) (frees, 0)
+#profile: (txs, 661955056) (mallocs, 0) (frees, 0)
+#profile: (txs, 663008559) (mallocs, 0) (frees, 0)
+#profile: (txs, 664057887) (mallocs, 0) (frees, 0)
+#profile: (txs, 665154419) (mallocs, 0) (frees, 0)
+#profile: (txs, 666239678) (mallocs, 0) (frees, 0)
+#profile: (txs, 667282787) (mallocs, 0) (frees, 0)
+#profile: (txs, 668285168) (mallocs, 0) (frees, 0)
+#profile: (txs, 669274166) (mallocs, 0) (frees, 0)
+#profile: (txs, 670259735) (mallocs, 0) (frees, 0)
+#profile: (txs, 671283184) (mallocs, 0) (frees, 0)
+#profile: (txs, 672268395) (mallocs, 0) (frees, 0)
+#profile: (txs, 673249046) (mallocs, 0) (frees, 0)
+#profile: (txs, 674202121) (mallocs, 0) (frees, 0)
+#profile: (txs, 675148920) (mallocs, 0) (frees, 0)
+#profile: (txs, 676107807) (mallocs, 0) (frees, 0)
+#profile: (txs, 677091571) (mallocs, 0) (frees, 0)
+#profile: (txs, 678071116) (mallocs, 0) (frees, 0)
+#profile: (txs, 679056654) (mallocs, 0) (frees, 0)
+#profile: (txs, 680034258) (mallocs, 0) (frees, 0)
+#profile: (txs, 681016305) (mallocs, 0) (frees, 0)
+#profile: (txs, 681996731) (mallocs, 0) (frees, 0)
+#profile: (txs, 682982095) (mallocs, 0) (frees, 0)
+#profile: (txs, 684002360) (mallocs, 0) (frees, 0)
+#profile: (txs, 685157330) (mallocs, 0) (frees, 0)
+#profile: (txs, 686352739) (mallocs, 0) (frees, 0)
+#profile: (txs, 687554715) (mallocs, 0) (frees, 0)
+#profile: (txs, 688728140) (mallocs, 0) (frees, 0)
+#profile: (txs, 689897221) (mallocs, 0) (frees, 0)
+#profile: (txs, 691071938) (mallocs, 0) (frees, 0)
+#profile: (txs, 692257871) (mallocs, 0) (frees, 0)
+#profile: (txs, 693431925) (mallocs, 0) (frees, 0)
+#profile: (txs, 694623043) (mallocs, 0) (frees, 0)
+#profile: (txs, 695792879) (mallocs, 0) (frees, 0)
+#profile: (txs, 696976924) (mallocs, 0) (frees, 0)
+#profile: (txs, 698162897) (mallocs, 0) (frees, 0)
+#profile: (txs, 699335812) (mallocs, 0) (frees, 0)
+#profile: (txs, 700531601) (mallocs, 0) (frees, 0)
+#profile: (txs, 701710240) (mallocs, 0) (frees, 0)
+#profile: (txs, 702889904) (mallocs, 0) (frees, 0)
+#profile: (txs, 704082102) (mallocs, 0) (frees, 0)
+#profile: (txs, 705256237) (mallocs, 0) (frees, 0)
+#profile: (txs, 706353182) (mallocs, 0) (frees, 0)
+#profile: (txs, 707448068) (mallocs, 0) (frees, 0)
+#profile: (txs, 708539099) (mallocs, 0) (frees, 0)
+#profile: (txs, 709607547) (mallocs, 0) (frees, 0)
+#profile: (txs, 710677078) (mallocs, 0) (frees, 0)
+#profile: (txs, 711763096) (mallocs, 0) (frees, 0)
+#profile: (txs, 712835719) (mallocs, 0) (frees, 0)
+#profile: (txs, 713907011) (mallocs, 0) (frees, 0)
+#profile: (txs, 714973699) (mallocs, 0) (frees, 0)
+#profile: (txs, 716039609) (mallocs, 0) (frees, 0)
+#profile: (txs, 717124737) (mallocs, 0) (frees, 0)
+#profile: (txs, 718190920) (mallocs, 0) (frees, 0)
+#profile: (txs, 719273340) (mallocs, 0) (frees, 0)
+#profile: (txs, 720349555) (mallocs, 0) (frees, 0)
+#profile: (txs, 721416305) (mallocs, 0) (frees, 0)
+#profile: (txs, 722493053) (mallocs, 0) (frees, 0)
+#profile: (txs, 723628154) (mallocs, 0) (frees, 0)
+#profile: (txs, 724712688) (mallocs, 0) (frees, 0)
+#profile: (txs, 725764585) (mallocs, 0) (frees, 0)
+#profile: (txs, 726919079) (mallocs, 0) (frees, 0)
+#profile: (txs, 728086745) (mallocs, 0) (frees, 0)
+#profile: (txs, 729263441) (mallocs, 0) (frees, 0)
+#profile: (txs, 730443624) (mallocs, 0) (frees, 0)
+#profile: (txs, 731613200) (mallocs, 0) (frees, 0)
+#profile: (txs, 732799002) (mallocs, 0) (frees, 0)
+#profile: (txs, 733966251) (mallocs, 0) (frees, 0)
+#profile: (txs, 735144067) (mallocs, 0) (frees, 0)
+#profile: (txs, 736330770) (mallocs, 0) (frees, 0)
+#profile: (txs, 737502450) (mallocs, 0) (frees, 0)
+#profile: (txs, 738682805) (mallocs, 0) (frees, 0)
+#profile: (txs, 739834229) (mallocs, 0) (frees, 0)
+#profile: (txs, 740901839) (mallocs, 0) (frees, 0)
+#profile: (txs, 741944048) (mallocs, 0) (frees, 0)
+#profile: (txs, 742891915) (mallocs, 0) (frees, 0)
+#profile: (txs, 743839826) (mallocs, 0) (frees, 0)
+#profile: (txs, 744789140) (mallocs, 0) (frees, 0)
+#profile: (txs, 745799028) (mallocs, 0) (frees, 0)
+#profile: (txs, 746845152) (mallocs, 0) (frees, 0)
+#profile: (txs, 747948697) (mallocs, 0) (frees, 0)
+#profile: (txs, 749056940) (mallocs, 0) (frees, 0)
+#profile: (txs, 750150253) (mallocs, 0) (frees, 0)
+#profile: (txs, 751248116) (mallocs, 0) (frees, 0)
+#profile: (txs, 752346916) (mallocs, 0) (frees, 0)
+#profile: (txs, 753452430) (mallocs, 0) (frees, 0)
+#profile: (txs, 754497770) (mallocs, 0) (frees, 0)
+#profile: (txs, 755572595) (mallocs, 0) (frees, 0)
+#profile: (txs, 756657972) (mallocs, 0) (frees, 0)
+#profile: (txs, 757793763) (mallocs, 0) (frees, 0)
+#profile: (txs, 758871051) (mallocs, 0) (frees, 0)
+#profile: (txs, 759956938) (mallocs, 0) (frees, 0)
+#profile: (txs, 761051976) (mallocs, 0) (frees, 0)
+#profile: (txs, 762177169) (mallocs, 0) (frees, 0)
+#profile: (txs, 763308795) (mallocs, 0) (frees, 0)
+#profile: (txs, 764468364) (mallocs, 0) (frees, 0)
+#profile: (txs, 765606344) (mallocs, 0) (frees, 0)
+#profile: (txs, 766796973) (mallocs, 0) (frees, 0)
+#profile: (txs, 768050478) (mallocs, 0) (frees, 0)
+#profile: (txs, 769311985) (mallocs, 0) (frees, 0)
+#profile: (txs, 770570055) (mallocs, 0) (frees, 0)
+#profile: (txs, 771825760) (mallocs, 0) (frees, 0)
+#profile: (txs, 773081290) (mallocs, 0) (frees, 0)
+#profile: (txs, 774303876) (mallocs, 0) (frees, 0)
+#profile: (txs, 775479583) (mallocs, 0) (frees, 0)
+#profile: (txs, 776651802) (mallocs, 0) (frees, 0)
+#profile: (txs, 777827898) (mallocs, 0) (frees, 0)
+#profile: (txs, 779022730) (mallocs, 0) (frees, 0)
+#profile: (txs, 780181729) (mallocs, 0) (frees, 0)
+#profile: (txs, 781361630) (mallocs, 0) (frees, 0)
+#profile: (txs, 782483154) (mallocs, 0) (frees, 0)
+#profile: (txs, 783576277) (mallocs, 0) (frees, 0)
+#profile: (txs, 784682621) (mallocs, 0) (frees, 0)
+#profile: (txs, 785782720) (mallocs, 0) (frees, 0)
+#profile: (txs, 786886532) (mallocs, 0) (frees, 0)
+#profile: (txs, 787982639) (mallocs, 0) (frees, 0)
+#profile: (txs, 789079166) (mallocs, 0) (frees, 0)
+#profile: (txs, 790169385) (mallocs, 0) (frees, 0)
+#profile: (txs, 791278146) (mallocs, 0) (frees, 0)
+#profile: (txs, 792383963) (mallocs, 0) (frees, 0)
+#profile: (txs, 793508878) (mallocs, 0) (frees, 0)
+#profile: (txs, 794599508) (mallocs, 0) (frees, 0)
+#profile: (txs, 795681031) (mallocs, 0) (frees, 0)
+#profile: (txs, 796724760) (mallocs, 0) (frees, 0)
+#profile: (txs, 797723387) (mallocs, 0) (frees, 0)
+#profile: (txs, 798713323) (mallocs, 0) (frees, 0)
+#profile: (txs, 799717701) (mallocs, 0) (frees, 0)
+#profile: (txs, 800728068) (mallocs, 0) (frees, 0)
+#profile: (txs, 801721025) (mallocs, 0) (frees, 0)
+#profile: (txs, 802722113) (mallocs, 0) (frees, 0)
+#profile: (txs, 803736874) (mallocs, 0) (frees, 0)
+#profile: (txs, 804756032) (mallocs, 0) (frees, 0)
+#profile: (txs, 805775141) (mallocs, 0) (frees, 0)
+#profile: (txs, 806796549) (mallocs, 0) (frees, 0)
+#profile: (txs, 807823155) (mallocs, 0) (frees, 0)
+#profile: (txs, 808868981) (mallocs, 0) (frees, 0)
+#profile: (txs, 809869174) (mallocs, 0) (frees, 0)
+#profile: (txs, 810867006) (mallocs, 0) (frees, 0)
+#profile: (txs, 811882334) (mallocs, 0) (frees, 0)
+#profile: (txs, 812899183) (mallocs, 0) (frees, 0)
+#profile: (txs, 814068697) (mallocs, 0) (frees, 0)
+#profile: (txs, 815262074) (mallocs, 0) (frees, 0)
+#profile: (txs, 816441951) (mallocs, 0) (frees, 0)
+#profile: (txs, 817597905) (mallocs, 0) (frees, 0)
+#profile: (txs, 818769351) (mallocs, 0) (frees, 0)
+#profile: (txs, 819945395) (mallocs, 0) (frees, 0)
+#profile: (txs, 821106998) (mallocs, 0) (frees, 0)
+#profile: (txs, 822285731) (mallocs, 0) (frees, 0)
+#profile: (txs, 823455369) (mallocs, 0) (frees, 0)
+#profile: (txs, 824625509) (mallocs, 0) (frees, 0)
+#profile: (txs, 825737542) (mallocs, 0) (frees, 0)
+#profile: (txs, 826909237) (mallocs, 0) (frees, 0)
+#profile: (txs, 828100144) (mallocs, 0) (frees, 0)
+#profile: (txs, 829268971) (mallocs, 0) (frees, 0)
+#profile: (txs, 830354936) (mallocs, 0) (frees, 0)
+#profile: (txs, 831446279) (mallocs, 0) (frees, 0)
+#profile: (txs, 832478541) (mallocs, 0) (frees, 0)
+#profile: (txs, 833514435) (mallocs, 0) (frees, 0)
+#profile: (txs, 834562232) (mallocs, 0) (frees, 0)
+#profile: (txs, 835618344) (mallocs, 0) (frees, 0)
+#profile: (txs, 836579551) (mallocs, 0) (frees, 0)
+#profile: (txs, 837535224) (mallocs, 0) (frees, 0)
+#profile: (txs, 838499112) (mallocs, 0) (frees, 0)
+#profile: (txs, 839454203) (mallocs, 0) (frees, 0)
+#profile: (txs, 840423934) (mallocs, 0) (frees, 0)
+#profile: (txs, 841410675) (mallocs, 0) (frees, 0)
+#profile: (txs, 842365724) (mallocs, 0) (frees, 0)
+#profile: (txs, 843326420) (mallocs, 0) (frees, 0)
+#profile: (txs, 844282917) (mallocs, 0) (frees, 0)
+#profile: (txs, 845243779) (mallocs, 0) (frees, 0)
+#profile: (txs, 846213980) (mallocs, 0) (frees, 0)
+#profile: (txs, 847175225) (mallocs, 0) (frees, 0)
+#profile: (txs, 848188686) (mallocs, 0) (frees, 0)
+#profile: (txs, 849212414) (mallocs, 0) (frees, 0)
+#profile: (txs, 850322861) (mallocs, 0) (frees, 0)
+#profile: (txs, 851429917) (mallocs, 0) (frees, 0)
+#profile: (txs, 852535492) (mallocs, 0) (frees, 0)
+#profile: (txs, 853528137) (mallocs, 0) (frees, 0)
+#profile: (txs, 854526585) (mallocs, 0) (frees, 0)
+#profile: (txs, 855560035) (mallocs, 0) (frees, 0)
+#profile: (txs, 856578032) (mallocs, 0) (frees, 0)
+#profile: (txs, 857617520) (mallocs, 0) (frees, 0)
+#profile: (txs, 858643446) (mallocs, 0) (frees, 0)
+#profile: (txs, 859664556) (mallocs, 0) (frees, 0)
+#profile: (txs, 860694938) (mallocs, 0) (frees, 0)
+#profile: (txs, 861828345) (mallocs, 0) (frees, 0)
+#profile: (txs, 862953623) (mallocs, 0) (frees, 0)
+#profile: (txs, 864028380) (mallocs, 0) (frees, 0)
+#profile: (txs, 865123819) (mallocs, 0) (frees, 0)
+#profile: (txs, 866213471) (mallocs, 0) (frees, 0)
+#profile: (txs, 867303942) (mallocs, 0) (frees, 0)
+#profile: (txs, 868401114) (mallocs, 0) (frees, 0)
+#profile: (txs, 869483929) (mallocs, 0) (frees, 0)
+#profile: (txs, 870580442) (mallocs, 0) (frees, 0)
+#profile: (txs, 871677260) (mallocs, 0) (frees, 0)
+#profile: (txs, 872812466) (mallocs, 0) (frees, 0)
+#profile: (txs, 874065037) (mallocs, 0) (frees, 0)
+#profile: (txs, 875316849) (mallocs, 0) (frees, 0)
+#profile: (txs, 876574363) (mallocs, 0) (frees, 0)
+#profile: (txs, 877828435) (mallocs, 0) (frees, 0)
+#profile: (txs, 879088586) (mallocs, 0) (frees, 0)
+#profile: (txs, 880301953) (mallocs, 0) (frees, 0)
+#profile: (txs, 881478141) (mallocs, 0) (frees, 0)
+#profile: (txs, 882676585) (mallocs, 0) (frees, 0)
+#profile: (txs, 883856401) (mallocs, 0) (frees, 0)
+#profile: (txs, 885041066) (mallocs, 0) (frees, 0)
+#profile: (txs, 886242315) (mallocs, 0) (frees, 0)
+#profile: (txs, 887437356) (mallocs, 0) (frees, 0)
+#profile: (txs, 888626240) (mallocs, 0) (frees, 0)
+#profile: (txs, 889819478) (mallocs, 0) (frees, 0)
+#profile: (txs, 890987552) (mallocs, 0) (frees, 0)
+#profile: (txs, 892127547) (mallocs, 0) (frees, 0)
+#profile: (txs, 893091032) (mallocs, 0) (frees, 0)
+#profile: (txs, 894054009) (mallocs, 0) (frees, 0)
+#profile: (txs, 895025347) (mallocs, 0) (frees, 0)
+#profile: (txs, 896011933) (mallocs, 0) (frees, 0)
+#profile: (txs, 896993211) (mallocs, 0) (frees, 0)
+#profile: (txs, 897985053) (mallocs, 0) (frees, 0)
+#profile: (txs, 898969941) (mallocs, 0) (frees, 0)
+#profile: (txs, 899956508) (mallocs, 0) (frees, 0)
+#profile: (txs, 900946711) (mallocs, 0) (frees, 0)
+#profile: (txs, 901903484) (mallocs, 0) (frees, 0)
+#profile: (txs, 902856728) (mallocs, 0) (frees, 0)
+#profile: (txs, 903817903) (mallocs, 0) (frees, 0)
+#profile: (txs, 904772715) (mallocs, 0) (frees, 0)
+#profile: (txs, 905726854) (mallocs, 0) (frees, 0)
+#profile: (txs, 906684088) (mallocs, 0) (frees, 0)
+#profile: (txs, 907645670) (mallocs, 0) (frees, 0)
+#profile: (txs, 908598717) (mallocs, 0) (frees, 0)
+#profile: (txs, 909554151) (mallocs, 0) (frees, 0)
+#profile: (txs, 910513801) (mallocs, 0) (frees, 0)
+#profile: (txs, 911471239) (mallocs, 0) (frees, 0)
+#profile: (txs, 912425308) (mallocs, 0) (frees, 0)
+#profile: (txs, 913380970) (mallocs, 0) (frees, 0)
+#profile: (txs, 914343843) (mallocs, 0) (frees, 0)
+#profile: (txs, 915341113) (mallocs, 0) (frees, 0)
+#profile: (txs, 916367439) (mallocs, 0) (frees, 0)
+#profile: (txs, 917403986) (mallocs, 0) (frees, 0)
+#profile: (txs, 918381082) (mallocs, 0) (frees, 0)
+#profile: (txs, 919334938) (mallocs, 0) (frees, 0)
+#profile: (txs, 920411777) (mallocs, 0) (frees, 0)
+#profile: (txs, 921602157) (mallocs, 0) (frees, 0)
+#profile: (txs, 922777415) (mallocs, 0) (frees, 0)
+#profile: (txs, 923953574) (mallocs, 0) (frees, 0)
+#profile: (txs, 925149968) (mallocs, 0) (frees, 0)
+#profile: (txs, 926326253) (mallocs, 0) (frees, 0)
+#profile: (txs, 927520949) (mallocs, 0) (frees, 0)
+#profile: (txs, 928707692) (mallocs, 0) (frees, 0)
+#profile: (txs, 929901577) (mallocs, 0) (frees, 0)
+#profile: (txs, 931072685) (mallocs, 0) (frees, 0)
+#profile: (txs, 932246722) (mallocs, 0) (frees, 0)
+#profile: (txs, 933436806) (mallocs, 0) (frees, 0)
+#profile: (txs, 934615658) (mallocs, 0) (frees, 0)
+#profile: (txs, 935797408) (mallocs, 0) (frees, 0)
+#profile: (txs, 936978391) (mallocs, 0) (frees, 0)
+#profile: (txs, 938194120) (mallocs, 0) (frees, 0)
+#profile: (txs, 939366174) (mallocs, 0) (frees, 0)
+#profile: (txs, 940547640) (mallocs, 0) (frees, 0)
+#profile: (txs, 941685428) (mallocs, 0) (frees, 0)
+#profile: (txs, 942711701) (mallocs, 0) (frees, 0)
+#profile: (txs, 943740477) (mallocs, 0) (frees, 0)
+#profile: (txs, 944774882) (mallocs, 0) (frees, 0)
+#profile: (txs, 945921679) (mallocs, 0) (frees, 0)
+#profile: (txs, 947085133) (mallocs, 0) (frees, 0)
+#profile: (txs, 948255519) (mallocs, 0) (frees, 0)
+#profile: (txs, 949413996) (mallocs, 0) (frees, 0)
+#profile: (txs, 950579592) (mallocs, 0) (frees, 0)
+#profile: (txs, 951757958) (mallocs, 0) (frees, 0)
+#profile: (txs, 952933660) (mallocs, 0) (frees, 0)
+#profile: (txs, 954096490) (mallocs, 0) (frees, 0)
+#profile: (txs, 955256119) (mallocs, 0) (frees, 0)
+#profile: (txs, 956453188) (mallocs, 0) (frees, 0)
+#profile: (txs, 957651980) (mallocs, 0) (frees, 0)
+#profile: (txs, 958842669) (mallocs, 0) (frees, 0)
+#profile: (txs, 960041235) (mallocs, 0) (frees, 0)
+#profile: (txs, 961213423) (mallocs, 0) (frees, 0)
+#profile: (txs, 962377348) (mallocs, 0) (frees, 0)
+#profile: (txs, 963540784) (mallocs, 0) (frees, 0)
+#profile: (txs, 964716298) (mallocs, 0) (frees, 0)
+#profile: (txs, 965882277) (mallocs, 0) (frees, 0)
+#profile: (txs, 967080277) (mallocs, 0) (frees, 0)
+#profile: (txs, 968228676) (mallocs, 0) (frees, 0)
+#profile: (txs, 969397118) (mallocs, 0) (frees, 0)
+#profile: (txs, 970556054) (mallocs, 0) (frees, 0)
+#profile: (txs, 971709825) (mallocs, 0) (frees, 0)
+#profile: (txs, 972843518) (mallocs, 0) (frees, 0)
+#profile: (txs, 973852709) (mallocs, 0) (frees, 0)
+#profile: (txs, 974841891) (mallocs, 0) (frees, 0)
+#profile: (txs, 975868199) (mallocs, 0) (frees, 0)
+#profile: (txs, 976867492) (mallocs, 0) (frees, 0)
+#profile: (txs, 977867870) (mallocs, 0) (frees, 0)
+#profile: (txs, 978879326) (mallocs, 0) (frees, 0)
+#profile: (txs, 979888242) (mallocs, 0) (frees, 0)
+#profile: (txs, 980899347) (mallocs, 0) (frees, 0)
+#profile: (txs, 981918945) (mallocs, 0) (frees, 0)
+#profile: (txs, 982949945) (mallocs, 0) (frees, 0)
+#profile: (txs, 983945678) (mallocs, 0) (frees, 0)
+#profile: (txs, 984976036) (mallocs, 0) (frees, 0)
+#profile: (txs, 985986590) (mallocs, 0) (frees, 0)
+#profile: (txs, 986989975) (mallocs, 0) (frees, 0)
+#profile: (txs, 987995210) (mallocs, 0) (frees, 0)
+#profile: (txs, 989005833) (mallocs, 0) (frees, 0)
+#profile: (txs, 990009535) (mallocs, 0) (frees, 0)
+#profile: (txs, 991011977) (mallocs, 0) (frees, 0)
+#profile: (txs, 992049047) (mallocs, 0) (frees, 0)
+#profile: (txs, 993271114) (mallocs, 0) (frees, 0)
+#profile: (txs, 994480569) (mallocs, 0) (frees, 0)
+#profile: (txs, 995604886) (mallocs, 0) (frees, 0)
+#profile: (txs, 996704436) (mallocs, 0) (frees, 0)
+#profile: (txs, 997804119) (mallocs, 0) (frees, 0)
+#profile: (txs, 998900657) (mallocs, 0) (frees, 0)
+#profile: (txs, 1000008609) (mallocs, 0) (frees, 0)
+#profile: (txs, 1001124047) (mallocs, 0) (frees, 0)
+#profile: (txs, 1002129271) (mallocs, 0) (frees, 0)
+#profile: (txs, 1003119721) (mallocs, 0) (frees, 0)
+#profile: (txs, 1004103868) (mallocs, 0) (frees, 0)
+#profile: (txs, 1005089442) (mallocs, 0) (frees, 0)
+#profile: (txs, 1006077214) (mallocs, 0) (frees, 0)
+#profile: (txs, 1007085356) (mallocs, 0) (frees, 0)
+#profile: (txs, 1008162002) (mallocs, 0) (frees, 0)
+#profile: (txs, 1009171847) (mallocs, 0) (frees, 0)
+#profile: (txs, 1010164372) (mallocs, 0) (frees, 0)
+#profile: (txs, 1011155398) (mallocs, 0) (frees, 0)
+#profile: (txs, 1012160543) (mallocs, 0) (frees, 0)
+#profile: (txs, 1013167001) (mallocs, 0) (frees, 0)
+#profile: (txs, 1014172592) (mallocs, 0) (frees, 0)
+#profile: (txs, 1015179850) (mallocs, 0) (frees, 0)
+#profile: (txs, 1016186755) (mallocs, 0) (frees, 0)
+#profile: (txs, 1017193064) (mallocs, 0) (frees, 0)
+#profile: (txs, 1018199481) (mallocs, 0) (frees, 0)
+#profile: (txs, 1019206004) (mallocs, 0) (frees, 0)
+#profile: (txs, 1020212427) (mallocs, 0) (frees, 0)
+#profile: (txs, 1021218548) (mallocs, 0) (frees, 0)
+#profile: (txs, 1022225543) (mallocs, 0) (frees, 0)
+#profile: (txs, 1023233038) (mallocs, 0) (frees, 0)
+#profile: (txs, 1024239658) (mallocs, 0) (frees, 0)
+#profile: (txs, 1025245111) (mallocs, 0) (frees, 0)
+#profile: (txs, 1026251522) (mallocs, 0) (frees, 0)
+#profile: (txs, 1027257936) (mallocs, 0) (frees, 0)
+#profile: (txs, 1028264598) (mallocs, 0) (frees, 0)
+#profile: (txs, 1029271427) (mallocs, 0) (frees, 0)
+#profile: (txs, 1030278615) (mallocs, 0) (frees, 0)
+#profile: (txs, 1031284679) (mallocs, 0) (frees, 0)
+#profile: (txs, 1032291173) (mallocs, 0) (frees, 0)
+#profile: (txs, 1033298635) (mallocs, 0) (frees, 0)
+#profile: (txs, 1034306423) (mallocs, 0) (frees, 0)
+#profile: (txs, 1035312111) (mallocs, 0) (frees, 0)
+#profile: (txs, 1036316896) (mallocs, 0) (frees, 0)
+#profile: (txs, 1037362028) (mallocs, 0) (frees, 0)
+#profile: (txs, 1038409950) (mallocs, 0) (frees, 0)
+STOPPING...
+Thread 0
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 58497886
+    #found    : 29256396
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 1
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 56439978
+    #found    : 28219513
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 2
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 55028830
+    #found    : 27512677
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 3
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 53924908
+    #found    : 26965153
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 4
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 53311416
+    #found    : 26659197
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 5
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 51321788
+    #found    : 25659512
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 6
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 51358721
+    #found    : 25674468
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 7
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 51994854
+    #found    : 25999545
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 8
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 49979623
+    #found    : 24994139
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 9
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 49661751
+    #found    : 24834823
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 10
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 50773879
+    #found    : 25384567
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 11
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 50307915
+    #found    : 25152453
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 12
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 51438030
+    #found    : 25726942
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 13
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 49511361
+    #found    : 24754925
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 14
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 49058499
+    #found    : 24527767
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 15
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 51218618
+    #found    : 25605890
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 16
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 49794048
+    #found    : 24898549
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 17
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 49141094
+    #found    : 24574307
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 18
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 52738050
+    #found    : 26368836
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Thread 19
+  #add        : 0
+    #added    : 0
+  #remove     : 0
+    #removed  : 0
+  #contains   : 52919973
+    #found    : 26456257
+#thread-mallocs: 0
+#thread-frees: 0
+#thread-memory pressure: 0
+
+Set size      : 250 (expected: 250)
+Duration      : 10107 (ms)
+#mallocs: 0
+#frees: 0
+#memory pressure: 0
+#txs          : 1038421222 (102742774.512714 / s)
+#read txs     : 1038421222 (102742774.512714 / s)
+  #cont/snpsht: 1038421222 (102742774.512714 / s)
+#eff. upd rate: 0.000000 
+#update txs   : 0 (0.000000 / s)
+  #upd trials : 0 (0.000000 / s)
